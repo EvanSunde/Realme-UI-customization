@@ -1,0 +1,317 @@
+{
+  "sora": [
+    {
+      "file": "sora-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "inter": [
+    {
+      "file": "inter-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "nunito": [
+    {
+      "file": "nunito-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "spacegrotesk": [
+    {
+      "file": "spacegrotesk-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "outfit": [
+    {
+      "file": "outfit-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "lexend": [
+    {
+      "file": "lexend-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "manrope": [
+    {
+      "file": "manrope-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "poppins": [
+    {
+      "file": "poppins-100.ttf",
+      "weight": 100,
+      "variable": false
+    },
+    {
+      "file": "poppins-200.ttf",
+      "weight": 200,
+      "variable": false
+    },
+    {
+      "file": "poppins-300.ttf",
+      "weight": 300,
+      "variable": false
+    },
+    {
+      "file": "poppins-400.ttf",
+      "weight": 400,
+      "variable": false
+    },
+    {
+      "file": "poppins-500.ttf",
+      "weight": 500,
+      "variable": false
+    },
+    {
+      "file": "poppins-600.ttf",
+      "weight": 600,
+      "variable": false
+    },
+    {
+      "file": "poppins-700.ttf",
+      "weight": 700,
+      "variable": false
+    },
+    {
+      "file": "poppins-800.ttf",
+      "weight": 800,
+      "variable": false
+    },
+    {
+      "file": "poppins-900.ttf",
+      "weight": 900,
+      "variable": false
+    }
+  ],
+  "bebas": [
+    {
+      "file": "bebas-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "bungee": [
+    {
+      "file": "bungee-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "righteous": [
+    {
+      "file": "righteous-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "syne": [
+    {
+      "file": "syne-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "archivoblack": [
+    {
+      "file": "archivoblack-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "unbounded": [
+    {
+      "file": "unbounded-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "anton": [
+    {
+      "file": "anton-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "bigshoulders": [
+    {
+      "file": "bigshoulders-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "cormorant": [
+    {
+      "file": "cormorant-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "jetbrains": [
+    {
+      "file": "jetbrains-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "fraunces": [
+    {
+      "file": "fraunces-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "dmserif": [
+    {
+      "file": "dmserif-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "spacemono": [
+    {
+      "file": "spacemono-400.ttf",
+      "weight": 400,
+      "variable": false
+    },
+    {
+      "file": "spacemono-700.ttf",
+      "weight": 700,
+      "variable": false
+    }
+  ],
+  "playfair": [
+    {
+      "file": "playfair-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "abril": [
+    {
+      "file": "abril-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "major": [
+    {
+      "file": "major-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "orbitron": [
+    {
+      "file": "orbitron-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ],
+  "barlow": [
+    {
+      "file": "barlow-100.ttf",
+      "weight": 100,
+      "variable": false
+    },
+    {
+      "file": "barlow-200.ttf",
+      "weight": 200,
+      "variable": false
+    },
+    {
+      "file": "barlow-300.ttf",
+      "weight": 300,
+      "variable": false
+    },
+    {
+      "file": "barlow-400.ttf",
+      "weight": 400,
+      "variable": false
+    },
+    {
+      "file": "barlow-500.ttf",
+      "weight": 500,
+      "variable": false
+    },
+    {
+      "file": "barlow-600.ttf",
+      "weight": 600,
+      "variable": false
+    },
+    {
+      "file": "barlow-700.ttf",
+      "weight": 700,
+      "variable": false
+    },
+    {
+      "file": "barlow-800.ttf",
+      "weight": 800,
+      "variable": false
+    },
+    {
+      "file": "barlow-900.ttf",
+      "weight": 900,
+      "variable": false
+    }
+  ],
+  "chakra": [
+    {
+      "file": "chakra-300.ttf",
+      "weight": 300,
+      "variable": false
+    },
+    {
+      "file": "chakra-400.ttf",
+      "weight": 400,
+      "variable": false
+    },
+    {
+      "file": "chakra-500.ttf",
+      "weight": 500,
+      "variable": false
+    },
+    {
+      "file": "chakra-600.ttf",
+      "weight": 600,
+      "variable": false
+    },
+    {
+      "file": "chakra-700.ttf",
+      "weight": 700,
+      "variable": false
+    }
+  ],
+  "rubikmono": [
+    {
+      "file": "rubikmono-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "audiowide": [
+    {
+      "file": "audiowide-400.ttf",
+      "weight": 400,
+      "variable": false
+    }
+  ],
+  "robotoslab": [
+    {
+      "file": "robotoslab-var.ttf",
+      "weight": 400,
+      "variable": true
+    }
+  ]
+}

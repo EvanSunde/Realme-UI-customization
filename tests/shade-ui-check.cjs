@@ -1,0 +1,35 @@
+const fs=require('fs'),http=require('http'),path=require('path'),assert=require('assert');
+const {chromium}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES+'/playwright');
+const ROOT=path.resolve(__dirname,'..'),ASSETS=path.join(ROOT,'assets');
+(async()=>{
+ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost'),file=url.pathname.startsWith('/fonts/')?path.join(ASSETS,url.pathname):path.join(ASSETS,'studio.html');res.setHeader('Content-Type',file.endsWith('.ttf')?'font/ttf':file.endsWith('.json')?'application/json':'text/html');res.end(fs.readFileSync(file));});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const browser=await chromium.launch({executablePath:process.env.STUDIO_CHROME,headless:true,args:['--no-sandbox']});
+ for(const [width,height,font]of [[320,568,1],[393,852,1],[360,640,2],[800,360,1],[1024,768,1.3]]){
+  const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.addInitScript(()=>{window.actions=[];window.StudioNative={action:(a,raw)=>actions.push({action:a,payload:JSON.parse(raw)})};});
+  await page.goto('http://127.0.0.1:'+server.address().port);await page.evaluate(font=>{receive('uiMetrics',{fontScale:font});receive('state',{design:{height:2400,v2:JSON.stringify(DEFAULTS)},shadeChoices:SHADE_DEFAULTS,shadeDirty:false,shadePresets:[],presets:[],connected:true,busy:false,revision:0});},font);
+  await page.locator('#tabs [data-tab="shade"]').click();
+  assert(await page.locator('#apply').isHidden(),'Clock action must be hidden in Shade');assert(await page.locator('#shadeApply').isVisible(),'Shade action must be accessible '+JSON.stringify({errors,ui:await page.evaluate(()=>({tab:UI.tab,footer:document.querySelector("#shadeFooter").outerHTML,classes:document.querySelector("#app").className}))}));
+  await page.evaluate(()=>{receive('shade',{colors:{notification_scrim_bg_mask_color:'#FF80CBC4',notification_material_background_color:'#40B9F6CA',notification_material_background_color_compass:'#40FAFAFA',notification_material_blur_bg:'#4000E676'},blur:'3',backup:true,note:'Phone readback ready',report:'Four native resources'});});
+  const set=async(key,value)=>{await page.locator('[data-shade="'+key+'"]').evaluate((el,v)=>{el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));},String(value));};
+  await set('panelAlpha',0);await set('cardOpacity',73);
+  await page.locator('[data-shade="changeBlur"]').check();await page.locator('[data-shade="blurMode"]').selectOption('0');
+  await page.locator('#shadeApply').click();let action=await page.evaluate(()=>actions.filter(a=>a.action==='shadeApply').at(-1));assert(action,'Apply must use native shade route');assert.equal(action.payload.panelAlpha,0);assert.equal(action.payload.cardOpacity,73);assert.equal(action.payload.blurMode,0);assert.equal(action.payload.changeBlur,true);assert(!(await page.evaluate(()=>actions.some(a=>a.action==='apply'))),'Shade must never trigger clock artwork regeneration');
+  await page.evaluate(()=>receive('status',{connected:true,busy:true,text:'Applying shade'}));assert(await page.locator('#shadeApply').isDisabled(),'Block repeat shade apply during native transaction');assert(await page.locator('[data-shade="panelAlpha"]').isDisabled(),'Block mid-transaction edits');
+  await page.evaluate(()=>{receive('shade',{colors:{notification_scrim_bg_mask_color:'#0080CBC4',notification_material_background_color:'#40B9F6CA',notification_material_background_color_compass:'#BAFAFAFA',notification_material_blur_bg:'#4000E676'},blur:'0',backup:true,note:'Applied shade choices',report:'Verified resource files'});receive('status',{connected:true,busy:false,text:'Applied shade choices'});});
+  assert.equal(await page.locator('[data-shade="panelAlpha"]').inputValue(),'0');assert.equal(await page.locator('[data-shade="cardOpacity"]').inputValue(),'73');
+  await page.locator('[data-shade-preset="clear"]').click();assert.equal(await page.locator('[data-shade="cardOpacity"]').inputValue(),'0');
+  await page.locator('[data-shade-preset="system"]').click();assert(!(await page.locator('[data-shade="panelEnabled"]').isChecked()));assert(!(await page.locator('[data-shade="cardsEnabled"]').isChecked()));
+  await page.locator('#shadePresetName').fill('My glass');await page.locator('[data-act="shadeSavePreset"]').click();assert((await page.evaluate(()=>actions.filter(a=>a.action==='shadeSavePreset').at(-1))).payload.name==='My glass');
+  await page.evaluate(()=>receive('shadePresets',{presets:[{id:'test-id',name:'My glass',settings:{...SHADE_DEFAULTS,panelAlpha:50,cardOpacity:10}}]}));await page.locator('[data-shade-load="test-id"]').click();assert.equal(await page.locator('[data-shade="panelAlpha"]').inputValue(),'50');
+  await page.locator('[data-disclosure="shadeAdvanced"] > summary').click();assert(await page.locator('[data-shade="testDarkMode"]').isVisible());
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),width+' document overflow');assert(await page.locator('#panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1),width+' shade overflow');
+  for(const b of await page.locator('#tabs button').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return{x:r.x,w:r.width,h:r.height}})))assert(b.w>=48&&b.h>=48&&b.x>=0&&b.x+b.w<=width+1,'Navigation target too small or clipped');
+  await page.locator('[data-act="shadeRestore"]').click();assert(await page.evaluate(()=>actions.some(a=>a.action==='shadeRestore')),'Persistent backup restore must be wired');
+  await page.evaluate(()=>{receive('shade',{error:true,backup:true,note:'Native readback was not confirmed',report:'No manual restart requested'});receive('status',{error:true,connected:true,busy:false,text:'Native readback was not confirmed'});});assert(await page.evaluate(()=>shadeDraft),'Failed apply must retain an unapplied draft');
+  const sanitized=await page.evaluate(()=>fixShade({panelAlpha:200,cardOpacity:-5,panelColor:'bad',blurMode:999,__proto__:{bad:true}}));assert.equal(sanitized.panelAlpha,100);assert.equal(sanitized.cardOpacity,0);assert.equal(sanitized.panelColor,'#80CBC4');assert.equal(sanitized.blurMode,3);
+  if(width===393){fs.mkdirSync(path.join(ROOT,'build/shade-ui'),{recursive:true});await page.locator('[data-shade-preset="teal"]').click();await page.evaluate(()=>document.querySelector('#workspace').scrollTop=0);await page.screenshot({path:path.join(ROOT,'build/shade-ui/phone.png')});}
+  assert.deepEqual(errors,[],width+' JS errors');await context.close();console.log('Shade UI passed '+width+'x'+height+' font '+font);
+ }
+ await browser.close();server.close();console.log('Shade controls, panel alpha, card opacity, blur, presets, backup, busy/error states and responsive navigation passed.');
+})().catch(e=>{console.error(e);process.exit(1)});
