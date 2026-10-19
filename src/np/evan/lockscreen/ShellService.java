@@ -43,10 +43,9 @@ public final class ShellService extends Binder {
   boolean error=false;String note=shade.note(),report="";
   try{if(code!=15&&recovery.pending())throw new IOException("Keep or revert the clock theme before changing the shade");if(code==16)note=shade.apply(ShadeJson.parse(new org.json.JSONObject(data.readString())));else if(code==17)note=shade.restore();}
   catch(Exception e){error=true;note=e.getMessage();}
-  try{report=shade.report();}catch(Exception e){report="Readback unavailable: "+e.getMessage();if(!error){error=true;note=report;}}
-  org.json.JSONObject colors=new org.json.JSONObject();try{byte[] module=shade.current().get(NativeThemeFiles.SYSTEMUI);if(module!=null){byte[] xml=NativeThemeFiles.unzip(module).get("assets/colors.xml");if(xml!=null){org.w3c.dom.NodeList nodes=NativeThemeFiles.xml(xml).getDocumentElement().getChildNodes();for(int i=0;i<nodes.getLength();i++)if(nodes.item(i) instanceof org.w3c.dom.Element){org.w3c.dom.Element el=(org.w3c.dom.Element)nodes.item(i);if(ShadeOptions.KEYS.contains(el.getAttribute("name")))colors.put(el.getAttribute("name"),el.getTextContent());}}}}catch(Exception ignored){}
-  String blur="";try{blur=shade.blur();}catch(Exception ignored){}
-  return "SHADE:"+new org.json.JSONObject().put("error",error).put("note",note).put("report",report).put("backup",shade.hasBackup()).put("blur",blur).put("colors",colors).toString();
+  ShadeLab.Readback r=null;try{r=shade.readback();report=r.text;}catch(Exception e){report="Readback unavailable: "+e.getMessage();if(!error){error=true;note=report;}}
+  org.json.JSONObject colors=new org.json.JSONObject();String blur="";boolean night=false;if(r!=null){for(Map.Entry<String,String> c:r.colors.entrySet())colors.put(c.getKey(),c.getValue());blur=r.blur;night=r.night;}
+  return "SHADE:"+new org.json.JSONObject().put("error",error).put("note",note).put("report",report).put("backup",shade.hasBackup()).put("blur",blur).put("night",night).put("colors",colors).toString();
  }
  private Set<String> aodTemplates;
  private synchronized Set<String> nativeAodTemplates()throws Exception{

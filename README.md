@@ -2,22 +2,31 @@
 
 ## New in 0.6.0: native notification shade
 
-Open the new **Shade** destination and connect Shizuku. Read phone loads current
-resource values. Change the controls, then tap **Apply shade** to send all shade
-choices in one transaction. The native service imports a theme, verifies the
+Open the new **Shade** destination and connect Shizuku. The screen loads the
+phone's current values. Change the controls, then tap **Apply shade** to send all
+shade choices in one transaction. **Undo edits** returns to the last phone
+readback; **Refresh from phone** never discards unapplied edits. The native service imports a theme, verifies the
 installed resources, restores both captured lockscreen-engine settings and
 restarts SystemUI once. The panel briefly closes during restart.
 
 Controls:
-- Panel tint colour, including lighter/darker colours.
-- Panel tint alpha 0–100% (experimental blending control, not proven panel opacity).
-- Ordinary-card tint colour and tint strength.
-- Card base opacity 0–100%; zero fill and approximately 25% fill worked in terminal tests.
-- Blurred-card tint colour and alpha (device-dependent rendering).
-- Blur modes default (-1), transparent/no blur (0), and modes 1, 2, 3.
-  Modes 1–3 all showed blur on this phone; these are not a calibrated strength scale.
-- Built-in looks, up to 12 saved shade presets, an approximate preview and copyable phone report.
+- **Panel**: colour and colour strength (0–100%, a blending control rather than proven panel opacity).
+- **Cards**: colour, card opacity (0% removes the fill, ~25% gives frosted cards) and colour strength.
+  *Cards over blur* sets the separate blurred-card colour.
+- **Blur**: one choice of keep current, device default (-1), off/see-through (0) or styles 1–3.
+  Styles 1–3 all showed blur on this phone; they are not a calibrated strength scale.
+- Built-in looks and up to 12 saved looks, a light/dark preview and a copyable phone report.
 - Restore of the SystemUI module and blur value captured before the first Studio shade apply.
+
+### Dark mode
+
+Panel and card colours only show in **light mode**. This is a Realme/Oplus framework
+rule, not an app bug: `OplusThemeResources.checkUpdate()` calls
+`OplusBaseFile.rejectTheme()`, which drops every theme package except `icons`,
+the lockscreen and the launcher while night mode is active. SystemUI is not on that
+list, so its theme `colors.xml` is ignored at night. Applying in dark mode is allowed;
+the colours appear when the phone switches to light mode, and the editor says so.
+Blur is a system property rather than a theme resource. See `docs/Shade-dark-mode.md`.
 
 The first backup captures your CURRENT appearance, which can include the teal
 terminal test; Restore is not a factory-theme reset. Turning custom panel/card
@@ -30,9 +39,8 @@ than dropping the shade. Clock activation repairs the engine class as well as th
 package, following the later on-phone repair test. Engine reads target user 0;
 invalid/error text is rejected before it can be saved or written back.
 
-The resource path was verified in LIGHT MODE on RMX3521 Android 14. A dark-mode
-experiment can be enabled explicitly under the advanced disclosure. Dark-mode
-rendering and reboot survival remain unverified. No boot receiver or persistent
+The resource path was verified in LIGHT MODE on RMX3521 Android 14. Reboot
+survival remains unverified. No boot receiver or persistent
 background reapply loop was added. The debug blur property is not advertised as
 reboot-persistent. The existing AOD, lockscreen design, icon and scene features
 remain available.
