@@ -1,7 +1,8 @@
 # Evan Lockscreen Studio 0.7.0
 
-Download the APK from the repository's **Releases** page. Pushing a `v*` tag builds,
-checks and publishes it automatically (`.github/workflows/release.yml`).
+Download the APK from the repository's **Releases** page. Releases are built, checked
+and published by `.github/workflows/release.yml`: bump `versionName`/`versionCode` in
+`AndroidManifest.xml`, add `docs/releases/v<version>.md`, and push (or push a `v*` tag).
 
 ## New in 0.7.0
 

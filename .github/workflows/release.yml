@@ -1,9 +1,13 @@
 name: Release APK
 
-# Push a tag such as v0.7.0 to build, check and publish the signed APK.
+# Publishes the signed APK as a GitHub release named after AndroidManifest's versionName.
+# Trigger it by pushing a v* tag, or by pushing a commit that adds docs/releases/v<version>.md;
+# in the second case the workflow creates the tag itself.
 on:
   push:
     tags: ['v*']
+    branches: ['**']
+    paths: ['docs/releases/**']
   workflow_dispatch:
 
 permissions:
@@ -14,6 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Read version
+        id: version
+        run: |
+          tag="v$(grep -o 'versionName="[^"]*"' AndroidManifest.xml | cut -d'"' -f2)"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "$tag" ]; then echo "Tag $GITHUB_REF_NAME does not match versionName $tag"; exit 1; fi
+          test -f "docs/releases/$tag.md" || { echo "Missing docs/releases/$tag.md"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -32,7 +43,9 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          name: Evan Lockscreen Studio ${{ github.ref_name }}
-          body_path: docs/releases/${{ github.ref_name }}.md
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Evan Lockscreen Studio ${{ steps.version.outputs.tag }}
+          body_path: docs/releases/${{ steps.version.outputs.tag }}.md
           files: dist/*.apk
           fail_on_unmatched_files: true
