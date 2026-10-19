@@ -1,6 +1,6 @@
 # Notice
 
-Evan Lockscreen Studio
+Lockscreen Studio
 Copyright (C) 2026 EvanSunde and contributors
 
 This program is free software: you can redistribute it and/or modify it under the terms

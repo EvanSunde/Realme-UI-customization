@@ -1,8 +1,8 @@
 {
-  "name": "evan-lockscreen-studio",
+  "name": "lockscreen-studio",
   "private": true,
   "license": "GPL-3.0-only",
-  "description": "Browser checks for the Evan Lockscreen Studio editor (assets/studio.html).",
+  "description": "Browser checks for the Lockscreen Studio editor (assets/studio.html).",
   "scripts": {
     "test:ui": "node tests/v2-ui-check.cjs && node tests/responsive-ui-check.cjs && node tests/shade-ui-check.cjs && node tests/aod-display-ui-check.cjs"
   },

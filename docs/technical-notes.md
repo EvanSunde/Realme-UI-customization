@@ -1,10 +1,12 @@
 # Technical notes
 
-Detailed behaviour, native mechanisms and validation notes for Evan Lockscreen Studio,
+Detailed behaviour, native mechanisms and validation notes for Lockscreen Studio,
 kept as the project's change history. The user-facing overview is the
 [README](../README.md); research write-ups are [AOD-research.md](AOD-research.md) and
 [Shade-dark-mode.md](Shade-dark-mode.md). Sections are ordered newest first; the
-"owner" in older notes is the maintainer whose RMX3521 the features were tested on.
+"owner" in older notes is the maintainer whose RMX3521 the features were tested on. The app was called
+"Evan Lockscreen Studio" up to 0.7.0; exports then lived in `Download/EvanLockscreen`
+as `Evan-*.theme`. From 0.8.0 they are `Download/LockscreenStudio/Lockscreen-*.theme`.
 
 ## New in 0.7.0
 
@@ -176,4 +178,4 @@ The main interface is `assets/studio.html`; native V2 rendering is `StudioTheme.
 
 Run `EVAN_ANDROID_TOOLS=/path/to/android-tools python3 build.py` on Linux with Python 3 and Java 17+. Without that variable, build tools download into `.tools`. Google Play services/ML Kit dependencies are resolved by `mlkit-deps.py`. Bundled fonts are included in the source archive; `fetch-fonts.py` can restore them from Google's font repository. Roboto Slab uses the Apache license, and the other bundled families carry their included OFL licenses. Shizuku's MIT license is included. Local builds sign with a generated development key in `.signing/` (see CONTRIBUTING.md).
 
-For UI checks: `STUDIO_CHROME=/path/to/chrome node tests/ui-check.cjs` and `STUDIO_CHROME=/path/to/chrome node tests/responsive-ui-check.cjs`. Output: `dist/Evan-Lockscreen-0.7.0.apk`. Native theme syntax reference: https://zhuti.designer.xiaomi.com/docs/grammar/ (Xiaomi's documentation does not guarantee support in Realme's fork).
+For UI checks: `STUDIO_CHROME=/path/to/chrome node tests/ui-check.cjs` and `STUDIO_CHROME=/path/to/chrome node tests/responsive-ui-check.cjs`. Output: `dist/Lockscreen-Studio-<version>.apk`. Native theme syntax reference: https://zhuti.designer.xiaomi.com/docs/grammar/ (Xiaomi's documentation does not guarantee support in Realme's fork).

@@ -11,7 +11,7 @@ import java.util.zip.ZipFile;
 public final class ShellService extends Binder {
  public static final String DESCRIPTOR="np.evan.lockscreen.ThemeShell";
  private final EngineSelection selection=new EngineSelection(this::command);
- private final ShadeLab shade=new ShadeLab(new ShadeLab.Phone(){public String run(String... args)throws Exception{return command(args);}public void pause(long millis)throws Exception{Thread.sleep(millis);}},new File("/data/theme"),new File("/data/local/tmp/evan-lockscreen-shade"),new File("/storage/emulated/0/Download/EvanLockscreen"));
+ private final ShadeLab shade=new ShadeLab(new ShadeLab.Phone(){public String run(String... args)throws Exception{return command(args);}public void pause(long millis)throws Exception{Thread.sleep(millis);}},new File("/data/theme"),new File("/data/local/tmp/evan-lockscreen-shade"),new File("/storage/emulated/0/Download/LockscreenStudio"));
  private final AodLab.Phone settings=new AodLab.Phone(){
   public int currentUser()throws Exception{return Integer.parseInt(command("/system/bin/am","get-current-user"));}
   public String read(int user,String space,String key)throws Exception{String value=command("/system/bin/settings","--user",Integer.toString(user),"get",space,key);return value.equals("null")?null:value;}
@@ -81,8 +81,8 @@ public final class ShellService extends Binder {
  private String apply(String path,boolean iconsOnly)throws Exception{
   if(path==null)throw new IOException("No exported file");
   File file=new File(path).getCanonicalFile();
-  String root=new File("/storage/emulated/0/Download/EvanLockscreen").getCanonicalPath()+"/";
-  if(!file.getPath().startsWith(root)||!file.getName().matches((iconsOnly?"Evan-Icons-":"Evan-Lockscreen-")+"[0-9]+\\.theme"))throw new IOException("Only this editor's Downloads/EvanLockscreen exports are allowed");
+  String root=new File("/storage/emulated/0/Download/LockscreenStudio").getCanonicalPath()+"/";
+  if(!file.getPath().startsWith(root)||!file.getName().matches((iconsOnly?"Lockscreen-Icons-":"Lockscreen-Studio-")+"[0-9]+\\.theme"))throw new IOException("Only this editor's Downloads/LockscreenStudio exports are allowed");
   if(!file.isFile())throw new IOException("Export is missing: "+file);
   try(ZipFile zip=new ZipFile(file)){
    if(zip.getEntry("themeInfo.xml")==null||zip.getEntry("wallpaper")==null||zip.getEntry(iconsOnly?"icons":"lock/lockstyle")==null)throw new IOException("Incomplete native theme package");

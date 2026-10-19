@@ -43,7 +43,7 @@ public final class NativeThemeFiles {
  }
  public static byte[] pack(Map<String,byte[]> resources)throws IOException{
   Map<String,byte[]> r=new LinkedHashMap<>(resources);r.remove("config");r.remove("themeInfo.xml");if(!r.containsKey("wallpaper"))r.put("wallpaper",emptyZip());check(r);
-  String id=UUID.randomUUID().toString().toUpperCase(Locale.US);StringBuilder meta=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><OppoSmartPhoneThemeInfo><Summary>Evan Studio</Summary><Author>Evan</Author><EditorVersion>6</EditorVersion><UUID>").append(id).append("</UUID><VersionCode>1</VersionCode><PackageName>").append(id).append("</PackageName><IsGlobalTheme>0</IsGlobalTheme><lockState>0</lockState><disableLockPictorial>0</disableLockPictorial><enableLauncherApplyEffect>0</enableLauncherApplyEffect>");
+  String id=UUID.randomUUID().toString().toUpperCase(Locale.US);StringBuilder meta=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><OppoSmartPhoneThemeInfo><Summary>Lockscreen Studio</Summary><Author>Lockscreen Studio</Author><EditorVersion>6</EditorVersion><UUID>").append(id).append("</UUID><VersionCode>1</VersionCode><PackageName>").append(id).append("</PackageName><IsGlobalTheme>0</IsGlobalTheme><lockState>0</lockState><disableLockPictorial>0</disableLockPictorial><enableLauncherApplyEffect>0</enableLauncherApplyEffect>");
   for(String n:r.keySet()){if(!n.matches("[A-Za-z0-9_./-]+"))throw new IOException("Unsupported native module name: "+n);meta.append("<package name=\"").append(n).append("\" version=\"\"/>");}meta.append("</OppoSmartPhoneThemeInfo>");r.put("themeInfo.xml",meta.toString().getBytes("UTF-8"));return zip(r);
  }
  public static void preserveExport(File exported,File nativeRoot)throws Exception{

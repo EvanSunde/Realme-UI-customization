@@ -1,4 +1,4 @@
-# Evan Lockscreen Studio
+# Lockscreen Studio
 
 [![CI](https://github.com/EvanSunde/Realme-UI-customization/actions/workflows/ci.yml/badge.svg)](https://github.com/EvanSunde/Realme-UI-customization/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/EvanSunde/Realme-UI-customization)](https://github.com/EvanSunde/Realme-UI-customization/releases/latest)
@@ -60,7 +60,7 @@ with your model and what worked.
 
 1. Install and start [Shizuku](https://shizuku.rikka.app/guide/setup/). Wireless
    debugging works; root isn't needed.
-2. Download the latest `Evan-Lockscreen-*.apk` from
+2. Download the latest `Lockscreen-Studio-*.apk` from
    [Releases](https://github.com/EvanSunde/Realme-UI-customization/releases/latest) and
    install it.
 3. Open the studio and grant Shizuku access once.
@@ -123,7 +123,7 @@ please report security problems privately as described in [SECURITY.md](SECURITY
 
 Copyright (C) 2026 EvanSunde and contributors.
 
-Evan Lockscreen Studio is free software: you can redistribute it and/or modify it under
+Lockscreen Studio is free software: you can redistribute it and/or modify it under
 the terms of the [GNU General Public License v3.0](LICENSE). It also grants an additional
 permission under section 7 to combine the app with Google ML Kit and Google Play services
 libraries. Bundled fonts (SIL OFL 1.1 / Apache 2.0) and Shizuku (MIT) keep their own

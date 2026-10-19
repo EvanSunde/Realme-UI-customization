@@ -41,8 +41,8 @@ public final class ShadeLab {
  private String install(Map<String,byte[]> target,String[] selected,String prop,String success)throws Exception{
   if(!target.containsKey("wallpaper"))target.put("wallpaper",NativeThemeFiles.emptyZip());
   // Each export is a full copy of the current theme; keep at most the one being imported.
-  File[] old=exports.listFiles((d,n)->n.matches("Evan-Shade-[0-9]+\\.theme"));if(old!=null)for(File f:old)f.delete();
-  File theme=new File(exports,"Evan-Shade-"+System.currentTimeMillis()+".theme");NativeThemeFiles.atomic(theme,NativeThemeFiles.pack(target));
+  File[] old=exports.listFiles((d,n)->n.matches("Lockscreen-Shade-[0-9]+\\.theme"));if(old!=null)for(File f:old)f.delete();
+  File theme=new File(exports,"Lockscreen-Shade-"+System.currentTimeMillis()+".theme");NativeThemeFiles.atomic(theme,NativeThemeFiles.pack(target));
   // A complete recovery pair is committed before Theme Store can change the selection.
   NativeThemeFiles.atomic(new File(work,"last-engine.txt"),(selected[0]+"\n"+selected[1]+"\n").getBytes("UTF-8"));
   boolean requested=false;Exception failure=null;

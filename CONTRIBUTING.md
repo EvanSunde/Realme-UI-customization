@@ -65,7 +65,7 @@ The release key exists only in repository secrets. Create it once on your own co
 
 ```sh
 keytool -genkeypair -alias release -keyalg RSA -keysize 4096 -validity 10000 \
-  -keystore release.keystore -storetype PKCS12 -dname "CN=Evan Lockscreen Studio"
+  -keystore release.keystore -storetype PKCS12 -dname "CN=Lockscreen Studio"
 base64 -w0 release.keystore > release.keystore.b64
 ```
 

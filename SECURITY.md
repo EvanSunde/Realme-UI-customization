@@ -1,6 +1,6 @@
 # Security policy
 
-Evan Lockscreen Studio runs a helper inside Shizuku with **shell (adb) privileges**. It
+Lockscreen Studio runs a helper inside Shizuku with **shell (adb) privileges**. It
 can change system settings and install themes, so security problems matter.
 
 ## Reporting a vulnerability
