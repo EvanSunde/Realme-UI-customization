@@ -36,23 +36,31 @@ SystemUI's own night values for the four resources are
   `<overlayable>`, so an app-owned overlay would also fail idmap policy checks unless
   it is preinstalled or platform-signed.
 
-## Remaining candidate (needs an on-phone test)
+## Material colour layer: tested, blocked for Shizuku
 
 `OplusAccessibleResources` / `OplusMaterialFile` is a separate colour layer that
-does **not** use `rejectTheme`. It loads night values at night, and SystemUI opts
-in through manifest meta-data `color_material_enable=true`. With the system's custom
-accent colour selected (`mMaterialColor & 0x20000`), it reads
-`data/oplus/uxres/uxcolor/ux_custom_color.xml` and, at night, also
-`ux_custom_color_night.xml`. Both use `<resources><color name="…">` and are
-resolved by resource name in each app. Resolving by name means the four SystemUI
-names would apply only to SystemUI.
+does **not** use `rejectTheme`. It loads night values at night, and SystemUI opts in
+through manifest meta-data `color_material_enable=true`. Depending on the active
+system colour mode (`mMaterialColor`), it reads one of these sets from
+`data/oplus/uxres/uxcolor/`:
 
-These files are written by `com.oplus.uxdesign`, which was not inspected. This route
-is usable only if Shizuku's shell user can write that directory and the system does
-not rewrite the files. Check with:
+- custom colour: `ux_custom_color.xml` and `ux_custom_color_night.xml`
+- wallpaper colours: `coui_theme_color_wallpaper.xml` and `coui_theme_color_wallpaper_night.xml`
 
-```
-adb shell ls -lZ /data/oplus/uxres/uxcolor/
-adb shell cat /data/oplus/uxres/uxcolor/ux_custom_color_night.xml
-adb shell touch /data/oplus/uxres/uxcolor/evan-probe && adb shell rm /data/oplus/uxres/uxcolor/evan-probe && echo writable
-```
+The wallpaper files use `<resources><group><index/><child name id><color name>`. The
+framework resolves each colour by resource name in each app. These files are written
+by `com.oplus.uxdesign` (u0_a201).
+
+On-phone result (2026-10-19): the directory and files are mode 777/766, but every
+write from the adb/Shizuku shell is refused. Creating a file and appending zero bytes
+to `ux_custom_color_night.xml` or `coui_theme_color_wallpaper_night.xml` both fail with
+"Permission denied". Unix permissions allow it, so SELinux is denying shell access to
+`uxicons_data_file`. **This route needs root.**
+
+## Conclusion
+
+Without root, Realme UI 5 cannot show custom notification shade colours in dark mode:
+the theme layer is rejected at night, the material colour files cannot be written,
+and the shell cannot fabricate overlays. With root, a fabricated overlay using a
+`night` configuration, or an edit to the material night file, would be the routes to
+try. Studio applies in light mode and explains the limit in dark mode.
