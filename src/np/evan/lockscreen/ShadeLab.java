@@ -25,32 +25,46 @@ public final class ShadeLab {
  public synchronized Map<String,byte[]> current()throws Exception{user();return NativeThemeFiles.capture(root);}
  private void user()throws Exception{if(!cmd("/system/bin/am","get-current-user").trim().equals("0"))throw new IOException("Shade controls are tested only for Android user 0");}
  public synchronized String apply(ShadeOptions o)throws Exception{
-  o.validate();user();String night=cmd("/system/bin/cmd","uimode","night");if(!o.testDarkMode&&night.contains("Night mode: yes"))throw new IOException("Use light mode for the verified resource path, or enable the experimental dark-mode test.");
+  o.validate();user();boolean dark=night();
   Map<String,byte[]> current=NativeThemeFiles.capture(root);String[] selected=engine();String originalBlur=blur();if(!property(originalBlur))throw new IOException("Unrecognized current blur property");
   if(!hasBackup())NativeThemeFiles.atomic(backup(),backupBytes(current.get(NativeThemeFiles.SYSTEMUI),originalBlur));else before();
   byte[] module=NativeThemeFiles.module(current.get(NativeThemeFiles.SYSTEMUI),o.colors());Map<String,byte[]> target=new TreeMap<>(current);if(module==null)target.remove(NativeThemeFiles.SYSTEMUI);else target.put(NativeThemeFiles.SYSTEMUI,module);
-  return install(target,selected,o.changeBlur?Integer.toString(o.blurMode):originalBlur,"Applied shade choices. Pull down the panel to check the phone. Panel alpha is a blending experiment; dark mode and reboot persistence are unverified.");
+  return install(target,selected,o.changeBlur?Integer.toString(o.blurMode):originalBlur,dark?"Applied. Dark mode is on, so the colours appear when you switch to light mode. "+DARK:"Applied shade choices. Pull down the panel to check the phone.");
+ }
+ /** Blur is a SystemUI property, not a theme resource: it changes without a theme import and also works in dark mode. */
+ public synchronized String blurOnly(int mode)throws Exception{
+  if(mode < -1||mode>3)throw new IOException("Choose a supported blur mode");user();String original=blur();if(!property(original))throw new IOException("Unrecognized current blur property");
+  if(!hasBackup())NativeThemeFiles.atomic(backup(),backupBytes(NativeThemeFiles.capture(root).get(NativeThemeFiles.SYSTEMUI),original));
+  blur(Integer.toString(mode));cmd("/system/bin/am","crash","--user","0","com.android.systemui");note="Blur updated. Debug properties reset after a reboot; apply blur again after restarting the phone.";return note;
  }
  public synchronized String restore()throws Exception{user();Before b=before();Map<String,byte[]> current=NativeThemeFiles.capture(root);if(b.module==null)current.remove(NativeThemeFiles.SYSTEMUI);else current.put(NativeThemeFiles.SYSTEMUI,b.module);return install(current,engine(),b.prop,"Restored the SystemUI module and blur value captured before the first Studio shade apply. Current clock and other theme resources were retained.");}
  private String install(Map<String,byte[]> target,String[] selected,String prop,String success)throws Exception{
   if(!target.containsKey("wallpaper"))target.put("wallpaper",NativeThemeFiles.emptyZip());
-  File theme=new File(exports,"Evan-Shade-"+System.currentTimeMillis()+".theme");NativeThemeFiles.atomic(theme,NativeThemeFiles.pack(target));
+  // Each export is a full copy of the current theme; keep at most the one being imported.
+  File[] old=exports.listFiles((d,n)->n.matches("Lockscreen-Shade-[0-9]+\\.theme"));if(old!=null)for(File f:old)f.delete();
+  File theme=new File(exports,"Lockscreen-Shade-"+System.currentTimeMillis()+".theme");NativeThemeFiles.atomic(theme,NativeThemeFiles.pack(target));
   // A complete recovery pair is committed before Theme Store can change the selection.
   NativeThemeFiles.atomic(new File(work,"last-engine.txt"),(selected[0]+"\n"+selected[1]+"\n").getBytes("UTF-8"));
   boolean requested=false;Exception failure=null;
   try{
    requested=true;String response=cmd("/system/bin/am","startservice","-n","com.oplus.themestore/com.nearme.themespace.services.ThemeApplyService","--es","THEME_PATH",theme.getPath(),"--ez","IS_FROM_911","true");String lower=response.toLowerCase(Locale.US);if(lower.contains("error")||lower.contains("exception")||lower.contains("denial")||lower.contains("failure"))throw new IOException(response);
-   int stable=0;for(int i=0;i<45;i++){boolean matches=false;try{matches=NativeThemeFiles.same(target,NativeThemeFiles.capture(root));}catch(IOException ignored){}stable=matches?stable+1:0;if(stable>=4)break;phone.pause(1000);}if(stable<4)throw new IOException("Native resource readback was not confirmed. Theme Store may have changed files; no manual SystemUI restart was requested. Read the report before repeating.");
+   // Poll cheap file sizes; read and compare the bytes only once the sizes have settled.
+   Map<String,Long> want=NativeThemeFiles.sizes(target);int stable=0;boolean verified=false;for(int i=0;i<45&&!verified;i++){boolean sized=false;try{sized=want.equals(NativeThemeFiles.sizes(root));}catch(IOException ignored){}stable=sized?stable+1:0;if(stable>=3)try{verified=NativeThemeFiles.same(target,NativeThemeFiles.capture(root));}catch(IOException ignored){}if(!verified)phone.pause(1000);}if(!verified)throw new IOException("Native resource readback was not confirmed. Theme Store may have changed files; no manual SystemUI restart was requested. Read the report before repeating.");
   }catch(Exception e){failure=e;}
   finally{if(requested)try{engine(selected);}catch(Exception e){if(failure==null)failure=e;else failure.addSuppressed(e);}}
   if(failure!=null){note=failure.getMessage();throw failure;}
-  blur(prop);cmd("/system/bin/am","crash","--user","0","com.android.systemui");note=success;return success;
+  theme.delete();blur(prop);cmd("/system/bin/am","crash","--user","0","com.android.systemui");note=success;return success;
  }
- public synchronized String report()throws Exception{
-  StringBuilder b=new StringBuilder("Shade controls · user 0\n");b.append(cmd("/system/bin/cmd","uimode","night")).append("\nBlur property: ").append(blur()).append("\nBackup: ").append(hasBackup()?"available":"not captured yet");
+ /** Oplus rejects every theme package except icons, lockscreen and launcher while night mode is active (OplusBaseFile.rejectTheme). */
+ public static final String DARK="Realme's theme engine ignores notification shade theme colours while dark mode is on; blur is not a theme resource.";
+ private boolean night()throws Exception{return cmd("/system/bin/cmd","uimode","night").contains("Night mode: yes");}
+ public static final class Readback {public String text,blur="";public boolean night;public final Map<String,String> colors=new LinkedHashMap<>();}
+ /** One capture of the native theme serves both the readable report and the editor's colour readback. */
+ public synchronized Readback readback()throws Exception{
+  Readback r=new Readback();r.night=night();r.blur=blur();StringBuilder b=new StringBuilder("Shade controls · user 0\nDark mode: ").append(r.night?"on (shade theme colours paused)":"off").append("\nBlur property: ").append(r.blur.isEmpty()?"device default":r.blur).append("\nBackup: ").append(hasBackup()?"available":"not captured yet");
   String[] e=engine();b.append("\nEngine package: ").append(e[0]).append("\nEngine class: ").append(e[1]);
-  Map<String,byte[]> m=current();b.append("\nNative resource files: ").append(m.size());byte[] module=m.get(NativeThemeFiles.SYSTEMUI);b.append("\nSystemUI module: ").append(module==null?"none":module.length+" bytes");if(module!=null){byte[] c=NativeThemeFiles.unzip(module).get("assets/colors.xml");if(c!=null){DocumentRead.append(b,c);}}
-  b.append("\n\n").append(note);return b.toString();
+  Map<String,byte[]> m=current();b.append("\nNative resource files: ").append(m.size());byte[] module=m.get(NativeThemeFiles.SYSTEMUI);b.append("\nSystemUI module: ").append(module==null?"none":module.length+" bytes");
+  if(module!=null){byte[] c=NativeThemeFiles.unzip(module).get("assets/colors.xml");if(c!=null){org.w3c.dom.NodeList nodes=NativeThemeFiles.xml(c).getDocumentElement().getChildNodes();for(int i=0;i<nodes.getLength();i++)if(nodes.item(i) instanceof org.w3c.dom.Element){org.w3c.dom.Element el=(org.w3c.dom.Element)nodes.item(i);if(ShadeOptions.KEYS.contains(el.getAttribute("name"))){r.colors.put(el.getAttribute("name"),el.getTextContent());b.append("\n").append(el.getAttribute("name")).append(": ").append(el.getTextContent());}}}}
+  if(r.night)b.append("\n\n").append(DARK);b.append("\n\n").append(note);r.text=b.toString();return r;
  }
- private static final class DocumentRead {static void append(StringBuilder b,byte[] xml)throws Exception{org.w3c.dom.NodeList nodes=NativeThemeFiles.xml(xml).getDocumentElement().getChildNodes();for(int i=0;i<nodes.getLength();i++)if(nodes.item(i) instanceof org.w3c.dom.Element){org.w3c.dom.Element e=(org.w3c.dom.Element)nodes.item(i);if(ShadeOptions.KEYS.contains(e.getAttribute("name")))b.append("\n").append(e.getAttribute("name")).append(": ").append(e.getTextContent());}}}
 }

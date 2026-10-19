@@ -131,7 +131,7 @@ public final class ThemeBuilder {
     }
     public static byte[] packageTheme(byte[] wallpaperZip,byte[] lockZip)throws IOException {
         String id=UUID.randomUUID().toString().toUpperCase(Locale.US);
-        String info="<?xml version=\"1.0\" encoding=\"UTF-8\"?><OppoSmartPhoneThemeInfo><Summary>Evan Lockscreen</Summary><Author>Evan Lockscreen Editor</Author><EditorVersion>6</EditorVersion><UUID>"+id+"</UUID><VersionCode>1</VersionCode><PackageName>"+id+"</PackageName><Description>Personal wallpaper and clock design</Description><IsGlobalTheme>0</IsGlobalTheme><lockState>0</lockState><disableLockPictorial>0</disableLockPictorial><enableLauncherApplyEffect>0</enableLauncherApplyEffect><package name=\"wallpaper\" version=\"\"/><package name=\"lock/lockstyle\" version=\"\"/></OppoSmartPhoneThemeInfo>";
+        String info="<?xml version=\"1.0\" encoding=\"UTF-8\"?><OppoSmartPhoneThemeInfo><Summary>Lockscreen Studio</Summary><Author>Lockscreen Studio</Author><EditorVersion>6</EditorVersion><UUID>"+id+"</UUID><VersionCode>1</VersionCode><PackageName>"+id+"</PackageName><Description>Personal wallpaper and clock design</Description><IsGlobalTheme>0</IsGlobalTheme><lockState>0</lockState><disableLockPictorial>0</disableLockPictorial><enableLauncherApplyEffect>0</enableLauncherApplyEffect><package name=\"wallpaper\" version=\"\"/><package name=\"lock/lockstyle\" version=\"\"/></OppoSmartPhoneThemeInfo>";
         Map<String,byte[]> out=new LinkedHashMap<>();out.put("themeInfo.xml",info.getBytes("UTF-8"));out.put("wallpaper",wallpaperZip);out.put("lock/lockstyle",lockZip);
         // This path is for the native apply service; Theme Store's preview importer is not used.
         return zip(out);

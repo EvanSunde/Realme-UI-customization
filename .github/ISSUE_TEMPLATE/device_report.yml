@@ -1,0 +1,26 @@
+name: Device compatibility report
+description: Tell us which features work on your phone
+labels: [device report]
+body:
+  - type: input
+    id: device
+    attributes:
+      label: Phone model and firmware
+      placeholder: OPPO Reno 8 (CPH2359), ColorOS 14, Android 14
+    validations:
+      required: true
+  - type: checkboxes
+    id: works
+    attributes:
+      label: What worked on the screen?
+      options:
+        - label: Lock screen clock apply
+        - label: Notification shade colours (light mode)
+        - label: Instant blur
+        - label: AOD on/off and display modes
+        - label: AOD song info
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes and Copy report output
+      render: text

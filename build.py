@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Reproducible Linux x86_64 build. Requires Python 3, Java 17+ and keytool."""
-import concurrent.futures,os,pathlib,subprocess,zipfile,urllib.request,sys
+import concurrent.futures,os,pathlib,re,subprocess,zipfile,urllib.request,sys
 ROOT=pathlib.Path(__file__).resolve().parent
 TOOLS=pathlib.Path(os.environ.get('EVAN_ANDROID_TOOLS',str(ROOT/'.tools'))).resolve()
 BUILD=ROOT/'build';DIST=ROOT/'dist';TOOLS.mkdir(parents=True,exist_ok=True);DIST.mkdir(exist_ok=True)
@@ -41,6 +41,7 @@ run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'a
 run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'V2Check')
 run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'AodCheck')
 run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'ShadeCheck')
+run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'AodDisplayCheck')
 jar=BUILD/'app-classes.jar'
 with zipfile.ZipFile(jar,'w') as z:
  for file in sorted(classes.rglob('*.class')):z.write(file,file.relative_to(classes))
@@ -52,10 +53,16 @@ with zipfile.ZipFile(BUILD/'unsigned.apk','a',zipfile.ZIP_DEFLATED) as z:
  for dex in sorted((BUILD/'dex').glob('classes*.dex')):z.write(dex,dex.name)
  for file in sorted((ROOT/'assets').rglob('*')):
   if file.is_file():z.write(file,'assets/'+str(file.relative_to(ROOT/'assets')))
-key=ROOT/'signing/debug.keystore';key.parent.mkdir(exist_ok=True)
-if not key.is_file():run('keytool','-genkeypair','-alias','evan-debug','-keyalg','RSA','-keysize','2048','-validity','10000','-keystore',key,'-storetype','JKS','-storepass','android','-keypass','android','-dname','CN=Evan Lockscreen Development','-noprompt')
+# Releases sign with EVAN_KEYSTORE (+ EVAN_KEY_ALIAS / EVAN_STORE_PASSWORD / EVAN_KEY_PASSWORD).
+# Without it, a per-machine development key is generated in .signing/ and never committed.
+key=pathlib.Path(os.environ['EVAN_KEYSTORE']) if os.environ.get('EVAN_KEYSTORE') else ROOT/'.signing/dev.keystore'
+if not os.environ.get('EVAN_KEYSTORE'):
+ print('Signing with the local development key; this APK cannot update a release install.',flush=True)
+ key.parent.mkdir(exist_ok=True)
+ if not key.is_file():run('keytool','-genkeypair','-alias','dev','-keyalg','RSA','-keysize','3072','-validity','10000','-keystore',key,'-storetype','PKCS12','-storepass','android','-keypass','android','-dname','CN=Lockscreen Studio local development','-noprompt')
 run('java','-jar',TOOLS/'ecj.jar','-17','-nowarn','-classpath',TOOLS/'apksig.jar','-d',BUILD/'sign',ROOT/'SignApk.java')
-out=DIST/'Evan-Lockscreen-0.6.0.apk'
+version=re.search(r'versionName="([^"]+)"',(ROOT/'AndroidManifest.xml').read_text()).group(1)
+out=DIST/('Lockscreen-Studio-'+version+'.apk')
 run('java','-cp',str(BUILD/'sign')+os.pathsep+str(TOOLS/'apksig.jar'),'SignApk',BUILD/'unsigned.apk',out,key)
 run('java','-cp',str(BUILD/'sign')+os.pathsep+str(TOOLS/'apksig.jar'),'SignApk','verify',out)
 print('Built:',out)

@@ -97,7 +97,7 @@ public final class IconThemeBuilder {
  }
  public static byte[] packageIcons(byte[] icons,byte[] launcher)throws IOException{
   String id=UUID.randomUUID().toString().toUpperCase(Locale.US);
-  String info="<?xml version=\"1.0\" encoding=\"UTF-8\"?><OppoSmartPhoneThemeInfo><Summary>Evan Icons</Summary><Author>Evan Lockscreen Editor</Author><EditorVersion>6</EditorVersion><UUID>"+id+"</UUID><VersionCode>1</VersionCode><PackageName>"+id+"</PackageName><IsGlobalTheme>0</IsGlobalTheme><lockState>0</lockState><package name=\"wallpaper\" version=\"\"/><package name=\"icons\" version=\"\"/><package name=\"com.oppo.launcher\" version=\"\"/></OppoSmartPhoneThemeInfo>";
+  String info="<?xml version=\"1.0\" encoding=\"UTF-8\"?><OppoSmartPhoneThemeInfo><Summary>Lockscreen Studio Icons</Summary><Author>Lockscreen Studio</Author><EditorVersion>6</EditorVersion><UUID>"+id+"</UUID><VersionCode>1</VersionCode><PackageName>"+id+"</PackageName><IsGlobalTheme>0</IsGlobalTheme><lockState>0</lockState><package name=\"wallpaper\" version=\"\"/><package name=\"icons\" version=\"\"/><package name=\"com.oppo.launcher\" version=\"\"/></OppoSmartPhoneThemeInfo>";
   Map<String,byte[]> root=new LinkedHashMap<>();root.put("themeInfo.xml",info.getBytes("UTF-8"));root.put("wallpaper",ThemeBuilder.wallpaperComponent(new byte[0],true));root.put("icons",icons);root.put("com.oppo.launcher",launcher);return zip(root);
  }
 }

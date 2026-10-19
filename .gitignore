@@ -1,0 +1,8 @@
+.tools/
+build/
+dist/
+.signing/
+node_modules/
+*.keystore
+*.jks
+*.p12
