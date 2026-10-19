@@ -41,6 +41,7 @@ run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'a
 run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'V2Check')
 run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'AodCheck')
 run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'ShadeCheck')
+run('java','-cp',os.pathsep.join(str(p) for p in [BUILD/'tests',classes,TOOLS/'android.jar']),'AodDisplayCheck')
 jar=BUILD/'app-classes.jar'
 with zipfile.ZipFile(jar,'w') as z:
  for file in sorted(classes.rglob('*.class')):z.write(file,file.relative_to(classes))
@@ -55,7 +56,7 @@ with zipfile.ZipFile(BUILD/'unsigned.apk','a',zipfile.ZIP_DEFLATED) as z:
 key=ROOT/'signing/debug.keystore';key.parent.mkdir(exist_ok=True)
 if not key.is_file():run('keytool','-genkeypair','-alias','evan-debug','-keyalg','RSA','-keysize','2048','-validity','10000','-keystore',key,'-storetype','JKS','-storepass','android','-keypass','android','-dname','CN=Evan Lockscreen Development','-noprompt')
 run('java','-jar',TOOLS/'ecj.jar','-17','-nowarn','-classpath',TOOLS/'apksig.jar','-d',BUILD/'sign',ROOT/'SignApk.java')
-out=DIST/'Evan-Lockscreen-0.6.0.apk'
+out=DIST/'Evan-Lockscreen-0.7.0.apk'
 run('java','-cp',str(BUILD/'sign')+os.pathsep+str(TOOLS/'apksig.jar'),'SignApk',BUILD/'unsigned.apk',out,key)
 run('java','-cp',str(BUILD/'sign')+os.pathsep+str(TOOLS/'apksig.jar'),'SignApk','verify',out)
 print('Built:',out)

@@ -56,6 +56,8 @@ public final class ShadeCheck {
    p.night=true;int imports=p.imports;check(lab.apply(o).contains("light mode")&&p.imports==imports+1,"Dark mode applies and explains when the colours appear");ShadeLab.Readback night=lab.readback();check(night.night&&night.text.contains(ShadeLab.DARK),"Readback reports paused shade colours in dark mode");p.night=false;
    File[] kept=new File(dir,"exports").listFiles();check(kept!=null&&kept.length==0,"Successful imports leave no full-theme copies in Downloads");
    o.panelEnabled=true;lab.apply(o);ShadeLab.Readback day=lab.readback();check(!day.night&&day.colors.get(ShadeOptions.PANEL).equals("#8080CBC4")&&day.colors.size()==1&&day.text.contains(ShadeOptions.PANEL),"One readback returns the report and managed colours");o.panelEnabled=false;
+   // Blur alone skips the theme import entirely.
+   imports=p.imports;int restarts=p.restarts;lab.blurOnly(2);check(p.blur.equals("2")&&p.imports==imports&&p.restarts==restarts+1,"Blur-only sets the property and restarts SystemUI without importing");fails(()->lab.blurOnly(4),"Reject unsupported blur mode");check(p.blur.equals("2"),"Rejected blur leaves the property");
    o.panelAlpha=101;imports=p.imports;fails(()->lab.apply(o),"Invalid alpha");check(p.imports==imports,"Invalid alpha never imports");o.panelAlpha=50;
    File other=Files.createTempDirectory(dir.toPath(),"failed-read").toFile(),otherRoot=seed(other);Phone bad=new Phone(otherRoot);ShadeLab guarded=new ShadeLab(bad,otherRoot,new File(other,"backup"),new File(other,"exports"));
    for(String read:new String[]{"cmd: Failure calling service settings: Failed transaction (2147483646)","com.oplus.uiengine\ncmd: Failure",""}){bad.badRead=read;fails(()->guarded.apply(new ShadeOptions()),"Reject invalid engine read");check(bad.imports==0&&!guarded.hasBackup()&&bad.writes==0,"Failed reads cannot become a backup or be written back");}
@@ -64,7 +66,7 @@ public final class ShadeCheck {
    // Ordinary clock/icon exports retain the currently installed shade and modules.
    File export=new File(dir,"new-clock.theme");Map<String,byte[]> incoming=new TreeMap<>();incoming.put("wallpaper",NativeThemeFiles.emptyZip());incoming.put("lock/lockstyle",utf("new-clock"));NativeThemeFiles.atomic(export,NativeThemeFiles.pack(incoming));NativeThemeFiles.preserveExport(export,root);Map<String,byte[]> combined=NativeThemeFiles.unzip(NativeThemeFiles.read(export));check(combined.containsKey("icons")&&combined.containsKey(NativeThemeFiles.SYSTEMUI),"Clock apply must carry forward shade and icon modules");check(new String(combined.get("lock/lockstyle"),"UTF-8").equals("new-clock"),"New clock wins over captured clock");
    fails(()->NativeThemeFiles.unzip(NativeThemeFiles.zip(Collections.singletonMap("../bad",new byte[0]))),"Reject unsafe paths");
-   System.out.println("Validated shade ARGB extremes and intermediate values; native staging, clock/icon retention, merged assets, both engine settings, persistent backup/restore, later clock preservation, dark-mode messaging, export cleanup, single readback, invalid reads, rejected/stalled imports and no restart after unconfirmed changes.");
+   System.out.println("Validated shade ARGB extremes and intermediate values; native staging, clock/icon retention, merged assets, both engine settings, persistent backup/restore, later clock preservation, dark-mode messaging, export cleanup, single readback, blur-only route, invalid reads, rejected/stalled imports and no restart after unconfirmed changes.");
   }finally{remove(dir);}
  }
 }

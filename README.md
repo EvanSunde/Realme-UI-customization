@@ -1,6 +1,33 @@
-# Evan Lockscreen Studio 0.6.0
+# Evan Lockscreen Studio 0.7.0
 
-## New in 0.6.0: native notification shade
+Download the APK from the repository's **Releases** page. Pushing a `v*` tag builds,
+checks and publishes it automatically (`.github/workflows/release.yml`).
+
+## New in 0.7.0
+
+- **Shizuku once.** After the first grant the studio reconnects automatically
+  whenever Shizuku is running; there is no Connect tap on each launch.
+- **Independent applies.** Lock screen (clock apply), shade colours (*Apply shade
+  colours*) and blur (*Apply blur*) are separate. Blur only sets
+  `debug.systemui.gaussblur_level` and restarts SystemUI, with no theme import; it
+  also works in dark mode and resets after a reboot.
+- **Curated shade looks:** Phone default, Frosted white, Clear glass, Teal frost,
+  Ocean, Mint, Lavender, Rose, Sunset amber and Graphite, plus your saved looks.
+- **AOD display** (Tools → Native AOD → Display): on/off and All day /
+  Scheduled (From–Until) / Power saving. It writes the secure settings Realme's AOD app
+  writes (`Setting_AodSwitchEnable`, `Setting_AodEnable`,
+  `Setting_AodEnableImmediate`, `Setting_AodUserSetTime`,
+  `Setting_AodUserEnergySavingSet`, `Setting_AodSetTime*`), which SystemUI reads
+  directly. Power saving reuses the OEM value (1 or 2) the phone wrote itself.
+  Originals are backed up to `/data/local/tmp/evan-lockscreen-aod/display.bin`
+  before the first write and restored exactly. Turning AOD on requires a style
+  already chosen once in Settings; Light OS is rejected.
+  Checked against AOD 14.20.43; on-phone behaviour is still to be confirmed.
+- AOD "show battery/date/notification" toggles are not offered: the AOD app bakes
+  them into the style, so writing the settings alone would not refresh the display.
+
+
+## Native notification shade (0.6.0)
 
 Open the new **Shade** destination and connect Shizuku. The screen loads the
 phone's current values. Change the controls, then tap **Apply shade** to send all
@@ -145,4 +172,4 @@ The main interface is `assets/studio.html`; native V2 rendering is `StudioTheme.
 
 Run `EVAN_ANDROID_TOOLS=/path/to/android-tools python3 build.py` on Linux with Python 3 and Java 17+. Without that variable, build tools download into `.tools`. Google Play services/ML Kit dependencies are resolved by `mlkit-deps.py`. Bundled fonts are included in the source archive; `fetch-fonts.py` can restore them from Google's font repository. Roboto Slab uses the Apache license, and the other bundled families carry their included OFL licenses. Shizuku's MIT license is included. Retain the included development key for local update compatibility.
 
-For UI checks: `STUDIO_CHROME=/path/to/chrome node tests/ui-check.cjs` and `STUDIO_CHROME=/path/to/chrome node tests/responsive-ui-check.cjs`. Output: `dist/Evan-Lockscreen-0.6.0.apk`. Native theme syntax reference: https://zhuti.designer.xiaomi.com/docs/grammar/ (Xiaomi's documentation does not guarantee support in Realme's fork).
+For UI checks: `STUDIO_CHROME=/path/to/chrome node tests/ui-check.cjs` and `STUDIO_CHROME=/path/to/chrome node tests/responsive-ui-check.cjs`. Output: `dist/Evan-Lockscreen-0.7.0.apk`. Native theme syntax reference: https://zhuti.designer.xiaomi.com/docs/grammar/ (Xiaomi's documentation does not guarantee support in Realme's fork).

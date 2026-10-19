@@ -31,6 +31,12 @@ public final class ShadeLab {
   byte[] module=NativeThemeFiles.module(current.get(NativeThemeFiles.SYSTEMUI),o.colors());Map<String,byte[]> target=new TreeMap<>(current);if(module==null)target.remove(NativeThemeFiles.SYSTEMUI);else target.put(NativeThemeFiles.SYSTEMUI,module);
   return install(target,selected,o.changeBlur?Integer.toString(o.blurMode):originalBlur,dark?"Applied. Dark mode is on, so the colours appear when you switch to light mode. "+DARK:"Applied shade choices. Pull down the panel to check the phone.");
  }
+ /** Blur is a SystemUI property, not a theme resource: it changes without a theme import and also works in dark mode. */
+ public synchronized String blurOnly(int mode)throws Exception{
+  if(mode < -1||mode>3)throw new IOException("Choose a supported blur mode");user();String original=blur();if(!property(original))throw new IOException("Unrecognized current blur property");
+  if(!hasBackup())NativeThemeFiles.atomic(backup(),backupBytes(NativeThemeFiles.capture(root).get(NativeThemeFiles.SYSTEMUI),original));
+  blur(Integer.toString(mode));cmd("/system/bin/am","crash","--user","0","com.android.systemui");note="Blur updated. Debug properties reset after a reboot; apply blur again after restarting the phone.";return note;
+ }
  public synchronized String restore()throws Exception{user();Before b=before();Map<String,byte[]> current=NativeThemeFiles.capture(root);if(b.module==null)current.remove(NativeThemeFiles.SYSTEMUI);else current.put(NativeThemeFiles.SYSTEMUI,b.module);return install(current,engine(),b.prop,"Restored the SystemUI module and blur value captured before the first Studio shade apply. Current clock and other theme resources were retained.");}
  private String install(Map<String,byte[]> target,String[] selected,String prop,String success)throws Exception{
   if(!target.containsKey("wallpaper"))target.put("wallpaper",NativeThemeFiles.emptyZip());

@@ -12,21 +12,24 @@ public final class ShellService extends Binder {
  public static final String DESCRIPTOR="np.evan.lockscreen.ThemeShell";
  private final EngineSelection selection=new EngineSelection(this::command);
  private final ShadeLab shade=new ShadeLab(new ShadeLab.Phone(){public String run(String... args)throws Exception{return command(args);}public void pause(long millis)throws Exception{Thread.sleep(millis);}},new File("/data/theme"),new File("/data/local/tmp/evan-lockscreen-shade"),new File("/storage/emulated/0/Download/EvanLockscreen"));
- private final AodLab aod=new AodLab(new AodLab.Phone(){
+ private final AodLab.Phone settings=new AodLab.Phone(){
   public int currentUser()throws Exception{return Integer.parseInt(command("/system/bin/am","get-current-user"));}
   public String read(int user,String space,String key)throws Exception{String value=command("/system/bin/settings","--user",Integer.toString(user),"get",space,key);return value.equals("null")?null:value;}
   public void write(int user,String space,String key,String value)throws Exception{if(value==null)command("/system/bin/settings","--user",Integer.toString(user),"delete",space,key);else command("/system/bin/settings","--user",Integer.toString(user),"put",space,key,value);}
   public boolean supports(String template)throws Exception{return nativeAodTemplates().contains(template);}
- },new File("/data/local/tmp/evan-lockscreen-aod/backup.bin"));
+ };
+ private final AodLab aod=new AodLab(settings,new File("/data/local/tmp/evan-lockscreen-aod/backup.bin"));
+ private final AodDisplay display=new AodDisplay(settings,new File("/data/local/tmp/evan-lockscreen-aod/display.bin"));
  private final ApplyRecovery recovery=new ApplyRecovery();private String lastThemePath=null,awaitingPath=null;
  public ShellService(){attachInterface(null,DESCRIPTOR);aod.recover();}
  @Override protected boolean onTransact(int code,Parcel data,Parcel reply,int flags)throws RemoteException{
   if(code==INTERFACE_TRANSACTION){reply.writeString(DESCRIPTOR);return true;}
   if(code==16777115){System.exit(0);return true;}
-  if(code<1||code>17)return super.onTransact(code,data,reply,flags);
+  if(code<1||code>21)return super.onTransact(code,data,reply,flags);
   data.enforceInterface(DESCRIPTOR);String result;
   try{
-   if(code>=15){result=shadeAction(code,data);}
+   if(code>=19){result=displayAction(code,data);}
+   else if(code>=15){result=shadeAction(code,data);}
    else if(code>=9){result=aodAction(code,data);}
    else if(code==1){String path=data.readString();boolean safe=data.readInt()!=0;if(recovery.pending())throw new IOException("Keep or revert the previous theme first");String previous=lastThemePath;result=apply(path,false);if(!result.contains("unavailable")){if(safe){awaitingPath=path;long until=recovery.arm(()->{if(previous!=null){try{String restored=apply(previous,false);if(restored.contains("unavailable"))throw new IOException("Rollback completion is unknown");lastThemePath=previous;}catch(Exception e){selection.restore();lastThemePath=null;}}else selection.restore();});result="CONFIRM:"+until+":Keep this lock screen? Otherwise the last Studio theme, or default keyguard, is restored.";}else lastThemePath=path;}}
    else if(code==5){if(recovery.pending())throw new IOException("Keep or revert the clock before applying icons");result=apply(data.readString(),true);}
@@ -41,7 +44,7 @@ public final class ShellService extends Binder {
  }
  private String shadeAction(int code,Parcel data)throws Exception{
   boolean error=false;String note=shade.note(),report="";
-  try{if(code!=15&&recovery.pending())throw new IOException("Keep or revert the clock theme before changing the shade");if(code==16)note=shade.apply(ShadeJson.parse(new org.json.JSONObject(data.readString())));else if(code==17)note=shade.restore();}
+  try{if(code!=15&&recovery.pending())throw new IOException("Keep or revert the clock theme before changing the shade");if(code==16)note=shade.apply(ShadeJson.parse(new org.json.JSONObject(data.readString())));else if(code==17)note=shade.restore();else if(code==18)note=shade.blurOnly(new org.json.JSONObject(data.readString()).getInt("blurMode"));}
   catch(Exception e){error=true;note=e.getMessage();}
   ShadeLab.Readback r=null;try{r=shade.readback();report=r.text;}catch(Exception e){report="Readback unavailable: "+e.getMessage();if(!error){error=true;note=report;}}
   org.json.JSONObject colors=new org.json.JSONObject();String blur="";boolean night=false;if(r!=null){for(Map.Entry<String,String> c:r.colors.entrySet())colors.put(c.getKey(),c.getValue());blur=r.blur;night=r.night;}
@@ -65,6 +68,15 @@ public final class ShellService extends Binder {
   org.json.JSONArray styles=new org.json.JSONArray();String catalogError="";try{for(String[] s:AodLab.STYLES)if(aod.available(s[0]))styles.put(new org.json.JSONObject().put("id",s[0]).put("name",s[1]).put("tested",s[0].equals("vertical")));}catch(Exception e){catalogError="Built-in style scan unavailable. Keep current style is still available.";}
   boolean matches=false;try{matches=aod.matches();}catch(Exception e){error=true;failure="Could not check current AOD settings: "+e.getMessage();}
   return "AOD:"+new org.json.JSONObject().put("active",aod.pending()).put("enabled",aod.enabled()).put("matches",matches).put("style",aod.style()).put("smart",aod.smart()).put("styles",styles).put("catalogNote",catalogError).put("until",aod.until()).put("note",error?failure:aod.note()).put("report",aod.cachedReport()).put("error",error).toString();
+ }
+ private String displayAction(int code,Parcel data)throws Exception{
+  boolean error=false;String note=display.note();
+  try{if(code==20){org.json.JSONObject j=new org.json.JSONObject(data.readString());note=display.apply(j.getBoolean("on"),j.getString("mode"),j.getInt("beginHour"),j.getInt("beginMin"),j.getInt("endHour"),j.getInt("endMin"));}else if(code==21)note=display.restore();}
+  catch(Exception e){error=true;note=e.getMessage();}
+  org.json.JSONObject state=new org.json.JSONObject().put("error",error).put("note",note);
+  try{AodDisplay.State s=display.read();state.put("on",s.on).put("mode",s.mode).put("beginHour",s.beginHour).put("beginMin",s.beginMin).put("endHour",s.endHour).put("endMin",s.endMin).put("backup",s.backup).put("style",s.style==null?"":s.style);}
+  catch(Exception e){state.put("error",true).put("note",error?note:"Could not read AOD settings: "+e.getMessage());}
+  return "AODDISPLAY:"+state;
  }
  private String apply(String path,boolean iconsOnly)throws Exception{
   if(path==null)throw new IOException("No exported file");
