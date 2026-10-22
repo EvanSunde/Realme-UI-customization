@@ -11,7 +11,7 @@ import java.util.zip.ZipFile;
 public final class ShellService extends Binder {
  public static final String DESCRIPTOR="np.evan.lockscreen.ThemeShell";
  private final EngineSelection selection=new EngineSelection(this::command);
- private final ShadeLab shade=new ShadeLab(new ShadeLab.Phone(){public String run(String... args)throws Exception{return command(args);}public void pause(long millis)throws Exception{Thread.sleep(millis);}},new File("/data/theme"),new File("/data/local/tmp/evan-lockscreen-shade"),new File("/storage/emulated/0/Download/LockscreenStudio"));
+ private final ShadeLab shade=new ShadeLab(new ShadeLab.Phone(){public String run(String... args)throws Exception{return command(args);}public void pause(long millis)throws Exception{Thread.sleep(millis);}public String themeStore()throws Exception{return ShellService.this.themeStore();}},new File("/data/theme"),new File("/data/local/tmp/evan-lockscreen-shade"),new File("/storage/emulated/0/Download/LockscreenStudio"));
  private final AodLab.Phone settings=new AodLab.Phone(){
   public int currentUser()throws Exception{return Integer.parseInt(command("/system/bin/am","get-current-user"));}
   public String read(int user,String space,String key)throws Exception{String value=command("/system/bin/settings","--user",Integer.toString(user),"get",space,key);return value.equals("null")?null:value;}
@@ -110,7 +110,7 @@ public final class ShellService extends Binder {
      }
     }catch(IOException ignored){}
    },"theme-completion");watcher.setDaemon(true);watcher.start();
-   command("/system/bin/am","startservice","-n","com.oplus.themestore/com.nearme.themespace.services.ThemeApplyService","--es","THEME_PATH",file.getPath(),"--ez","IS_FROM_911","true");
+   command("/system/bin/am","startservice","-n",themeStore()+"/com.nearme.themespace.services.ThemeApplyService","--es","THEME_PATH",file.getPath(),"--ez","IS_FROM_911","true");
    boolean applied;
    try{applied=completion.get(60,TimeUnit.SECONDS);}
    catch(TimeoutException e){
@@ -123,8 +123,16 @@ public final class ShellService extends Binder {
    return "Theme Store finished; the custom clock was selected automatically. Turn the screen off and back on to check your design.";
   }finally{if(logs!=null)logs.destroy();if(previousEngine!=null)shade.restoreEngine(previousEngine);}
  }
+ /** Realme/OPPO ship Theme Store as com.oplus.themestore; some regions and older builds use com.heytap.themestore. Same apply service in both. */
+ public static final String[] THEME_STORES={"com.oplus.themestore","com.heytap.themestore"};
+ private String themeStore;
+ synchronized String themeStore()throws Exception{
+  if(themeStore!=null)return themeStore;
+  for(String pkg:THEME_STORES)if(command("/system/bin/pm","path",pkg).startsWith("package:"))return themeStore=pkg;
+  throw new IOException("Theme Store was not found (looked for "+String.join(", ",THEME_STORES)+")");
+ }
  private String diagnostics()throws Exception{
-  StringBuilder out=new StringBuilder("Selected lock-screen package: ").append(command("/system/bin/settings","get","system",EngineSelection.PKG_KEY)).append("\nSelected class: ").append(command("/system/bin/settings","get","system",EngineSelection.CLASS_KEY));
+  StringBuilder out=new StringBuilder("Theme Store package: ");try{out.append(themeStore());}catch(Exception e){out.append(e.getMessage());}out.append("\nSelected lock-screen package: ").append(command("/system/bin/settings","get","system",EngineSelection.PKG_KEY)).append("\nSelected class: ").append(command("/system/bin/settings","get","system",EngineSelection.CLASS_KEY));
   out.append("\n\nKeyguard services:\n").append(command("/system/bin/cmd","package","query-services","--components","-a","oplus.intent.action.keyguard"));
   String packages=command("/system/bin/pm","list","packages");out.append("\n\nPossible AI / photo packages (not confirmed APIs):\n");int count=0;
   for(String line:packages.split("\n")){String lower=line.toLowerCase(Locale.US);if(lower.contains("gallery")||lower.contains("photos")||lower.contains("segment")||lower.contains("vision")||lower.contains("intelligence")||lower.contains(".ai")||lower.contains(".gms")||lower.contains("google.android.as")){out.append(line).append('\n');if(++count>=40)break;}}

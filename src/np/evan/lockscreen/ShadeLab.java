@@ -3,7 +3,7 @@ import java.io.*;
 import java.util.*;
 /** Native theme transaction under the Shizuku shell identity; no hooks or overlays. */
 public final class ShadeLab {
- public interface Phone {String run(String... args)throws Exception;void pause(long millis)throws Exception;}
+ public interface Phone {String run(String... args)throws Exception;void pause(long millis)throws Exception;default String themeStore()throws Exception{return "com.oplus.themestore";}}
  private final Phone phone;private final File root,work,exports;private String note="Read the shade state, then apply your choices.";
  public ShadeLab(Phone phone,File root,File work,File exports){this.phone=phone;this.root=root;this.work=work;this.exports=exports;}
  private String cmd(String... a)throws Exception{return phone.run(a);}
@@ -47,7 +47,7 @@ public final class ShadeLab {
   NativeThemeFiles.atomic(new File(work,"last-engine.txt"),(selected[0]+"\n"+selected[1]+"\n").getBytes("UTF-8"));
   boolean requested=false;Exception failure=null;
   try{
-   requested=true;String response=cmd("/system/bin/am","startservice","-n","com.oplus.themestore/com.nearme.themespace.services.ThemeApplyService","--es","THEME_PATH",theme.getPath(),"--ez","IS_FROM_911","true");String lower=response.toLowerCase(Locale.US);if(lower.contains("error")||lower.contains("exception")||lower.contains("denial")||lower.contains("failure"))throw new IOException(response);
+   requested=true;String response=cmd("/system/bin/am","startservice","-n",phone.themeStore()+"/com.nearme.themespace.services.ThemeApplyService","--es","THEME_PATH",theme.getPath(),"--ez","IS_FROM_911","true");String lower=response.toLowerCase(Locale.US);if(lower.contains("error")||lower.contains("exception")||lower.contains("denial")||lower.contains("failure"))throw new IOException(response);
    // Poll cheap file sizes; read and compare the bytes only once the sizes have settled.
    Map<String,Long> want=NativeThemeFiles.sizes(target);int stable=0;boolean verified=false;for(int i=0;i<45&&!verified;i++){boolean sized=false;try{sized=want.equals(NativeThemeFiles.sizes(root));}catch(IOException ignored){}stable=sized?stable+1:0;if(stable>=3)try{verified=NativeThemeFiles.same(target,NativeThemeFiles.capture(root));}catch(IOException ignored){}if(!verified)phone.pause(1000);}if(!verified)throw new IOException("Native resource readback was not confirmed. Theme Store may have changed files; no manual SystemUI restart was requested. Read the report before repeating.");
   }catch(Exception e){failure=e;}

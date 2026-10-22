@@ -10,6 +10,7 @@ own Theme Store, SystemUI and AOD settings through [Shizuku](https://shizuku.rik
 backs up everything before it changes it, and can put it all back with one tap.
 
 <p>
+  <img src="docs/images/preview.png" width="220" alt="Full-screen preview with separate hours, minutes and date">
   <img src="docs/images/shade.png" width="220" alt="Notification shade editor with live preview">
   <img src="docs/images/looks.png" width="220" alt="Built-in shade looks">
   <img src="docs/images/aod-display.png" width="220" alt="Always-On Display schedule controls">
@@ -18,8 +19,16 @@ backs up everything before it changes it, and can put it all back with one tap.
 ## Features
 
 **Lock screen**
-- Clock designer with 10 layouts, 30 bundled fonts, colours, finishes (glow, neon,
-  gradient, glass…), date styles, motion and day/evening/night schedules.
+- Clock designer with 16 layouts (including Analog with live hands, Big minutes,
+  Diagonal, Wave, Offset and Wide), 30 bundled fonts, and 17 finishes (glow, neon, chrome,
+  holo, retro 3D, glitch, stencil and more). Also date styles, motion, and
+  day/evening/night schedules.
+- Full-screen preview: drag the clock (it moves with your finger instead of jumping),
+  pinch to resize up to 600, and twist or use the corner handle to rotate.
+- Separate hours, minutes and date: split the clock into three pieces and move, size
+  and rotate each one on its own.
+- Colour suggestions from your photo and from your current wallpaper (including live
+  wallpapers that report their colours), for both the hours and two-tone minutes.
 - Depth effect: put the subject of your photo in front of the clock (ML Kit separation
   or your own PNG). Works with Atmos live wallpapers.
 - Applies as a native Theme Store theme, with a confirm-or-revert timer in case
@@ -49,7 +58,7 @@ backs up everything before it changes it, and can put it all back with one tap.
 | --- | --- |
 | Phone | realme 9 (RMX3521) |
 | OS | realme UI 5.0, Android 14 |
-| Theme Store | 10.3.5 |
+| Theme Store | 10.3.5 (`com.oplus.themestore`; `com.heytap.themestore` is also supported) |
 | System UI / Always-On Display | 14.00.16 / 14.20.43 |
 
 Other realme, OPPO and OnePlus phones on ColorOS 14 may work, but haven't been tested.
@@ -83,6 +92,9 @@ After a phone restart, start Shizuku again; Shizuku can't start itself without r
   [docs/AOD-research.md](docs/AOD-research.md).
 - Applying shade colours or a lock screen restarts SystemUI, so the screen flickers
   briefly.
+- The new layouts, finishes and split pieces are drawn into the theme on the phone. The
+  editor preview is a close approximation, and Analog hands, separate-piece rotation and
+  the new finishes are still to be confirmed on a real lock screen.
 
 ## How it works
 
