@@ -8,6 +8,44 @@ kept as the project's change history. The user-facing overview is the
 "Evan Lockscreen Studio" up to 0.7.0; exports then lived in `Download/EvanLockscreen`
 as `Evan-*.theme`. From 0.8.0 they are `Download/LockscreenStudio/Lockscreen-*.theme`.
 
+## New in 0.8.0: preview, split pieces, layouts and finishes
+
+- **Expanded preview** fills the screen at the phone's real shape. One finger drags by
+  the finger's offset (the old code set the clock centre to the touch point). Two
+  fingers pinch to resize and twist to rotate, and the corner handle does both with one
+  finger. Rotation snaps to multiples of 15° within 3°, and a centre-line snap applies
+  within 1.5 units. The toolbar has Split/Join, a Hours/Minutes/Date chooser, Reset and
+  Undo; "More" shows the old preview pills.
+- **Limits** now shared by editor and renderer: size 80–600, rotation ±180°,
+  horizontal −80…80, vertical −10…80 (same centre-anchored percentage mapping as
+  before), date size 20–120.
+- **Split pieces** (`split`, `mins{x,y,size,rot}`, `meta{x,y,rot}`):
+  `StudioTheme.splitTime` writes three top-level groups per schedule/warm slot. They are
+  the hours (2 digits at `size`), the minutes (2 digits rendered at `mins.size`), and
+  seconds/date/caption/info. Each is centred and rotated about itself and shares the
+  movement animation and alpha. Grid, Tower, Edge, Arc and Analog are already
+  single-digit shapes or a dial, so they can't split (`NO_SPLIT`).
+- **Layouts** `bigmin`, `diagonal`, `wave`, `offset`, `wide` are new `geometry()`
+  branches. The editor mirrors them in `freeGeom()` using absolutely positioned digits
+  in em. `analog` draws a dial plus full-size hand images; the hands use
+  `rotation="#hour12*30+#minute*0.5"` and `rotation="#minute*6"` about the dial centre.
+  The arithmetic-expression rotation is still to be confirmed on Realme's engine.
+- **Finishes**: `outlineglow` and `halftone` configure the Paint. `chrome`, `holo` and
+  `splittone` add a canvas-sized shader. `retro`, `emboss`, `glitch` and `duo` draw
+  extra passes. `stencil` draws a plate and clears the glyph (PorterDuff CLEAR), so
+  the wallpaper shows through. Date and caption text never take a finish. The editor
+  approximates each with CSS.
+- **Sliders**: range inputs ignore direct touches. A vertical swipe scrolls, a tap does
+  nothing, and only a horizontal drag of 8 px or more changes the value, by the finger's
+  offset. Keyboard input still works.
+- **Colours**: "From your photo" and "From your wallpaper" (`WallpaperColors` for the
+  lock wallpaper, falling back to home; no permission) for both colour and colour 2.
+  "Use current Material You colour" was removed.
+- **Theme Store package**: the helper uses `com.oplus.themestore` or
+  `com.heytap.themestore`, whichever is installed (`pm path`), for both theme and shade
+  imports. The completion log tag is the same in both.
+- The default caption is empty; it previously contained the maintainer's email.
+
 ## New in 0.7.0
 
 - **Shizuku once.** After the first grant the studio reconnects automatically

@@ -107,6 +107,37 @@ button:disabled{opacity:.4;cursor:default}
 .f-glass{color:#ffffff22;-webkit-text-stroke:.012em color-mix(in srgb,var(--c) 55%,#fff);text-shadow:0 .03em .1em #0004}
 .f-glass.tt .min{-webkit-text-stroke-color:color-mix(in srgb,var(--c2) 55%,#fff)}
 .meta{color:var(--c);margin-top:.35em;line-height:1.3}
+.meta.solo{margin-top:0}
+.L-free{display:block;position:relative;margin:0 auto}
+.L-free .pc{position:absolute;display:block}
+.L-free .pc>span{display:block;line-height:1.28;text-align:center}
+.L-analog{display:block;line-height:0}
+.L-analog .dial{width:1.8em;height:1.8em;overflow:visible}
+.L-analog .face{stroke:var(--c);fill:var(--c)}
+.L-analog .min{stroke:var(--c);fill:var(--c)}
+.L-analog.tt .min{stroke:var(--c2);fill:var(--c2)}
+.L-analog line{stroke-linecap:round}
+.L-analog.f-glow .dial,.L-analog.f-outlineglow .dial{filter:drop-shadow(0 0 .05em var(--c))}
+.L-analog.f-neon .dial{filter:drop-shadow(0 0 .03em #fff) drop-shadow(0 0 .1em var(--c))}
+.L-analog.f-shadow .dial{filter:drop-shadow(0 .04em .06em #0009)}
+.L-analog.f-glass .dial{opacity:.55}
+.digits.tt .min{--c:var(--c2)}
+.f-outlineglow{color:transparent;-webkit-text-stroke:.022em var(--c);text-shadow:0 0 .14em color-mix(in srgb,var(--c) calc(var(--g)*90%),transparent)}
+.f-duo{color:var(--c);-webkit-text-stroke:.03em var(--c2);paint-order:stroke fill}
+.f-retro{text-shadow:.012em .012em 0 color-mix(in srgb,var(--c2) 65%,#000),.024em .024em 0 color-mix(in srgb,var(--c2) 65%,#000),.036em .036em 0 color-mix(in srgb,var(--c2) 65%,#000),.048em .048em 0 color-mix(in srgb,var(--c2) 65%,#000),.06em .06em 0 color-mix(in srgb,var(--c2) 65%,#000),.072em .072em 0 color-mix(in srgb,var(--c2) 65%,#000),.084em .084em 0 color-mix(in srgb,var(--c2) 65%,#000)}
+.f-emboss{text-shadow:-.014em -.014em 0 #ffffff80,.014em .014em 0 #0000008c}
+.f-chrome,.f-holo,.f-splittone,.f-halftone{-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Gradient-filled finishes paint each text block; .digits.f-x .min outranks the two-tone colour rule so minutes keep the finish (in colour 2). */
+.digits:is(.f-chrome,.f-holo,.f-splittone,.f-halftone)>*,.digits:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .min,.digits.L-free:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .pc>span{-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0}
+.digits.f-chrome>*,.digits.f-chrome .min,.digits.L-free.f-chrome .pc>span{background-image:linear-gradient(180deg,color-mix(in srgb,var(--c) 20%,#fff) 0,var(--c) 35%,color-mix(in srgb,var(--c) 50%,#000) 50%,color-mix(in srgb,var(--c) 10%,#fff) 62%,var(--c) 100%)}
+.digits.f-holo>*,.digits.f-holo .min,.digits.L-free.f-holo .pc>span{background-image:linear-gradient(90deg,#ff5f6d,#ffc371,#47e5bc,#5f9dff,#c86bff)}
+.digits.f-splittone>*,.digits.f-splittone .min,.digits.L-free.f-splittone .pc>span{background-image:linear-gradient(180deg,var(--c) 50%,var(--c2) 50%)}
+.digits.f-halftone>*,.digits.f-halftone .min,.digits.L-free.f-halftone .pc>span{background-image:radial-gradient(circle,var(--c) 40%,transparent 44%);background-size:.07em .07em}
+.digits.L-free:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .pc{background:none}
+.f-glitch{text-shadow:-.028em 0 #ff2a55cc,.028em 0 #22e5ffcc}
+/* Stencil: a plate in the clock colour with the digits showing what is behind (screen blend approximates the cut-out). */
+.digits.f-stencil>*,.digits.f-stencil .min,.digits.L-free.f-stencil .pc>span{background:var(--c);color:#000;mix-blend-mode:screen;border-radius:.1em;padding:0 .04em;-webkit-text-stroke:0}
+.digits.L-free.f-stencil .pc{background:none}.digits.L-free.f-stencil .pc>span{padding:0}
 .meta .date{opacity:calc(var(--op)*.85)}
 .meta .cap{opacity:calc(var(--op)*.6);font-size:.8em;margin-top:.1em}
 .meta .inforow{justify-content:var(--jc,center)}
@@ -141,7 +172,9 @@ button:disabled{opacity:.4;cursor:default}
 .row:last-child{border:0}
 .row.slider label{display:flex;justify-content:space-between;align-items:center;font-size:0.875rem;margin-bottom:4px}
 .row.slider output{color:var(--ac);font-weight:600;font-variant-numeric:tabular-nums}
-input[type=range]{width:100%;height:30px;background:transparent;-webkit-appearance:none;appearance:none;--p:50%}
+input[type=range]{width:100%;height:30px;background:transparent;-webkit-appearance:none;appearance:none;--p:50%;pointer-events:none}
+.row.slider,.shade-row{touch-action:pan-y}
+.sliding input[type=range]::-webkit-slider-thumb{transform:scale(1.15)}
 input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:9px;background:linear-gradient(90deg,var(--ac) var(--p),#394060 var(--p))}
 input[type=range]::-moz-range-track{height:6px;border-radius:9px;background:#394060}
 input[type=range]::-moz-range-progress{height:6px;border-radius:9px;background:var(--ac)}
@@ -244,6 +277,24 @@ ol.steps2{padding-left:20px;display:grid;gap:8px;color:#c9cde2;font-size:0.84375
 .bar{height:6px;border-radius:9px;background:#2a3047;margin-top:14px;overflow:hidden}.bar span{display:block;height:100%;background:var(--ac);transition:width 1s linear}
 .full{position:absolute;inset:0;z-index:30;background:#05060af2;display:none;flex-direction:column;align-items:center;gap:14px;padding:max(16px,env(safe-area-inset-top)) 0 16px}
 .full.on{display:flex}
+/* Toasts never block touches on what is behind them; only their own buttons are tappable. */
+.toast{pointer-events:none}.toast button{pointer-events:auto}
+/* Expanded preview: the real phone shape fills the screen; controls float over it. */
+.full.on{display:block!important;padding:0!important;overflow:hidden!important}
+.full .phone.big{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);--ph:min(100dvh,calc(100vw/.4615))!important;border:0;border-radius:0;box-shadow:none}
+.ftop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;padding:max(10px,env(safe-area-inset-top)) 12px 10px;background:linear-gradient(#000b,#0000);z-index:2;pointer-events:none}
+.ftop>*{pointer-events:auto}
+.freadout{flex:1;text-align:center;font:600 .75rem/1.3 ui-monospace,monospace;color:#fff;text-shadow:0 1px 3px #000}
+.fbottom{position:absolute;left:0;right:0;bottom:0;padding:10px 12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(#0000,#000c);z-index:2;display:flex;flex-direction:column;gap:8px}
+.fbottom .pills{position:static;padding:0}.fbottom .pills[hidden]{display:none}
+.fbar{display:flex;flex-direction:column;gap:8px;align-items:center}
+.frow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.fseg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden;background:#0b0d14cc}
+.fseg button{min-height:40px;min-width:76px;padding:0 14px;font-weight:600;font-size:.78125rem}
+.fseg button[aria-checked=true]{background:var(--ac);color:var(--ink)}
+.full .clockpos.picked{outline:1.5px dashed #ffffffb0;outline-offset:.6cqw;border-radius:2px}
+.hdl{position:absolute;right:-5cqw;bottom:-5cqw;width:7cqw;height:7cqw;min-width:28px;min-height:28px;border-radius:50%;background:#fff;border:3px solid var(--ac2);box-shadow:0 2px 8px #0009;cursor:nwse-resize;touch-action:none}
+.screen.snap-x::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:#bba7ffcc;pointer-events:none;z-index:4}
 .full .fh{display:flex;justify-content:space-between;align-items:center;width:100%;padding:0 16px}
 .full .fh b{font-size:0.75rem;letter-spacing:.18em;color:var(--mu);text-transform:uppercase}
 .full .pills{position:static}
@@ -326,9 +377,9 @@ ol.steps2{padding-left:20px;display:grid;gap:8px;color:#c9cde2;font-size:0.84375
   </footer>
 
   <div class="full" id="full">
-    <div class="fh"><b>Your lock screen</b><button class="pill" data-act="fullClose">Close ✕</button></div>
     <div class="phone big"><div class="screen" id="fscreen"></div></div>
-    <div class="pills" id="fpills"></div>
+    <div class="ftop"><button class="pill" data-act="fullClose">✕ Close</button><output id="freadout" class="freadout" aria-live="polite"></output><button class="pill" data-act="fullTools" id="fullTools" aria-pressed="false">More</button></div>
+    <div class="fbottom"><div class="pills" id="fpills" hidden></div><div class="fbar" id="fbar"></div></div>
   </div>
   <div class="scrim" id="scrim" data-act="closeSheet"></div>
   <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div id="sheetBody"></div></div>
@@ -393,7 +444,7 @@ const FONTS={
 };
 const LEGACY={light:['inter',300],medium:['inter',500],bold:['inter',800],condensed:['barlow',600],mono:['jetbrains',500],serif:['fraunces',600],rounded:['nunito',800],grotesk:['spacegrotesk',600]};
 function fixState(st){if(LEGACY[st.font]){st.weight=LEGACY[st.font][1];st.font=LEGACY[st.font][0]}if(!FONTS[st.font])st.font='inter';if(st.dateFont!=='same'&&!FONTS[st.dateFont])st.dateFont='inter';return st}
-const FINISH=[['solid','Solid'],['glow','Glow'],['outline','Outline'],['neon','Neon'],['gradient','Gradient'],['shadow','Shadow'],['glass','Glass']];
+const FINISH=[['solid','Solid'],['glow','Glow'],['outline','Outline'],['neon','Neon'],['gradient','Gradient'],['shadow','Shadow'],['glass','Glass'],['outlineglow','Outline glow'],['duo','Two-tone stroke'],['retro','Retro 3D'],['emboss','Embossed'],['chrome','Chrome'],['holo','Holo'],['splittone','Split tone'],['halftone','Halftone'],['glitch','Glitch'],['stencil','Stencil']];
 const GRADS={
  aurora:{n:'Aurora',css:'linear-gradient(160deg,#0f2b3a,#1d5c63 45%,#3a2a6b)',avg:'#1d3f55'},
  dusk:{n:'Dusk',css:'linear-gradient(170deg,#1f2340,#4a2f63 55%,#8a4a6b)',avg:'#3d2c58'},
@@ -406,15 +457,16 @@ const DEFAULTS={
  font:'inter',weight:800,slant:0,lh:88,minScale:100,align:'center',rotate:0,arc:55,layout:'stacked',size:266,vpos:14,hpos:-3,spacing:2,
  color:'#ffd3a5',color2:'#bba7ff',twoTone:false,finish:'glow',glow:60,opacity:53,
  h12:false,showDate:true,seconds:false,warm:false,warmFrom:18,warmTo:6,
- dateStyle:'full',dateSize:38,dateFont:'inter',dateCase:'normal',dateTrack:0,caption:'evansunde2@gmail.com',movement:'still',
+ dateStyle:'full',dateSize:38,dateFont:'inter',dateCase:'normal',dateTrack:0,caption:'',movement:'still',
  info:{battery:false,alarm:false,weather:false,progress:false},infoPos:'below',
  nightDim:0,lowBatDim:false,
  bg:'atmos',gradient:'dusk',dim:59,
  subjectOn:true,subjScale:100,subjX:0,subjY:5,
  dbl:true,startHidden:false,delay:5,safeRevert:true,
- schedule:{on:false,day:'quiet',eve:'afterglow',night:'cinema'}
+ schedule:{on:false,day:'quiet',eve:'afterglow',night:'cinema'},
+ split:false,mins:{x:-3,y:27,size:266,rot:0},meta:{x:-3,y:40,rot:0}
 };
-const STOCK={font:'inter',weight:300,slant:0,lh:88,minScale:100,align:'center',rotate:0,dateFont:'inter',dateCase:'normal',dateTrack:0,layout:'single',color:'#ffffff',color2:'#ffffff',twoTone:false,finish:'solid',opacity:100,size:200,vpos:16,hpos:0,spacing:0,movement:'still',showDate:true,dateStyle:'full',dateSize:38,caption:'',seconds:false,warm:false,nightDim:0,lowBatDim:false,info:{battery:false,alarm:false,weather:false,progress:false}};
+const STOCK={split:false,font:'inter',weight:300,slant:0,lh:88,minScale:100,align:'center',rotate:0,dateFont:'inter',dateCase:'normal',dateTrack:0,layout:'single',color:'#ffffff',color2:'#ffffff',twoTone:false,finish:'solid',opacity:100,size:200,vpos:16,hpos:0,spacing:0,movement:'still',showDate:true,dateStyle:'full',dateSize:38,caption:'',seconds:false,warm:false,nightDim:0,lowBatDim:false,info:{battery:false,alarm:false,weather:false,progress:false}};
 const PBASE={slant:0,lh:88,minScale:100,align:'center',rotate:0,arc:55,twoTone:false,glow:60,spacing:0,hpos:0,movement:'still'};
 const PRESETS=[
  {id:'quiet',name:'Quiet hours',tag:'Clean · light · still',bg:'linear-gradient(135deg,#2a4252,#1c2331)',patch:{font:'inter',weight:300,layout:'single',color:'#bba7ff',finish:'solid',opacity:92,size:230,vpos:12}},
@@ -450,7 +502,7 @@ let S=clone(DEFAULTS),SC=[];
 try{const r=localStorage.getItem(KEY);if(r)S=deepMerge(clone(DEFAULTS),JSON.parse(r));const q=localStorage.getItem(SKEY);if(q)SC=JSON.parse(q)||[]}catch(e){}
 S=fixState(S);SC.forEach(x=>{if(x&&x.state)fixState(x.state)});
 const assets={photo:null,subject:null};
-const UI={tab:'clock',night:false,hide:S.startHidden,notifs:false,guides:false,compare:false,full:false,battery:37,shizuku:'idle',atmosDone:false,palette:[],photoAvg:null,applied:JSON.stringify(S),confirmReset:false,fcat:'All'};
+const UI={tab:'clock',night:false,hide:S.startHidden,notifs:false,guides:false,compare:false,full:false,battery:37,shizuku:'idle',atmosDone:false,palette:[],wallColors:[],photoAvg:null,sel:'h',fullTools:false,applied:JSON.stringify(S),confirmReset:false,fcat:'All'};
 let hist=[JSON.stringify(S)],hi=0,ctm=null;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function saveScenes(){try{localStorage.setItem(SKEY,JSON.stringify(SC))}catch(e){}}
@@ -476,11 +528,36 @@ const numWords=n=>n<20?ONES[n]:TENS[Math.floor(n/10)]+(n%10?'-'+ONES[n%10]:'');
 const minWords=m=>m===0?"o'clock":m<10?'oh '+ONES[m]:numWords(m);
 const fwOf=s=>{const f=FONTS[s.font]||FONTS.inter;return clamp(s.weight,f.wr[0],f.wr[1])};
 let arcN=0;
-function digitsHTML(s,e,p,fs){
- const f=FONTS[s.font]||FONTS.inter,lay=s.layout,ms=(s.minScale/100)*(lay==='hero'?.4:1);
+/* Same arrangement maths as StudioTheme.geometry, in em (1em = clock size), for layouts drawn as positioned digits. */
+const FREE=['bigmin','diagonal','wave','offset','wide'];
+function freeGeom(lay,s){
+ const c=.62,h=1.28,gap=s.spacing*.01,step=s.lh*.01,ms=s.minScale/100,P=[];
+ for(let i=0;i<4;i++){const min=i>=2;let x=0,y=0,sc=min?ms:1;
+  if(lay==='bigmin'){const hs=.45;sc=min?ms:hs;x=min?2*(c+gap)*hs+.06+(i-2)*(c+gap)*ms:i*(c+gap)*hs;y=(h-h*sc)*.5}
+  else if(lay==='diagonal'){const w=c*.8+gap;x=min?2*w+(i-2)*w*ms:i*w;y=i*step*.32}
+  else if(lay==='wave'){x=min?2*(c+gap)+(i-2)*(c+gap)*ms:i*(c+gap);y=(i%2)*step*.3}
+  else if(lay==='offset'){x=min?2*(c+gap)+(i-2)*(c+gap)*ms:i*(c+gap);y=min?step:0}
+  else if(lay==='wide'){x=min?2*(c+gap)+.9+(i-2)*(c+gap)*ms:i*(c+gap);y=(h-h*sc)*.5}
+  P.push({i,x,y,sc,min})}
+ let x0=0,y0=0,x1=0,y1=0;for(const q of P){x0=Math.min(x0,q.x);y0=Math.min(y0,q.y);x1=Math.max(x1,q.x+c*q.sc);y1=Math.max(y1,q.y+h*q.sc)}
+ P.forEach(q=>{q.x-=x0;q.y-=y0});return{P,w:x1-x0,h:y1-y0};
+}
+function analogSVG(s,d){
+ const hr=(d.getHours()%12)*30+d.getMinutes()*.5,mn=d.getMinutes()*6,ticks=[...Array(12).keys()].map(i=>{const a=i*30*Math.PI/180,mj=i%3===0,o=78-7,n=o-(mj?16:8);return `<line x1="${90+Math.sin(a)*n}" y1="${90-Math.cos(a)*n}" x2="${90+Math.sin(a)*o}" y2="${90-Math.cos(a)*o}" stroke-width="${mj?5:2.5}"/>`}).join('');
+ return `<svg class="dial" viewBox="0 0 180 180" aria-hidden="true"><g class="face"><circle cx="90" cy="90" r="78" fill="none" stroke-width="3"/>${ticks}<line class="hand" x1="90" y1="90" x2="90" y2="${90-78*.52}" stroke-width="7.5" transform="rotate(${hr} 90 90)"/></g><g class="min"><line class="hand" x1="90" y1="90" x2="90" y2="${90-78*.8}" stroke-width="5" transform="rotate(${mn} 90 90)"/><circle cx="90" cy="90" r="7"/></g></svg>`;
+}
+function digitsHTML(s,e,p,fs,part){
+ const f=FONTS[s.font]||FONTS.inter,lay=s.layout,ms=part?1:(s.minScale/100)*(lay==='hero'?.4:1);
  const size=lay==='words'?`calc(${fs} * .5)`:fs;
  const st=`--c:${e.c};--c2:${e.c2};--ff:${f.f};--fw:${fwOf(s)};--ls:${s.spacing*.01}em;--op:${e.op};--g:${s.glow/100};--ms:${ms};--lh:${s.lh/100};--sl:${s.slant};font-size:${size}`;
- const hh=p.hh,mm=p.mm;
+ const hh=p.hh,mm=p.mm,cls=`f-${s.finish} ${s.twoTone?'tt':''}`;
+ // A split piece is just the hours, or just the minutes, as its own block.
+ if(part){
+  if(lay==='words'){const hr=p.d.getHours()%12||12;return `<div class="digits L-words ${cls}" style="${st}">${part==='h'?`<div class="wd">${ONES[hr]}</div>`:`<div class="wm min">${minWords(p.d.getMinutes())}</div>`}</div>`}
+  return `<div class="digits L-piece ${cls}" style="${st}">${part==='h'?`<span data-t="hh">${hh}</span>`:`<span class="min" data-t="mm">${mm}</span>`}</div>`;
+ }
+ if(lay==='analog')return `<div class="digits L-analog ${cls}" style="${st}">${analogSVG(s,p.d)}</div>`;
+ if(FREE.includes(lay)){const g=freeGeom(lay,s),dg=[hh[0],hh[1],mm[0],mm[1]];return `<div class="digits L-free ${cls}" style="${st};width:${g.w.toFixed(3)}em;height:${g.h.toFixed(3)}em">${g.P.map(q=>`<span class="pc" style="left:${q.x.toFixed(3)}em;top:${q.y.toFixed(3)}em;width:${(.62*q.sc).toFixed(3)}em;height:${(1.28*q.sc).toFixed(3)}em"><span class="${q.min?'min':''}" style="font-size:${q.sc}em">${dg[q.i]}</span></span>`).join('')}</div>`}
  if(lay==='arc'){
   const id='a'+(++arcN),cy=200-2*s.arc,grad=s.finish==='gradient';
   return `<div class="digits arcw L-arc" style="${st}"><svg class="arcs a-${s.finish} ${s.twoTone?'tt':''}" viewBox="0 -60 400 330" style="width:calc(${fs} * 3.4)">${grad?`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${e.c}"/><stop offset="1" stop-color="${e.c2}"/></linearGradient></defs>`:''}<path id="${id}" d="M 20 200 Q 200 ${cy} 380 200" fill="none"/><text style="font-size:100px;letter-spacing:${s.spacing*1.2}px${grad?`;fill:url(#g${id})`:''}"><textPath href="#${id}" startOffset="50%" text-anchor="middle"><tspan>${hh}</tspan><tspan>:</tspan><tspan class="min">${mm}</tspan></textPath></text></svg></div>`;
@@ -505,12 +582,15 @@ function infoHTML(s){
  if(s.info.progress){const d=new Date(),pr=Math.round((d.getHours()*60+d.getMinutes())/14.4);c.push(`<span class="chip">Day <span class="pb"><i style="width:${pr}%"></i></span> ${pr}%</span>`)}
  return c.length?`<div class="inforow">${c.join('')}</div>`:'';
 }
-function previewHTML(s,p){
+function previewHTML(s,p,full){
  const e=eff(s,p.d),bg=bgLayer(s);
  const anim=s.movement==='breathe'?'breathe':s.movement==='float'?'float':s.movement==='tilt'?'tilt':'';
  const f0=FONTS[s.font]||FONTS.inter,df=s.dateFont==="same"?f0:(FONTS[s.dateFont]||FONTS.inter),dw=s.dateFont==="same"?clamp(Math.min(fwOf(s),600),f0.wr[0],f0.wr[1]):clamp(500,df.wr[0],df.wr[1]),jc=s.align==="left"?"flex-start":s.align==="right"?"flex-end":"center";
  const meta=`<div class="meta" style="--c:${e.c};--op:${e.op};--jc:${jc};font-family:${df.f};font-weight:${dw};text-transform:${s.dateCase==="upper"?"uppercase":"none"};letter-spacing:${s.dateTrack*.01}em;font-size:calc(${s.dateSize} * 100cqw / 1080)">${s.infoPos==='above'?infoHTML(s):''}${s.showDate?`<div class="date">${dateText(s.dateStyle,p.d)}</div>`:''}${s.caption?`<div class="cap">${s.caption.replace(/</g,'&lt;')}</div>`:''}${s.infoPos!=='above'?infoHTML(s):''}</div>`;
- const clock=UI.hide?'':`<div class="clockpos" style="text-align:${s.align}"><div class="anim ${anim}">${digitsHTML(s,e,p,`calc(${s.size} * 100cqw / 1080)`)}${meta}</div></div>`;
+ const fs=n=>`calc(${n} * 100cqw / 1080)`,hasMeta=s.showDate||s.caption||s.seconds||Object.values(s.info).some(Boolean);
+ const piece=(id,x,y,rot,body)=>{const sel=full&&(isSplit(s)?UI.sel:'h')===id;return `<div class="clockpos${sel?' picked':''}" data-piece="${id}" style="--hx:${x};--vy:${y};--rot:${rot};text-align:${s.align}"><div class="anim ${anim}">${body}</div>${sel?'<i class="hdl" data-handle aria-hidden="true"></i>':''}</div>`};
+ const clock=UI.hide?'':isSplit(s)?piece('h',s.hpos,s.vpos,s.rotate,digitsHTML(s,e,p,fs(s.size),'h'))+piece('m',s.mins.x,s.mins.y,s.mins.rot,digitsHTML(s,e,p,fs(s.mins.size),'m'))+(hasMeta?piece('d',s.meta.x,s.meta.y,s.meta.rot,meta.replace('class="meta"','class="meta solo"')):'')
+  :piece('h',s.hpos,s.vpos,s.rotate,digitsHTML(s,e,p,fs(s.size))+meta);
  const subj=(s.subjectOn&&assets.subject&&s.bg==='photo')?`<img class="subject" alt="" src="${assets.subject}">`:'';
  const notifs=UI.notifs?`<div class="notifs"><div class="n"><b>Messages · now</b>Aarav: Are we still meeting at 5?</div><div class="n"><b>Calendar · 4:30 PM</b>Project sync starts in 10 min</div><div class="n"><b>Photos</b>Your weekend memories are ready</div></div>`:'';
  const guides=UI.guides?`<div class="g g-top">Status bar</div><div class="g g-notif">Notification zone</div><div class="g g-fp">Fingerprint / gesture</div><div class="g-mid"></div>`:'';
@@ -529,11 +609,11 @@ function renderPreview(root){
  if(!root)return;const s=UI.compare?deepMerge(clone(S),clone(STOCK)):S,p=parts();
  for(const [k,v]of Object.entries({hx:s.hpos,rot:s.rotate,vy:s.vpos,sx:s.subjX,sy:s.subjY,ss:s.subjScale/100}))root.style.setProperty('--'+k,v);
  arcN=root.id==='fscreen'?100000:0;
- const frame=document.createElement('div');frame.innerHTML=previewHTML(s,p);
+ const frame=document.createElement('div');frame.innerHTML=previewHTML(s,p,root.id==='fscreen');
  const old=[...root.childNodes],fresh=[...frame.childNodes];for(let i=0;i<Math.max(old.length,fresh.length);i++){if(!fresh[i])old[i].remove();else if(!old[i])root.appendChild(fresh[i].cloneNode(true));else syncNode(old[i],fresh[i]);}
 }
 let previewFrame=0;
-function renderAll(){if(previewFrame)return;previewFrame=requestAnimationFrame(()=>{previewFrame=0;renderPreview($('#screen'));if(UI.full)renderPreview($('#fscreen'));updateContrast();});}
+function renderAll(){if(previewFrame)return;previewFrame=requestAnimationFrame(()=>{previewFrame=0;renderPreview($('#screen'));if(UI.full){if(!isSplit(S))UI.sel='h';renderFbar();renderPreview($('#fscreen'))}updateContrast();});}
 function tick(){const p=parts();if(p.d.getMinutes()!==tick.m){tick.m=p.d.getMinutes();renderAll();return}$$('[data-t]').forEach(el=>{const k=el.dataset.t;el.textContent=(k==='ss'&&el.tagName==='SPAN'?':':'')+p[k]})}
 tick.m=-1;
 
@@ -561,30 +641,39 @@ const LAYOUTS=[
  ['tower','Tower','<span class="lg" style="font-size:11px;line-height:.92">1<br>0<br>2<br>4</span>'],
  ['vertical','Edge','<span class="lg" style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:15px">10:24</span>'],
  ['arc','Arc','<svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true"><path id="tp" d="M3 24 Q22 -6 41 24" fill="none"/><text font-size="13" font-weight="800" fill="currentColor"><textPath href="#tp" startOffset="50%" text-anchor="middle">10:24</textPath></text></svg>'],
- ['words','Words','<span class="lg" style="font-size:12px">ten<br>twenty-four</span>']
+ ['words','Words','<span class="lg" style="font-size:12px">ten<br>twenty-four</span>'],
+ ['bigmin','Big minutes','<span class="lg"><span style="font-size:.5em">10</span>24</span>'],
+ ['diagonal','Diagonal','<span class="lg" style="font-size:13px;line-height:.7">1<span style="position:relative;top:.3em">0</span><span style="position:relative;top:.6em">2</span><span style="position:relative;top:.9em">4</span></span>'],
+ ['wave','Wave','<span class="lg">1<span style="position:relative;top:.25em">0</span>2<span style="position:relative;top:.25em">4</span></span>'],
+ ['offset','Offset','<span class="lg" style="text-align:left">10<br><i style="margin-left:1.2em">24</i></span>'],
+ ['wide','Wide','<span class="lg">10&nbsp;&nbsp;&nbsp;24</span>'],
+ ['analog','Analog','<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15V8M15 15l5 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>']
 ];
-const LHINT={single:'Classic one-line clock.',stacked:'Hours over minutes.',stairs:'Minutes step to the side.',hero:'Big hours with small minutes beside them.',split:'Hours and minutes divided by a line.',grid:'A 2×2 block of digits.',tower:'One digit per line.',vertical:'Runs along the screen edge. Try the “Left edge” position.',arc:'Curved along an arc. Use the curve slider.',words:'Spoken time, for example “six thirty-one”.'};
+// Layouts that are already single-digit shapes (or a dial) cannot be split into hours/minutes/date pieces.
+const NO_SPLIT=['grid','tower','vertical','arc','analog'];
+const canSplit=s=>!NO_SPLIT.includes(s.layout),isSplit=s=>!!s.split&&canSplit(s);
+const LHINT={single:'Classic one-line clock.',stacked:'Hours over minutes.',stairs:'Minutes step to the side.',hero:'Big hours with small minutes beside them.',split:'Hours and minutes divided by a line.',grid:'A 2×2 block of digits.',tower:'One digit per line.',vertical:'Runs along the screen edge. Try the “Left edge” position.',arc:'Curved along an arc. Use the curve slider.',words:'Spoken time, for example “six thirty-one”.',bigmin:'Small hours with big minutes.',diagonal:'Digits step down at an angle.',wave:'Digits alternate up and down.',offset:'Minutes start where the hours end.',wide:'One line with a wide gap instead of a colon.',analog:'A dial whose hands move live on your lock screen.'};
 const FCATS=['All','Clean','Display','Serif','Mono','Tech'];
 function tabClock(){
  const lay=S.layout,f=FONTS[S.font]||FONTS.inter;
- const extra=(['single','stacked','stairs','hero','split'].includes(lay)?slider('minScale','Minutes size',30,130,1,'%'):'')+(lay==='arc'?slider('arc','Arc curve',-100,100):'');
+ const extra=(['single','stacked','stairs','hero','split','bigmin','diagonal','wave','offset','wide'].includes(lay)&&!isSplit(S)?slider('minScale','Minutes size',30,130,1,'%'):'')+(lay==='arc'?slider('arc','Arc curve',-100,100):'');
  const wrow=f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider('weight','Weight',f.wr[0],f.wr[1],50);
- return sec('Clock layout','Choose a shape',`<div class="grid g3">${LAYOUTS.slice(0,6).map(([v,n,g])=>tile('layout',v,g,n,true)).join('')}</div><button class="btn block" data-act="layoutPicker" style="margin-top:10px">All 10 layouts · ${LAYOUTS.find(x=>x[0]===lay)[1]} selected</button>`)
- +sec('Size & position','Drag in the expanded preview',card(slider('size','Clock size',80,340)+slider('vpos','Vertical position',0,70,1,'%')+slider('hpos','Horizontal position',-50,50))
+ return sec('Clock layout','Choose a shape',`<div class="grid g3">${LAYOUTS.slice(0,6).map(([v,n,g])=>tile('layout',v,g,n,true)).join('')}</div><button class="btn block" data-act="layoutPicker" style="margin-top:10px">All ${LAYOUTS.length} layouts · ${LAYOUTS.find(x=>x[0]===lay)[1]} selected</button>`)
+ +sec('Size & position','Drag, pinch and twist in the expanded preview',card(slider('size',isSplit(S)?'Hours size':'Clock size',80,600)+slider('vpos','Vertical position',-10,80,1,'%')+slider('hpos','Horizontal position',-80,80)+slider('rotate','Rotation',-180,180,1,'°')+(canSplit(S)?toggle('split','Separate hours, minutes & date','Move, size and rotate each piece on its own','',true)+(S.split?slider('mins.size','Minutes size',60,600)+slider('mins.rot','Minutes rotation',-180,180,1,'°')+slider('meta.rot','Date rotation',-180,180,1,'°'):''):`<div class="row"><p class="mu sm">This layout can’t be separated into pieces.</p></div>`))
  +`<div class="chips">${[['Upper','14,0'],['Centre','35,0'],['Lower','55,0'],['Left edge','35,-40'],['Right edge','35,40']].map(([l,v])=>`<button class="cp" data-act="place" data-v="${v}">${l}</button>`).join('')}</div>`)
  +sec('Typography','30 offline typefaces',card(`<button class="choice-row" data-act="fontPicker"><span class="sample" style="font-family:${f.f};font-weight:${fwOf(S)}">10:24</span><span class="choice-text"><b>${f.n}</b><small>Browse fonts</small></span><span aria-hidden="true">›</span></button>`+wrow)
- +`<details class="disclosure" data-disclosure="type"><summary>Fine-tune typography</summary>${slider('slant','Slant',0,20,1,'°')}${slider('spacing','Digit spacing',-10,30)}${slider('lh','Line spacing',60,140,1,'%')}${slider('rotate','Rotation',-45,45,1,'°')}${extra}<div class="row">${sel('align',[['left','Align left'],['center','Align centre'],['right','Align right']])}</div></details>`)
- +sec('Date & caption','Under the clock',card(toggle('showDate','Show date')+`<div class="row">${sel('dateStyle',['full','short','dm','caps','num','day'].map(v=>[v,dateText(v,new Date())]))}</div>`+slider('dateSize','Date size',20,70)+`<div class="row grid g2">${sel('dateFont',[['same','Match clock'],['inter','Inter'],['jetbrains','JetBrains Mono'],['fraunces','Fraunces'],['barlow','Barlow Condensed'],['spacegrotesk','Space Grotesk']])}${sel('dateCase',[['normal','Normal case'],['upper','UPPERCASE']])}</div>`+slider('dateTrack','Date tracking',0,30)+`<div class="row"><p class="mu sm" style="margin-bottom:8px">Personal caption</p><input class="txt" data-key="caption" value="${S.caption.replace(/"/g,'&quot;')}" maxlength="60" placeholder="Name, motto, or contact for lost phone"><div class="chips">${[['Name','Your name'],['If found, call…','If found, call +977-'],['Motto','Stay curious'],['Clear','']].map(([l,v])=>`<button class="cp" data-act="caption" data-v="${v}">${l}</button>`).join('')}</div></div>`))
+ +`<details class="disclosure" data-disclosure="type"><summary>Fine-tune typography</summary>${slider('slant','Slant',0,20,1,'°')}${slider('spacing','Digit spacing',-10,30)}${slider('lh','Line spacing',60,140,1,'%')}${extra}<div class="row">${sel('align',[['left','Align left'],['center','Align centre'],['right','Align right']])}</div></details>`)
+ +sec('Date & caption','Under the clock',card(toggle('showDate','Show date')+`<div class="row">${sel('dateStyle',['full','short','dm','caps','num','day'].map(v=>[v,dateText(v,new Date())]))}</div>`+slider('dateSize','Date size',20,120)+`<div class="row grid g2">${sel('dateFont',[['same','Match clock'],['inter','Inter'],['jetbrains','JetBrains Mono'],['fraunces','Fraunces'],['barlow','Barlow Condensed'],['spacegrotesk','Space Grotesk']])}${sel('dateCase',[['normal','Normal case'],['upper','UPPERCASE']])}</div>`+slider('dateTrack','Date tracking',0,30)+`<div class="row"><p class="mu sm" style="margin-bottom:8px">Personal caption</p><input class="txt" data-key="caption" value="${S.caption.replace(/"/g,'&quot;')}" maxlength="60" placeholder="Name, motto, or contact for lost phone"><div class="chips">${[['Name','Your name'],['If found, call…','If found, call +977-'],['Motto','Stay curious'],['Clear','']].map(([l,v])=>`<button class="cp" data-act="caption" data-v="${v}">${l}</button>`).join('')}</div></div>`))
  +sec('Time','Format & behaviour',card(toggle('h12','12-hour time')+toggle('seconds','Show seconds','Small seconds beside the minutes','t')+toggle('warm','Warm colour after dark',`Shifts the clock warmer (${pad(S.warmFrom)}:00 – ${pad(S.warmTo)}:00)`,'',true)+(S.warm?`<div class="row grid g2"><div><p class="mu sm" style="margin-bottom:6px">From</p>${sel('warmFrom',hours,1)}</div><div><p class="mu sm" style="margin-bottom:6px">Until</p>${sel('warmTo',hours,1)}</div></div>`:'')))
 ;
 }
 function tabStyle(){
- const pal=UI.palette.length?`<p class="mu sm" style="margin:2px 0 8px">From your photo</p><div class="swrow">${UI.palette.map(c=>`<button class="dot" style="--c:${c}" data-set="color" data-val="${c}" aria-label="${c}" aria-pressed="${S.color.toLowerCase()===c}"></button>`).join('')}</div>`:'';
+ // Suggested colours from the selected photo and from the phone's wallpaper (works for live/Atmos wallpapers that report colours).
+ const pal=k=>[['From your photo',UI.palette],['From your wallpaper',UI.wallColors]].filter(([,cs])=>cs.length).map(([t,cs])=>`<p class="mu sm" style="margin:10px 0 8px">${t}</p><div class="swrow">${cs.map(c=>`<button class="dot" style="--c:${c}" data-set="${k}" data-val="${c}" aria-label="${c}" aria-pressed="${S[k].toLowerCase()===c}"></button>`).join('')}</div>`).join('');
  const fin=FINISH.map(([v,n])=>`<button class="tile" data-set="finish" data-val="${v}" data-rerender aria-pressed="${S.finish===v}"><span class="digits f-${v}" style="--c:${S.color};--c2:${S.color2};--g:.7;--op:1;--ff:'Inter',sans-serif;--fw:800;--ls:0;font-size:28px">10</span><small>${n}</small></button>`).join('');
- return sec('Colour','Pick, type or sample',card(`<div class="row">${swatches('color')}${hexrow('color')}${pal}</div>`+toggle('twoTone','Two-tone minutes','Give the minutes their own colour or gradient end','',true)+(S.twoTone?`<div class="row"><p class="mu sm" style="margin-bottom:10px">Minutes / gradient end</p>${swatches('color2')}${hexrow('color2')}</div>`:'')))
- +`<button class="btn block" data-act="materialColor" style="margin-bottom:18px">Use current Material You colour</button><p class="mu sm" style="margin-top:-10px;margin-bottom:24px">Samples Android’s current accent. Apply the clock once to update its colour.</p>`
+ return sec('Colour','Pick, type or sample',card(`<div class="row">${swatches('color')}${hexrow('color')}${pal('color')}</div>`+toggle('twoTone','Two-tone minutes','Give the minutes their own colour or gradient end','',true)+(S.twoTone?`<div class="row"><p class="mu sm" style="margin-bottom:10px">Minutes / gradient end</p>${swatches('color2')}${hexrow('color2')}${pal('color2')}</div>`:'')))
  +sec('Readability','Checked against your background',`<div class="card contrast" id="contrast" style="padding:12px 14px"></div>`)
- +sec('Finish','7 looks',`<div class="grid g3">${fin}</div><div class="card" style="margin-top:12px">${slider('opacity','Clock opacity',10,100,1,'%')}${(S.finish==='glow'||S.finish==='neon')?slider('glow','Glow strength',0,100,1,'%'):''}</div>`)
+ +sec('Finish',`${FINISH.length} looks`,`<div class="grid g3">${fin}</div><div class="card" style="margin-top:12px">${slider('opacity','Clock opacity',10,100,1,'%')}${(S.finish==='glow'||S.finish==='neon')?slider('glow','Glow strength',0,100,1,'%'):''}</div>`)
 ;
 }
 function tabMotion(){return sec('Movement','Motion costs battery',`<div class="grid g2">${[['still','Still','Lowest battery'],['breathe','Breathe','Slow fade pulse'],['float','Float','Gentle drift'],['tilt','Tilt','Follows motion']].map(([v,n,d])=>`<button class="tile" data-set="movement" data-val="${v}" aria-pressed="${S.movement===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`);}
@@ -729,6 +818,26 @@ function refreshColors(skip){
  $$('.tile .digits').forEach(d=>{d.style.setProperty('--c',S.color);d.style.setProperty('--c2',S.color2)});
 }
 
+/* ---------- sliders ----------
+   Native range inputs react to any sideways movement and jump on a tap, so scrolling past one could change it.
+   Here a vertical swipe always scrolls, the value only follows a deliberate horizontal drag (by the finger's
+   offset, so it never jumps), and taps change nothing. Keyboard input still works on the focusable range. */
+let slide=null;
+const sliderHost=t=>t.closest('.row.slider,.shade-row');
+document.addEventListener('pointerdown',e=>{
+ const host=sliderHost(e.target);if(!host)return;const r=host.querySelector('input[type=range]');if(!r||r.disabled)return;
+ const b=r.getBoundingClientRect();if(e.clientY<b.top-18||e.clientY>b.bottom+18)return;
+ slide={r,host,id:e.pointerId,x:e.clientX,y:e.clientY,v:+r.value,w:b.width||1,on:false};
+},true);
+document.addEventListener('pointermove',e=>{
+ if(!slide||e.pointerId!==slide.id)return;const dx=e.clientX-slide.x,dy=e.clientY-slide.y;
+ if(!slide.on){if(Math.abs(dy)>8&&Math.abs(dy)>=Math.abs(dx)){slide=null;return}if(Math.abs(dx)<8)return;slide.on=true;slide.host.classList.add('sliding');try{slide.host.setPointerCapture(e.pointerId)}catch(err){}}
+ const r=slide.r,min=+r.min,max=+r.max,step=+r.step||1,v=clamp(Math.round((slide.v+dx/slide.w*(max-min))/step)*step,min,max);
+ if(+r.value!==v){r.value=v;r.dispatchEvent(new Event('input',{bubbles:true}))}
+},true);
+const slideEnd=e=>{if(!slide||e.pointerId!==slide.id)return;const s0=slide;slide=null;s0.host.classList.remove('sliding');if(s0.on&&e.type==='pointerup')s0.r.dispatchEvent(new Event('change',{bubbles:true}))};
+document.addEventListener('pointerup',slideEnd,true);document.addEventListener('pointercancel',slideEnd,true);
+
 /* ---------- events ---------- */
 const panel=$('#panel');
 panel.addEventListener('input',e=>{
@@ -742,7 +851,7 @@ panel.addEventListener('input',e=>{
 });
 panel.addEventListener('change',e=>{
  const t=e.target,k=t.dataset.key;if(!k)return;
- if(t.type==='checkbox'){setP(S,k,t.checked);if(k==='startHidden')UI.hide=t.checked;changed();if(t.hasAttribute('data-rerender'))renderPanel(true)}
+ if(t.type==='checkbox'){if(k==='split'){toggleSplit(t.checked);return}setP(S,k,t.checked);if(k==='startHidden')UI.hide=t.checked;changed();if(t.hasAttribute('data-rerender'))renderPanel(true)}
  else if(t.tagName==='SELECT'){setP(S,k,t.hasAttribute('data-num')?+t.value:t.value);changed()}
  else if(t.type==='color'||t.classList.contains('txt')){commit()}
 });
@@ -769,8 +878,12 @@ document.addEventListener('click',e=>{
   case'closeSheet':closeSheet();break;
   case'keep':clearInterval(applyTimer);closeSheet();toast('Kept · lock screen updated');break;
   case'revert':clearInterval(applyTimer);UI.applied=UI.prevApplied||UI.applied;chrome();closeSheet();if(UI.tab==='setup')renderPanel(true);toast('Reverted to your previous lock screen');break;
-  case'full':UI.full=true;$('#full').classList.add('on');renderPreview($('#fscreen'));break;
+  case'full':UI.full=true;if(!isSplit(S))UI.sel='h';$('#full').classList.add('on');renderFbar();readout(isSplit(S)?UI.sel:'h');renderPreview($('#fscreen'));break;
   case'fullClose':UI.full=false;$('#full').classList.remove('on');break;
+  case'fullTools':UI.fullTools=!UI.fullTools;$('#fpills').hidden=!UI.fullTools;a.setAttribute('aria-pressed',String(UI.fullTools));break;
+  case'splitToggle':toggleSplit(!isSplit(S));break;
+  case'pieceSel':UI.sel=a.dataset.v;renderFbar();readout(UI.sel);renderAll();break;
+  case'pieceReset':resetPiece(isSplit(S)?UI.sel:'h');break;
   case'photo':$('#photoIn').click();break;
   case'subject':$('#subjectIn').click();break;
   case'subjectClear':if(assets.subject)URL.revokeObjectURL(assets.subject);assets.subject=null;changed();renderPanel(true);break;
@@ -828,31 +941,85 @@ $('#importIn').addEventListener('change',e=>{
  e.target.value='';
 });
 
-/* drag the clock + tilt + double tap */
-let drag=null,lastTap=0;
+/* Direct manipulation of the clock pieces: drag moves by the finger's offset (never jumps to the touch point),
+   two fingers pinch to resize and twist to rotate, and the corner handle does both with one finger. */
+const PIECES={h:{x:'hpos',y:'vpos',size:'size',rot:'rotate',lo:80,name:'Hours'},m:{x:'mins.x',y:'mins.y',size:'mins.size',rot:'mins.rot',lo:60,name:'Minutes'},d:{x:'meta.x',y:'meta.y',size:'dateSize',rot:'meta.rot',lo:20,hi:120,name:'Date'}};
+const pieceState=id=>{const k=PIECES[id];return{x:getP(S,k.x),y:getP(S,k.y),size:getP(S,k.size),rot:getP(S,k.rot)}};
+const normDeg=a=>((a+180)%360+360)%360-180;
+function snapRot(a){a=normDeg(a);const n=Math.round(a/15)*15;return Math.abs(a-n)<=3?n:Math.round(a)}
+function readout(id){const o=$('#freadout');if(!o)return;const st=pieceState(id),label=isSplit(S)?PIECES[id].name:'Clock';o.textContent=`${label} · Size ${Math.round(st.size)} · ${Math.round(st.rot)}°`}
+function setPiece(id,v){
+ const k=PIECES[id];
+ if(v.x!=null)setP(S,k.x,Math.round(clamp(v.x,-80,80)));if(v.y!=null)setP(S,k.y,Math.round(clamp(v.y,-10,80)));
+ if(v.size!=null)setP(S,k.size,Math.round(clamp(v.size,k.lo,k.hi||600)));if(v.rot!=null)setP(S,k.rot,snapRot(v.rot));
+ for(const key of [k.x,k.y,k.size,k.rot])syncRange(key);readout(id);renderAll();
+}
+let gest=null,lastTap=0;
 function bindScreen(root){
+ const pts=new Map();
+ const begin=()=>{
+  const ids=[...pts.keys()],a=pts.get(ids[0]),b=pts.get(ids[1]);
+  gest.start=pieceState(gest.id);gest.rect=root.getBoundingClientRect();
+  if(b){gest.mode='pinch';gest.d0=Math.hypot(b.x-a.x,b.y-a.y)||1;gest.a0=Math.atan2(b.y-a.y,b.x-a.x)}
+  else if(gest.mode==='handle'){const el=root.querySelector(`.clockpos[data-piece="${gest.id}"]`),r=el?el.getBoundingClientRect():gest.rect;gest.cx=r.left+r.width/2;gest.cy=r.top+r.height/2;gest.d0=Math.hypot(a.x-gest.cx,a.y-gest.cy)||1;gest.a0=Math.atan2(a.y-gest.cy,a.x-gest.cx)}
+  else{gest.mode='move';gest.x0=a.x;gest.y0=a.y}
+ };
  root.addEventListener('pointerdown',e=>{
-  if(!e.target.closest('.clockpos'))return;
-  drag={root,rect:root.getBoundingClientRect(),moved:false,x:e.clientX,y:e.clientY};
-  try{root.setPointerCapture(e.pointerId)}catch(err){}
+  const pc=e.target.closest('.clockpos[data-piece]'),handle=e.target.closest('[data-handle]');
+  if(!gest&&!pc&&!handle)return;
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});try{root.setPointerCapture(e.pointerId)}catch(err){}
+  if(!gest){const id=pc?pc.dataset.piece:'h';gest={root,id:isSplit(S)?id:'h',mode:handle?'handle':'move',moved:false};if(root.id==='fscreen'&&isSplit(S)&&UI.sel!==gest.id){UI.sel=gest.id;renderFbar();renderAll()}}
+  else if(gest.root!==root)return;
+  begin();readout(gest.id);
  });
  root.addEventListener('pointermove',e=>{
-  if(drag&&drag.root===root){
-   if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<4)return;
-   const r=drag.rect,x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;
-   S.hpos=Math.round(clamp((x-50)/.6,-50,50));S.vpos=Math.round(clamp((y-12)/1.1,0,70));drag.moved=true;
-   $$('#screen,#fscreen').forEach(el=>{el.style.setProperty('--hx',S.hpos);el.style.setProperty('--vy',S.vpos)});
-   syncRange('hpos');syncRange('vpos');
-  }else if(S.movement==='tilt'){
+  if(gest&&gest.root===root&&pts.has(e.pointerId)){
+   pts.set(e.pointerId,{x:e.clientX,y:e.clientY});const ids=[...pts.keys()],a=pts.get(ids[0]),b=pts.get(ids[1]),st=gest.start,r=gest.rect;
+   if(gest.mode==='pinch'&&b){const d=Math.hypot(b.x-a.x,b.y-a.y),ang=Math.atan2(b.y-a.y,b.x-a.x);gest.moved=true;setPiece(gest.id,{size:st.size*d/gest.d0,rot:st.rot+(ang-gest.a0)*180/Math.PI})}
+   else if(gest.mode==='handle'){const d=Math.hypot(a.x-gest.cx,a.y-gest.cy),ang=Math.atan2(a.y-gest.cy,a.x-gest.cx);gest.moved=true;setPiece(gest.id,{size:st.size*d/gest.d0,rot:st.rot+(ang-gest.a0)*180/Math.PI})}
+   else if(gest.mode==='move'){
+    if(!gest.moved&&Math.hypot(a.x-gest.x0,a.y-gest.y0)<4)return;gest.moved=true;
+    let x=st.x+(a.x-gest.x0)/r.width*100/.6;const y=st.y+(a.y-gest.y0)/r.height*100/1.1;
+    // Soft snap to the vertical centre line.
+    const snapped=Math.abs(x)<1.5;if(snapped)x=0;root.classList.toggle('snap-x',snapped);
+    setPiece(gest.id,{x,y});
+   }
+  }else if(!gest&&S.movement==='tilt'){
    const r=root.getBoundingClientRect();root.style.setProperty('--tx',((e.clientX-r.left)/r.width-.5)*-5);root.style.setProperty('--ty',((e.clientY-r.top)/r.height-.5)*-5)
   }
  });
- root.addEventListener('pointerup',()=>{
-  if(drag&&drag.root===root){const m=drag.moved;drag=null;if(m){changed();return}}
+ const end=e=>{
+  const tracked=pts.delete(e.pointerId);
+  if(tracked&&gest&&gest.root===root){
+   if(pts.size){gest.mode='move';begin();return}
+   const moved=gest.moved;gest=null;root.classList.remove('snap-x');if(moved){changed();return}
+  }else if(gest)return;
+  // A tap that did not move anything (on the clock or an empty area): double-tap hides/shows the clock.
+  if(e.type==='pointercancel')return;
   const now=Date.now();
   if(now-lastTap<320&&S.dbl){UI.hide=!UI.hide;renderAll();chrome();lastTap=0}else lastTap=now;
- });
- root.addEventListener('pointerleave',()=>{if(S.movement==='tilt'){root.style.setProperty('--tx',0);root.style.setProperty('--ty',0)}});
+ };
+ root.addEventListener('pointerup',end);root.addEventListener('pointercancel',end);
+ root.addEventListener('pointerleave',()=>{if(S.movement==='tilt'&&!gest){root.style.setProperty('--tx',0);root.style.setProperty('--ty',0)}});
+}
+/* Expanded preview toolbar: split toggle, piece choice, reset, undo. */
+function seedSplit(){
+ // Place minutes below the hours and the date below the minutes, sized like the current arrangement.
+ const u=n=>n*1.28/26.4,ms=S.minScale/100*(S.layout==='hero'?.4:S.layout==='bigmin'?1:1),msize=clamp(Math.round(S.size*ms),60,600);
+ S.mins={x:S.hpos,y:clamp(Math.round(S.vpos+u(S.size)/2+u(msize)/2),-10,80),size:msize,rot:0};
+ S.meta={x:S.hpos,y:clamp(Math.round(S.mins.y+u(msize)/2+3),-10,80),rot:0};
+}
+function toggleSplit(on){if(!canSplit(S))return;S.split=on;if(on)seedSplit();UI.sel='h';changed();commit();renderPanel(true);renderFbar();readout(UI.sel);const msg=on?'Hours, minutes and date are separate. Drag each piece.':'Pieces joined back into one clock';if(UI.full){const o=$('#freadout');if(o)o.textContent=msg}else toast(msg)}
+function resetPiece(id){
+ if(id==='h'){S.hpos=DEFAULTS.hpos;S.vpos=DEFAULTS.vpos;S.rotate=0;if(isSplit(S))seedSplit()}
+ else{const keep=id==='m'?S.meta:S.mins;seedSplit();if(id==='m')S.meta=keep;else S.mins=keep}
+ changed();commit();renderPanel(true);readout(id);
+}
+function renderFbar(){
+ const bar=$('#fbar');if(!bar)return;const split=isSplit(S),sel=split?UI.sel:'h';
+ const html=(split?`<div class="fseg" role="radiogroup" aria-label="Piece to edit">${['h','m','d'].map(id=>`<button role="radio" data-act="pieceSel" data-v="${id}" aria-checked="${sel===id}">${PIECES[id].name}</button>`).join('')}</div>`:'')
+  +`<div class="frow">${canSplit(S)?`<button class="pill" data-act="splitToggle" aria-pressed="${split}">${split?'Join pieces':'Split hours / minutes'}</button>`:''}<button class="pill" data-act="pieceReset">Reset ${split?PIECES[sel].name.toLowerCase():'position'}</button><button class="pill" data-act="undo">Undo</button></div>`;
+ if(bar.innerHTML!==html)bar.innerHTML=html;
 }
 bindScreen($('#screen'));bindScreen($('#fscreen'));
 window.addEventListener('deviceorientation',e=>{if(S.movement!=='tilt'||e.gamma==null)return;const r=$('#screen');r.style.setProperty('--tx',clamp(e.gamma/12,-3,3));r.style.setProperty('--ty',clamp((e.beta-45)/14,-3,3))});
@@ -871,7 +1038,7 @@ const fixOriginal=fixState;
 fixState=function(st){
  const out=clone(DEFAULTS);for(const key of Object.keys(DEFAULTS))if(Object.prototype.hasOwnProperty.call(st||{},key))out[key]=clone(st[key]);
  fixOriginal(out);
- const ranges={weight:[100,900],slant:[0,20],lh:[60,140],minScale:[30,130],rotate:[-45,45],arc:[-100,100],size:[80,340],vpos:[0,70],hpos:[-50,50],spacing:[-10,30],glow:[0,100],opacity:[10,100],warmFrom:[0,23],warmTo:[0,23],dateSize:[20,70],dateTrack:[0,30],nightDim:[0,70],dim:[0,100],subjScale:[50,200],subjX:[-30,30],subjY:[-30,30]};
+ const ranges={weight:[100,900],slant:[0,20],lh:[60,140],minScale:[30,130],rotate:[-180,180],arc:[-100,100],size:[80,600],vpos:[-10,80],hpos:[-80,80],spacing:[-10,30],glow:[0,100],opacity:[10,100],warmFrom:[0,23],warmTo:[0,23],dateSize:[20,120],dateTrack:[0,30],nightDim:[0,70],dim:[0,100],subjScale:[50,200],subjX:[-30,30],subjY:[-30,30]};
  for(const [k,[low,high]]of Object.entries(ranges)){const v=Number(out[k]);out[k]=Number.isFinite(v)?clamp(v,low,high):DEFAULTS[k];}
  for(const k of ['color','color2'])if(!HEX.test(out[k]))out[k]=DEFAULTS[k];
  const enums={layout:LAYOUTS.map(x=>x[0]),align:['left','center','right'],finish:FINISH.map(x=>x[0]),bg:['atmos','photo','gradient','black'],gradient:Object.keys(GRADS),movement:['still','breathe','float','tilt'],dateStyle:['full','short','dm','caps','num','day'],dateCase:['normal','upper'],infoPos:['above','below']};
@@ -880,6 +1047,9 @@ fixState=function(st){
  out.info=Object.fromEntries(['battery','alarm','weather','progress'].map(k=>[k,!!(out.info&&out.info[k])]));
  out.schedule={on:!!(out.schedule&&out.schedule.on),day:String(out.schedule&&out.schedule.day||'quiet'),eve:String(out.schedule&&out.schedule.eve||'afterglow'),night:String(out.schedule&&out.schedule.night||'cinema')};
  for(const k of Object.keys(DEFAULTS))if(typeof DEFAULTS[k]==='boolean')out[k]=!!out[k];
+ const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?clamp(Math.round(v),lo,hi):d};
+ out.mins={x:num(out.mins&&out.mins.x,-80,80,out.hpos),y:num(out.mins&&out.mins.y,-10,80,clamp(out.vpos+12,-10,80)),size:num(out.mins&&out.mins.size,60,600,out.size),rot:num(out.mins&&out.mins.rot,-180,180,0)};
+ out.meta={x:num(out.meta&&out.meta.x,-80,80,out.hpos),y:num(out.meta&&out.meta.y,-10,80,clamp(out.vpos+24,-10,80)),rot:num(out.meta&&out.meta.rot,-180,180,0)};
  return out;
 };
 function native(action,payload={}){if(window.StudioNative)StudioNative.action(action,JSON.stringify(payload));else{window.demoActions=window.demoActions||[];window.demoActions.push({action,payload});}}
@@ -897,7 +1067,7 @@ function nativeDesign(state=S){
 save=function(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>native('change',{design:nativeDesign()}),160);};
 saveScenes=function(){};
 const oldChrome=chrome;
-function disableBusy(){const busy=nativeBusy||recoveryLock;$$('#panel input,#panel select,#panel button,#pills button,#fpills button,[data-act="editorMenu"],[data-act="previewOptions"],#apply,#shadeFooter button').forEach(el=>el.disabled=busy||el.hasAttribute('data-disabled'));if(busy){$('#undo').disabled=true;$('#redo').disabled=true;}}
+function disableBusy(){const busy=nativeBusy||recoveryLock;$$('#panel input,#panel select,#panel button,#pills button,#fpills button,#fbar button,[data-act="editorMenu"],[data-act="previewOptions"],#apply,#shadeFooter button').forEach(el=>el.disabled=busy||el.hasAttribute('data-disabled'));if(busy){$('#undo').disabled=true;$('#redo').disabled=true;}}
 chrome=function(){oldChrome();$('#shzTxt').textContent=UI.shizuku==='connected'?'Connected':UI.shizuku==='connecting'?'Connecting…':'Shizuku needed';$('#shadeFooter').hidden=UI.tab!=='shade';if(UI.tab==='shade'){$('#hint').textContent=shadeDraft?'Unapplied changes · tap Apply shade':shadeState.night?'Dark mode · colours show in light mode':(shadeState.note||'Notification shade');$('#shadeApply').classList.toggle('dirty',shadeDraft);$('#shadeDiscard').hidden=!(shadeDraft&&shadeState.read);}if(UI.tab==='aod')$('#hint').textContent=aodState.enabled?'Native AOD · enabled':aodState.active?'Native AOD · test / recovery':'Native AOD · ready';if(nativeBusy)$('#hint').textContent='Working…';const task=$('#taskStatus');if(task){task.hidden=!nativeBusy;task.textContent=UI.status||'Working…';}disableBusy();};
 const oldPanel=renderPanel;renderPanel=function(keep){oldPanel(keep);const task=$('#taskStatus');if(task){task.hidden=!nativeBusy;task.textContent=UI.status||'Working…';}disableBusy();};
 connect=async function(){if(UI.shizuku==='connecting')return;UI.shizuku='connecting';chrome();native('connect');};
@@ -923,7 +1093,7 @@ window.receive=function(type,state){
  if(type==='aod'){if(aodDisplayWanted){aodDisplayWanted=false;setTimeout(()=>native('aodDisplayRead'),0);}aodState=state;aodPollSent=false;if(!aodDraft){aodStyle=state.style||'vertical';aodSmart=!!state.smart;}if(UI.tab==='aod')renderPanel(true);chrome();return;}
  if(type==='state'){
   if(!shadeLoaded){shadeLoaded=true;if(state.shadeChoices)shade=fixShade(state.shadeChoices);shadeDraft=!!state.shadeDirty;shadePresets=state.shadePresets||[];}nativeState=state;nativeHeight=state.design.height||2400;const next=state.fresh?fixState(DEFAULTS):fromNative(state.design),different=JSON.stringify(S)!==JSON.stringify(next);S=next;if(different){hist=[JSON.stringify(S)];hi=0;}UI.hide=S.startHidden;nativeBusy=!!state.busy;UI.shizuku=state.connected?'connected':'idle';UI.status=state.status||'';UI.nextAlarm=state.nextAlarm||'None set';if(typeof state.battery==='number')UI.battery=state.battery;
-  SC=(state.presets||[]).map(x=>({id:x.id,name:x.name,state:fromNative(x.design)}));photoReady=!!state.photoReady;subjectReady=!!state.subjectReady;iconPack=state.iconPack||'';iconShape=state.iconShape||0;
+  UI.wallColors=Array.isArray(state.wallColors)?state.wallColors.filter(c=>HEX.test(c)).map(c=>c.toLowerCase()):[];SC=(state.presets||[]).map(x=>({id:x.id,name:x.name,state:fromNative(x.design)}));photoReady=!!state.photoReady;subjectReady=!!state.subjectReady;iconPack=state.iconPack||'';iconShape=state.iconShape||0;
   if(state.revision!==rev){rev=state.revision;assets.photo=photoReady?'/preview/background?rev='+rev:null;assets.subject=subjectReady?'/preview/subject?rev='+rev:null;if(assets.photo)loadImg(assets.photo).then(img=>{const p=palette(img);UI.palette=p.colors;UI.photoAvg=p.avg;if(UI.tab==='style')renderPanel(true);}).catch(()=>{});}
   renderTabs();renderPanel(true);renderAll();chrome();if(state.fresh)native('change',{design:nativeDesign()});return;
  }
@@ -940,7 +1110,7 @@ window.receive=function(type,state){
  }
  if(type==='confirm'){confirmApply(state.until);return;}
  if(type==='recovery'){const value=String(state.state||'');recoveryLock=value.includes('reverting');if(recoveryLock)setTimeout(()=>native('recoveryStatus'),2000);else{UI.applied='';toast(value.includes('restored')?'Previous lock screen restored':value);chrome();}return;}
- if(type==='materialColor'){S.color='#'+((state.color>>>0)&0xffffff).toString(16).padStart(6,'0');changed();renderPanel(true);return;}
+ 
  if(type==='details'){showNativeDetails('About Lockscreen Studio',state);return;}
  if(type==='diagnostics'){showNativeDetails('Engine & AI details',state);return;}
  if(type==='iconPacks'){iconPacks=state.packs||[];if(UI.tab==='icons')renderPanel(true);return;}
@@ -966,7 +1136,7 @@ function tabAod(){
 }
 setInterval(()=>{if(!aodState.active||!aodState.until)return;const n=Math.max(0,Math.ceil((aodState.until-Date.now())/1000)),el=$('#aodCountdown');if(el)el.textContent=n?'Automatic restore in '+n+' s':'Checking AOD restore…';if(!n&&!aodPollSent&&!nativeBusy&&UI.shizuku==='connected'){aodPollSent=true;native('aodStatus');}},1000);
 function tabIcons(){return sec('Installed icon pack','Separate launcher theme',card(`<div class="row"><select class="sel" id="packSelect" aria-label="Installed icon pack"><option value="">Choose a pack</option>${iconPacks.map(x=>`<option value="${escapeHTML(x.package)}" ${iconPack===x.package?'selected':''}>${escapeHTML(x.name)}</option>`).join('')}</select><p class="mu sm">${iconPacks.length?'Apps without a pack icon use their current Android launcher icon.':'Tap Rescan to find supported installed icon packs.'}</p><button class="btn block" data-act="iconPacks" style="margin-top:12px">Rescan icon packs</button></div>`))+sec('Shape','Six choices',`<div class="grid g3">${['Original','Circle','Rounded square','Squircle','Diamond','Hexagon'].map((name,i)=>`<button class="tile" data-act="iconShape" data-v="${i}" aria-pressed="${iconShape===i}"><span style="font-size:24px">${['▣','●','▢','▩','◆','⬢'][i]}</span><small>${name}</small></button>`).join('')}</div>`)+`<div class="stack" style="margin-top:18px"><button class="btn pri block" data-act="applyIcons">Apply icons only</button><button class="btn block" data-act="exportIcons">Export icons only</button></div><p class="mu sm">Targets the Realme launcher. Icon-only application still needs a phone test. If it resets clock selection, use Setup → Activate clock now.</p>`;}
-const nativeActions=new Set(['connect','connectApply','apply','keep','revert','photo','subject','subjectClear','autoSubject','resetSubject','openAtmos','liveWp','themeStore','activate','restore','details','diagnostics','appInfo','materialColor','saveScene','delScene','copyScene','importCode','importFile','exportAll','exportTheme','applyScene','hide','iconPacks','iconShape','applyIcons','exportIcons','aodRead','aodTest','aodRestore','aodCopy','aodDisplayApply','aodDisplayRestore','aodEnable','aodKeep','aodSettings','maps','shadeApply','shadeBlur','shadeRead','shadeDiscard','shadeRestore','shadeCopy','shadeSavePreset','shadeDeletePreset']);
+const nativeActions=new Set(['connect','connectApply','apply','keep','revert','photo','subject','subjectClear','autoSubject','resetSubject','openAtmos','liveWp','themeStore','activate','restore','details','diagnostics','appInfo','saveScene','delScene','copyScene','importCode','importFile','exportAll','exportTheme','applyScene','hide','iconPacks','iconShape','applyIcons','exportIcons','aodRead','aodTest','aodRestore','aodCopy','aodDisplayApply','aodDisplayRestore','aodEnable','aodKeep','aodSettings','maps','shadeApply','shadeBlur','shadeRead','shadeDiscard','shadeRestore','shadeCopy','shadeSavePreset','shadeDeletePreset']);
 document.addEventListener('click',event=>{
  const el=event.target.closest('[data-act]');if(!el||!nativeActions.has(el.dataset.act))return;const action=el.dataset.act;event.preventDefault();event.stopImmediatePropagation();if((nativeBusy||recoveryLock)&&!['keep','revert'].includes(action))return;
  if(action.startsWith('shade')){handleShadeAction(action,el);return;}
@@ -993,7 +1163,7 @@ document.addEventListener('click',event=>{
   case 'aodTest':case 'aodEnable':aodDraft=false;native(action,{style:aodStyle,smart:aodSmart});break;
   case 'aodKeep':case 'aodRestore':aodDraft=false;native(action);break;
   case 'aodCopy':native('copy',{text:(aodState.note||'')+'\n\n'+(aodState.report||'')});toast('AOD report copied');break;
-  case 'details':case 'diagnostics':case 'appInfo':case 'materialColor':native(action);break;
+  case 'details':case 'diagnostics':case 'appInfo':native(action);break;
   case 'saveScene':{const name=($('#sceneName').value||'My scene').trim().slice(0,40);native('presetSave',{name,design:nativeDesign()});}break;
   case 'delScene':native('presetDelete',{id:el.dataset.id});toast('Scene deleted',{label:'Undo',fn:()=>native('undoSceneDelete')});break;
   case 'copyScene':{const scene=SC.find(x=>x.id===el.dataset.id);if(scene)copyText(btoa(unescape(encodeURIComponent(JSON.stringify({name:scene.name,state:scene.state}))))).then(()=>toast('Scene code copied'));}break;
