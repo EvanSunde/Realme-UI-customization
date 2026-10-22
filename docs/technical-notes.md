@@ -8,7 +8,7 @@ kept as the project's change history. The user-facing overview is the
 "Evan Lockscreen Studio" up to 0.7.0; exports then lived in `Download/EvanLockscreen`
 as `Evan-*.theme`. From 0.8.0 they are `Download/LockscreenStudio/Lockscreen-*.theme`.
 
-## Unreleased: preview, split pieces, layouts and finishes
+## New in 0.8.0: preview, split pieces, layouts and finishes
 
 - **Expanded preview** fills the screen at the phone's real shape. One finger drags by
   the finger's offset (the old code set the clock centre to the touch point). Two

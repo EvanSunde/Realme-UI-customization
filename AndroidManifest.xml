@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="np.evan.lockscreen" android:versionCode="12" android:versionName="0.7.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="np.evan.lockscreen" android:versionCode="13" android:versionName="0.8.0">
  <uses-sdk android:minSdkVersion="29" android:targetSdkVersion="34"/>
  <uses-permission android:name="moe.shizuku.manager.permission.API_V23"/>
  <queries><package android:name="com.google.android.apps.maps"/><package android:name="com.oplus.themestore"/><package android:name="com.heytap.themestore"/><package android:name="moe.shizuku.privileged.api"/><package android:name="com.saad_khan_rind.atmosphere_effect"/><package android:name="com.saad_khan_rind.atmosphere_effect.debug"/><intent><action android:name="android.service.wallpaper.WallpaperService"/></intent><intent><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent><intent><action android:name="org.adw.launcher.THEMES"/></intent><intent><action android:name="com.novalauncher.THEME"/></intent></queries>

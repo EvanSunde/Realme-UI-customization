@@ -21,7 +21,7 @@ public final class MainActivity extends Activity {
  private String selectedIconPack="",pendingData="";private int selectedIconShape=0;private JSONObject deletedScene=null;
  private int delay=10,revision=0;private volatile byte[] backgroundPreview=new byte[0],subjectPreview=new byte[0];
  private static final String ORIGIN="https://appassets.androidplatform.net";
- private final Shizuku.UserServiceArgs serviceArgs=new Shizuku.UserServiceArgs(new ComponentName("np.evan.lockscreen",ShellService.class.getName())).daemon(true).processNameSuffix("theme_shell").version(12);
+ private final Shizuku.UserServiceArgs serviceArgs=new Shizuku.UserServiceArgs(new ComponentName("np.evan.lockscreen",ShellService.class.getName())).daemon(true).processNameSuffix("theme_shell").version(13);
  private final ServiceConnection connection=new ServiceConnection(){
   public void onServiceConnected(ComponentName n,IBinder binder){shell=binder;binding=false;status("Shizuku connected. Your studio is ready.",false);if(ready)web.evaluateJavascript("if(typeof UI!=='undefined'){if(UI.tab==='aod')readAod();if(UI.tab==='shade')native('shadeRead');}",null);}
   public void onServiceDisconnected(ComponentName n){shell=null;binding=false;status("Shizuku disconnected. Start it and reconnect.",true);}
@@ -174,7 +174,7 @@ public final class MainActivity extends Activity {
  private int batteryPercent(){try{Intent i=registerReceiver(null,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));return i==null?0:Math.round(100f*i.getIntExtra(BatteryManager.EXTRA_LEVEL,0)/Math.max(1,i.getIntExtra(BatteryManager.EXTRA_SCALE,100)));}catch(Exception e){return 0;}}
  private void details(){try{
   String theme="Not found",wallpaper="Static wallpaper or unavailable";for(String pkg:ShellService.THEME_STORES)try{theme=getPackageManager().getPackageInfo(pkg,0).versionName+" ("+pkg+")";break;}catch(Exception ignored){}try{android.app.WallpaperInfo info=WallpaperManager.getInstance(this).getWallpaperInfo();if(info!=null)wallpaper=info.getPackageName()+" / "+info.getServiceName();}catch(Exception ignored){}
-  emit("details",new JSONObject().put("version","0.7.0").put("device",Build.MANUFACTURER+" "+Build.MODEL).put("android",Build.VERSION.RELEASE).put("themeStore",theme).put("wallpaper",wallpaper).put("exports","Download/LockscreenStudio").put("security","Native keyguard; PIN and fingerprint stay managed by Android.").put("privacy","No Internet permission. Photos, presets and compatibility details stay on this device."));
+  emit("details",new JSONObject().put("version","0.8.0").put("device",Build.MANUFACTURER+" "+Build.MODEL).put("android",Build.VERSION.RELEASE).put("themeStore",theme).put("wallpaper",wallpaper).put("exports","Download/LockscreenStudio").put("security","Native keyguard; PIN and fingerprint stay managed by Android.").put("privacy","No Internet permission. Photos, presets and compatibility details stay on this device."));
  }catch(Exception e){status(e.getMessage(),true);}}
  @Override public void onBackPressed(){if(web!=null&&ready)web.evaluateJavascript("window.handleBack?window.handleBack():false",result->{if(!"true".equals(result))MainActivity.super.onBackPressed();});else super.onBackPressed();}
  @Override protected void onPause(){if(web!=null)web.onPause();super.onPause();}
