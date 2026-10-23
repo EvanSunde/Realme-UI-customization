@@ -136,6 +136,9 @@ button:disabled{opacity:.4;cursor:default}
 .digits.f-splittone>*,.digits.f-splittone .min,.digits.L-free.f-splittone .pc>span,.pf.f-splittone{background-image:linear-gradient(180deg,var(--c) 50%,var(--c2) 50%)}
 .digits.f-halftone>*,.digits.f-halftone .min,.digits.L-free.f-halftone .pc>span,.pf.f-halftone{background-image:radial-gradient(circle,var(--c) 40%,transparent 44%);background-size:.07em .07em}
 .digits.L-free:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .pc{background:none}
+/* Photo fill: the background seen through the digits; fitPreview aligns each block with the screen. */
+.f-photo,.pf.f-photo{color:transparent;-webkit-text-stroke:0;text-shadow:none;background-image:var(--photo,linear-gradient(135deg,#ff9a8b,#7f7fd5 55%,#86e3ce));-webkit-background-clip:text;background-clip:text;filter:brightness(1.3) saturate(1.15)}
+.digits.f-photo *{color:transparent}
 .f-glitch{text-shadow:-.028em 0 #ff2a55cc,.028em 0 #22e5ffcc}
 /* Stencil: a plate in the clock colour with the digits showing what is behind (screen blend approximates the cut-out). */
 .digits.f-stencil>*,.digits.f-stencil .min,.digits.L-free.f-stencil .pc>span,.pf.f-stencil{background:var(--c);color:#000;mix-blend-mode:screen;border-radius:.1em;padding:0 .04em;-webkit-text-stroke:0}
@@ -295,14 +298,21 @@ ol.steps2{padding-left:20px;display:grid;gap:8px;color:#c9cde2;font-size:0.84375
 .fseg button{min-height:40px;min-width:76px;padding:0 14px;font-weight:600;font-size:.78125rem}
 .fseg button[aria-checked=true]{background:var(--ac);color:var(--ink)}
 .full .clockpos.picked{outline:1.5px dashed #ffffffb0;outline-offset:.6cqw;border-radius:2px}
-.str{display:inline-block;text-align:left}.stri{display:inline-block;transform-origin:0 0}
+.str{display:inline-block;text-align:left}
+/* Digit depth: front digits are hidden in the clock behind the subject and shown in a copy above it. */
+.screen>.clockpos .dg.fr{visibility:hidden}
+.layer-front{position:absolute;inset:0;pointer-events:none;visibility:hidden;z-index:5}.layer-front .dg.fr{visibility:visible}
+.subject.sshadow{filter:brightness(0) blur(1.1cqw);opacity:calc(var(--sa)*.75)}
+.subject.rim{background:var(--rc);opacity:var(--ra);-webkit-mask-size:cover;mask-size:cover;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:source-out;mask-composite:subtract;filter:blur(.15cqw)}
+.screen.parallax .bg,.screen.parallax .subject{translate:calc(var(--tx,0)*-.45cqw) calc(var(--ty,0)*-.45cqw);scale:1.045}
+.dgrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dgrow .tile b{font-size:1.6rem;line-height:1}.stri{display:inline-block;transform-origin:0 0}
 .hdl.hdl-x{bottom:auto;top:calc(50% - 5cqw);width:4.5cqw;height:10cqw;min-height:40px;border-radius:99px;cursor:ew-resize}
 .hdl.hdl-y{right:auto;left:calc(50% - 5cqw);width:10cqw;height:4.5cqw;min-width:40px;border-radius:99px;cursor:ns-resize}
 .cnt{display:flex;flex-direction:column;align-items:center;color:var(--c);opacity:var(--op);line-height:1}
 .cnt .disc{position:relative;width:1em;height:1em;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent)}
 .cnt .disc::after{content:'';position:absolute;inset:.0175em;border-radius:50%;border:.025em solid color-mix(in srgb,var(--c) 69%,transparent)}
 .cnt b{font-family:var(--ff);font-weight:var(--fw);font-size:.42em;font-variant-numeric:tabular-nums}
-.cnt small{font-size:.16em;margin-top:.44em;white-space:nowrap}
+.cnt small{font-size:.2em;margin-top:.25em;white-space:nowrap}
 .quote{color:var(--c);opacity:var(--op);white-space:nowrap;line-height:1.5}
 .clockpos.chg-glow::before{content:'';position:absolute;left:50%;top:50%;width:150%;height:150%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--cc) 55%,transparent),color-mix(in srgb,var(--cc) 19%,transparent) 55%,transparent);animation:chgPulse 3.2s ease-in-out infinite;z-index:-1;pointer-events:none}
 @keyframes chgPulse{50%{opacity:.43}}
@@ -464,7 +474,7 @@ const FONTS={
 };
 const LEGACY={light:['inter',300],medium:['inter',500],bold:['inter',800],condensed:['barlow',600],mono:['jetbrains',500],serif:['fraunces',600],rounded:['nunito',800],grotesk:['spacegrotesk',600]};
 function fixState(st){if(LEGACY[st.font]){st.weight=LEGACY[st.font][1];st.font=LEGACY[st.font][0]}if(!FONTS[st.font])st.font='inter';if(st.dateFont!=='same'&&!FONTS[st.dateFont])st.dateFont='inter';return st}
-const FINISH=[['solid','Solid'],['glow','Glow'],['outline','Outline'],['neon','Neon'],['gradient','Gradient'],['shadow','Shadow'],['glass','Glass'],['outlineglow','Outline glow'],['duo','Two-tone stroke'],['retro','Retro 3D'],['emboss','Embossed'],['chrome','Chrome'],['holo','Holo'],['splittone','Split tone'],['halftone','Halftone'],['glitch','Glitch'],['stencil','Stencil']];
+const FINISH=[['solid','Solid'],['glow','Glow'],['outline','Outline'],['neon','Neon'],['gradient','Gradient'],['shadow','Shadow'],['glass','Glass'],['outlineglow','Outline glow'],['duo','Two-tone stroke'],['retro','Retro 3D'],['emboss','Embossed'],['chrome','Chrome'],['holo','Holo'],['splittone','Split tone'],['halftone','Halftone'],['glitch','Glitch'],['stencil','Stencil'],['photo','Photo fill']];
 const GRADS={
  aurora:{n:'Aurora',css:'linear-gradient(160deg,#0f2b3a,#1d5c63 45%,#3a2a6b)',avg:'#1d3f55'},
  dusk:{n:'Dusk',css:'linear-gradient(170deg,#1f2340,#4a2f63 55%,#8a4a6b)',avg:'#3d2c58'},
@@ -486,6 +496,7 @@ const DEFAULTS={
  schedule:{on:false,day:'quiet',eve:'afterglow',night:'cinema'},
  split:false,mins:{x:-3,y:27,size:266,rot:0,sx:100,sy:100},meta:{x:-3,y:40,rot:0},
  sx:100,sy:100,detachDate:false,styleH:{},styleM:{},styleD:{},secHand:false,charge:'none',chargeColor:'#7be0b0',
+ weightFlow:{on:false,from:200,to:900},depthFront:[false,false,false,false],subjShadow:0,rimLight:0,
  counters:[],quote:{on:false,x:0,y:58,rot:0,size:40,lines:['Make today count.','One step at a time.','Small progress is still progress.','Be where your feet are.','Rest is part of the work.','Stay curious.','Done is better than perfect.']}
 };
 const STOCK={split:false,font:'inter',weight:300,slant:0,lh:88,minScale:100,align:'center',rotate:0,dateFont:'inter',dateCase:'normal',dateTrack:0,layout:'single',color:'#ffffff',color2:'#ffffff',twoTone:false,finish:'solid',opacity:100,size:200,vpos:16,hpos:0,spacing:0,movement:'still',showDate:true,dateStyle:'full',dateSize:38,caption:'',seconds:false,warm:false,nightDim:0,lowBatDim:false,info:{battery:false,alarm:false,weather:false,progress:false}};
@@ -561,11 +572,21 @@ const jdn=(y,m,d)=>{const a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return
 const dayNo=d=>jdn(d.getFullYear(),d.getMonth()+1,d.getDate());
 function daysTo(c,d){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(c.date||'');if(!m)return null;const t=dayNo(d);if(!c.yearly)return jdn(+m[1],+m[2],+m[3])-t;const n=jdn(d.getFullYear(),+m[2],+m[3])-t;return n<0?jdn(d.getFullYear()+1,+m[2],+m[3])-t:n}
 const quoteLines=s=>((s.quote&&s.quote.lines)||[]).map(x=>String(x).trim()).filter(Boolean).slice(0,30);
+const NO_DEPTH=['arc','analog','words','rings'];
+const depthOn=s=>!!(s.subjectOn&&assets.subject&&s.bg==='photo'&&!NO_DEPTH.includes(s.layout)&&(s.depthFront||[]).some(Boolean));
+const hasBackdrop=s=>s.bg==='gradient'||(s.bg==='photo'&&!!assets.photo);
+// Without a still background there is nothing to show through, so Photo fill falls back to solid (as on the phone).
+const finOf=(s,f)=>f==='photo'&&!hasBackdrop(s)?'solid':f;
+// Six weight steps through the hour, as StudioTheme renders them.
+const flowW=(s,d)=>{const f=s.weightFlow||{};return Math.round(f.from+(f.to-f.from)*Math.floor(d.getMinutes()/10)/5)};
+const flowOn=s=>!!(s.weightFlow&&s.weightFlow.on)&&!NO_DIGITS.includes(s.layout)&&s.finish!=='photo';
+// Direction from the subject's centre toward the clock, in screen pixels (1080 wide); light and shadow follow it.
+function lightVec(s){const H=typeof nativeHeight==='number'?nativeHeight:2400,vx=1080*(s.hpos*.006-s.subjX/100),vy=H*(.12+s.vpos*.011-.5-s.subjY/100),l=Math.hypot(vx,vy);return l<1?[0,-1]:[vx/l,vy/l]}
 const hasOv=s=>['styleH','styleM'].some(k=>s[k]&&Object.keys(s[k]).length>0);
 function partOf(s,e,w){
  const o=(w==='h'?s.styleH:s.styleM)||{},f=FONTS[o.font]||FONTS[s.font]||FONTS.inter,wt=clamp(o.weight!=null?o.weight:s.weight,f.wr[0],f.wr[1]);
  const c=HEX.test(o.color||'')?(s.warm&&e.night?mixHex(o.color,'#ffb070',.6):o.color):(w==='m'&&s.twoTone?e.c2:e.c);
- return{c,cls:`pf f-${FINISH.some(x=>x[0]===o.finish)?o.finish:s.finish}`,st:`--c:${c};font-family:${f.f};font-weight:${wt}`};
+ return{c,cls:`pf f-${finOf(s,FINISH.some(x=>x[0]===o.finish)?o.finish:s.finish)}`,st:`--c:${c};font-family:${f.f};font-weight:${wt}`};
 }
 const dateW=s=>{const f0=FONTS[s.font]||FONTS.inter,df=s.dateFont==='same'?f0:(FONTS[s.dateFont]||FONTS.inter);return s.styleD&&s.styleD.weight?clamp(s.styleD.weight,df.wr[0],df.wr[1]):s.dateFont==='same'?clamp(Math.min(fwOf(s),600),f0.wr[0],f0.wr[1]):clamp(500,df.wr[0],df.wr[1])};
 function freeGeom(lay,s){
@@ -592,7 +613,9 @@ function digitsHTML(s,e,p,fs,part){
  const f=FONTS[s.font]||FONTS.inter,lay=s.layout,ms=part?1:(s.minScale/100)*(lay==='hero'?.4:1);
  const size=lay==='words'?`calc(${fs} * .5)`:fs;
  const st=`--c:${e.c};--c2:${e.c2};--ff:${f.f};--fw:${fwOf(s)};--ls:${s.spacing*.01}em;--op:${e.op};--g:${s.glow/100};--ms:${ms};--lh:${s.lh/100};--sl:${s.slant};font-size:${size}`;
- const hh=p.hh,mm=p.mm,ov=hasOv(s),H=ov?partOf(s,e,'h'):null,M=ov?partOf(s,e,'m'):null,cls=ov?'f-plain':`f-${s.finish} ${s.twoTone?'tt':''}`;
+ const hh0=p.hh,mm0=p.mm,ov=hasOv(s),H=ov?partOf(s,e,'h'):null,M=ov?partOf(s,e,'m'):null,cls=ov?'f-plain':`f-${finOf(s,s.finish)} ${s.twoTone?'tt':''}`;
+ // With digit depth on, each digit is its own span so it can sit in front of or behind the subject.
+ const F=depthOn(s)?s.depthFront:null,D=(t,b)=>F?[...t].map((c,i)=>`<span class="dg${F[b+i]?' fr':''}">${c}</span>`).join(''):t,fr=i=>F?'dg'+(F[i]?' fr':''):'',hh=D(hh0,0),mm=D(mm0,2);
  // Attributes for an hours ('h') or minutes ('m') element: its own finish, colour and font when overridden.
  const at=(w,x='',xs='')=>{const P=w==='h'?H:M,c=[x,w==='m'?'min':'',P?P.cls:''].filter(Boolean).join(' '),y=[xs,P?P.st:''].filter(Boolean).join(';');return `${c?` class="${c}"`:''}${y?` style="${y}"`:''}`};
  // A split piece is just the hours, or just the minutes, as its own block.
@@ -601,11 +624,11 @@ function digitsHTML(s,e,p,fs,part){
   return `<div class="digits L-piece ${cls}" style="${st}">${part==='h'?`<span${at('h')} data-t="hh">${hh}</span>`:`<span${at('m')} data-t="mm">${mm}</span>`}</div>`;
  }
  if(lay==='analog')return `<div class="digits L-analog ${cls}" style="${st}">${analogSVG(s,p.d,H,M)}</div>`;
- if(lay==='rings')return `<div class="digits L-analog L-rings ${cls}" style="${st}">${ringsSVG(p,H?H.c:e.c,M?M.c:(s.twoTone?e.c2:e.c),H,M)}</div>`;
- if(FREE.includes(lay)){const g=freeGeom(lay,s),dg=[hh[0],hh[1],mm[0],mm[1]];return `<div class="digits L-free ${cls}" style="${st};width:${g.w.toFixed(3)}em;height:${g.h.toFixed(3)}em">${g.P.map(q=>`<span class="pc" style="left:${q.x.toFixed(3)}em;top:${q.y.toFixed(3)}em;width:${(.62*q.sc).toFixed(3)}em;height:${(1.28*q.sc).toFixed(3)}em"><span${at(q.min?'m':'h','',`font-size:${q.sc}em`)}>${dg[q.i]}</span></span>`).join('')}</div>`}
+ if(lay==='rings')return `<div class="digits L-analog L-rings ${cls}" style="${st}">${ringsSVG({...p,hh:hh0,mm:mm0},H?H.c:e.c,M?M.c:(s.twoTone?e.c2:e.c),H,M)}</div>`;
+ if(FREE.includes(lay)){const g=freeGeom(lay,s),dg=[hh0[0],hh0[1],mm0[0],mm0[1]];return `<div class="digits L-free ${cls}" style="${st};width:${g.w.toFixed(3)}em;height:${g.h.toFixed(3)}em">${g.P.map(q=>`<span class="pc" style="left:${q.x.toFixed(3)}em;top:${q.y.toFixed(3)}em;width:${(.62*q.sc).toFixed(3)}em;height:${(1.28*q.sc).toFixed(3)}em"><span${at(q.min?'m':'h',fr(q.i),`font-size:${q.sc}em`)}>${dg[q.i]}</span></span>`).join('')}</div>`}
  if(lay==='arc'){
   const id='a'+(++arcN),cy=200-2*s.arc,grad=s.finish==='gradient';
-  return `<div class="digits arcw L-arc" style="${st}"><svg class="arcs a-${s.finish} ${s.twoTone?'tt':''}" viewBox="0 -60 400 330" style="width:calc(${fs} * 3.4)">${grad?`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${e.c}"/><stop offset="1" stop-color="${e.c2}"/></linearGradient></defs>`:''}<path id="${id}" d="M 20 200 Q 200 ${cy} 380 200" fill="none"/><text style="font-size:100px;letter-spacing:${s.spacing*1.2}px${grad?`;fill:url(#g${id})`:''}"><textPath href="#${id}" startOffset="50%" text-anchor="middle"><tspan${H?` style="fill:${H.c};font-family:inherit"`:''}>${hh}</tspan><tspan${H?` style="fill:${H.c}"`:''}>:</tspan><tspan class="min"${M?` style="fill:${M.c}"`:''}>${mm}</tspan></textPath></text></svg></div>`;
+  return `<div class="digits arcw L-arc" style="${st}"><svg class="arcs a-${s.finish} ${s.twoTone?'tt':''}" viewBox="0 -60 400 330" style="width:calc(${fs} * 3.4)">${grad?`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${e.c}"/><stop offset="1" stop-color="${e.c2}"/></linearGradient></defs>`:''}<path id="${id}" d="M 20 200 Q 200 ${cy} 380 200" fill="none"/><text style="font-size:100px;letter-spacing:${s.spacing*1.2}px${grad?`;fill:url(#g${id})`:''}"><textPath href="#${id}" startOffset="50%" text-anchor="middle"><tspan${H?` style="fill:${H.c};font-family:inherit"`:''}>${hh0}</tspan><tspan${H?` style="fill:${H.c}"`:''}>:</tspan><tspan class="min"${M?` style="fill:${M.c}"`:''}>${mm0}</tspan></textPath></text></svg></div>`;
  }
  let inner='';
  switch(lay){
@@ -613,7 +636,7 @@ function digitsHTML(s,e,p,fs,part){
   case'stairs':case'stacked':inner=`<div${at('h')} data-t="hh">${hh}</div><div${at('m')} data-t="mm">${mm}</div>${s.seconds?`<div class="sec" data-t="ss">${p.ss}</div>`:''}`;break;
   case'hero':inner=`<span${at('h')} data-t="hh">${hh}</span><span${at('m')} data-t="mm">${mm}</span>`;break;
   case'split':inner=`<span${at('h')} data-t="hh">${hh}</span><i class="bar"></i><span${at('m')} data-t="mm">${mm}</span>`;break;
-  case'grid':case'tower':inner=`<span${at('h')}>${hh[0]}</span><span${at('h')}>${hh[1]}</span><span${at('m')}>${mm[0]}</span><span${at('m')}>${mm[1]}</span>`;break;
+  case'grid':case'tower':inner=`<span${at('h',fr(0))}>${hh0[0]}</span><span${at('h',fr(1))}>${hh0[1]}</span><span${at('m',fr(2))}>${mm0[0]}</span><span${at('m',fr(3))}>${mm0[1]}</span>`;break;
   case'vertical':inner=`<span${at('h')} data-t="hh">${hh}</span><span${at('h','colon')}>:</span><span${at('m')} data-t="mm">${mm}</span>`;break;
   case'words':{const hr=p.d.getHours()%12||12;inner=`<div${at('h','wd')}>${ONES[hr]}</div><div${at('m','wm')}>${minWords(p.d.getMinutes())}</div>`}break;
  }
@@ -630,9 +653,10 @@ function infoHTML(s){
 function previewHTML(s,p,full){
  // Charging preview: colour shift recolours the digits; the other styles are drawn around the clock below.
  const chg=UI.charging&&s.charge&&s.charge!=='none'?s.charge:'',cc=s.chargeColor||'#7be0b0',digitLay=!NO_DIGITS.includes(s.layout);
+ if(flowOn(s)){const w=flowW(s,p.d),nw=o=>{const c={...o};delete c.weight;return c};s={...s,weight:w,styleH:nw(s.styleH||{}),styleM:nw(s.styleM||{})}}
  if(chg==='color'&&digitLay){const o=k=>s[k]&&s[k].color?{...s[k],color:cc}:s[k];s={...s,color:cc,color2:cc,styleH:o('styleH'),styleM:o('styleM')}}
  const e=eff(s,p.d),bg=bgLayer(s);
- const anim=s.movement==='breathe'?'breathe':s.movement==='float'?'float':s.movement==='tilt'?'tilt':'';
+ const anim=s.movement==='breathe'?'breathe':s.movement==='float'?'float':s.movement==='tilt'||s.movement==='parallax'?'tilt':'';
  const f0=FONTS[s.font]||FONTS.inter,df=s.dateFont==="same"?f0:(FONTS[s.dateFont]||FONTS.inter),dw=s.dateFont==="same"?clamp(Math.min(fwOf(s),600),f0.wr[0],f0.wr[1]):clamp(500,df.wr[0],df.wr[1]),jc=s.align==="left"?"flex-start":s.align==="right"?"flex-end":"center";
  const dc=s.styleD&&HEX.test(s.styleD.color||'')?(s.warm&&e.night?mixHex(s.styleD.color,'#ffb070',.6):s.styleD.color):e.c;
  const meta=`<div class="meta" style="--c:${dc};--op:${e.op};--jc:${jc};font-family:${df.f};font-weight:${dateW(s)};text-transform:${s.dateCase==="upper"?"uppercase":"none"};letter-spacing:${s.dateTrack*.01}em;font-size:calc(${s.dateSize} * 100cqw / 1080)">${s.infoPos==='above'?infoHTML(s):''}${s.showDate?`<div class="date">${dateText(s.dateStyle,p.d)}</div>`:''}${s.caption?`<div class="cap">${s.caption.replace(/</g,'&lt;')}</div>`:''}${s.infoPos!=='above'?infoHTML(s):''}</div>`;
@@ -645,13 +669,21 @@ function previewHTML(s,p,full){
  const cnt=(s.counters||[]).map((c,k)=>{const n=c.on?daysTo(c,p.d):null;return n==null||n<0?'':piece('c'+k,c.x,c.y,c.rot,`<div class="cnt" style="--c:${s.color};--op:${e.op};--ff:${f0.f};--fw:${fwOf(s)};font-size:${fs(c.size)}"><div class="disc"><b>${Math.min(n,999)}</b></div>${c.label?`<small style="font-family:${df.f}">${escapeHTML(c.label)}</small>`:''}</div>`)}).join('');
  const ql=quoteLines(s),qt=ql.length?ql[dayNo(p.d)%ql.length]:'';
  const quote=s.quote&&s.quote.on&&qt?piece('q',s.quote.x,s.quote.y,s.quote.rot,`<div class="quote" style="--c:${s.color};--op:${e.op};font-family:${df.f};font-size:${fs(Math.min(s.quote.size,2000/Math.max(1,qt.length)).toFixed(1))}">${escapeHTML(qt)}</div>`):'';
- const clock=UI.hide?'':(isSplit(s)?piece('h',s.hpos,s.vpos,s.rotate,digits(s.size,s.sx,s.sy,'h'),chgCls('h'),ring)+piece('m',s.mins.x,s.mins.y,s.mins.rot,digits(s.mins.size,s.mins.sx,s.mins.sy,'m'),chgCls('m'))
-  :piece('h',s.hpos,s.vpos,s.rotate,digits(s.size,s.sx,s.sy)+(dateApart(s)?'':meta),chgCls('h'),ring))+metaPiece+cnt+quote+(chg==='bar'?`<div class="chg-bar" style="--cc:${cc}"><i style="width:${lvl}%"></i></div>`:'');
- const subj=(s.subjectOn&&assets.subject&&s.bg==='photo')?`<img class="subject" alt="" src="${assets.subject}">`:'';
+ const clockTime=UI.hide?'':isSplit(s)?piece('h',s.hpos,s.vpos,s.rotate,digits(s.size,s.sx,s.sy,'h'),chgCls('h'),ring)+piece('m',s.mins.x,s.mins.y,s.mins.rot,digits(s.mins.size,s.mins.sx,s.mins.sy,'m'),chgCls('m'))
+  :piece('h',s.hpos,s.vpos,s.rotate,digits(s.size,s.sx,s.sy)+(dateApart(s)?'':meta),chgCls('h'),ring);
+ const clock=UI.hide?'':clockTime+metaPiece+cnt+quote+(chg==='bar'?`<div class="chg-bar" style="--cc:${cc}"><i style="width:${lvl}%"></i></div>`:'');
+ let subj='';
+ if(s.subjectOn&&assets.subject&&s.bg==='photo'){
+  // Shadow cast down and toward the clock, the subject, then a rim of clock-coloured light on the side facing the clock.
+  const [vx,vy]=lightVec(s),sc=s.subjScale/100,u=`url('${assets.subject}')`;let ox=vx*.45,oy=vy*.45+.9;const ol=Math.hypot(ox,oy);ox=ox/ol*22*sc/10.8;oy=oy/ol*22*sc/10.8;
+  subj=(s.subjShadow?`<img class="subject sshadow" alt="" src="${assets.subject}" style="--sa:${s.subjShadow/100};left:${ox.toFixed(2)}cqw;top:${oy.toFixed(2)}cqw">`:'')+`<img class="subject" alt="" src="${assets.subject}">`
+   +(s.rimLight?`<div class="subject rim" aria-hidden="true" style="--rc:${s.color};--ra:${s.rimLight/100};-webkit-mask-image:${u},${u};mask-image:${u},${u};-webkit-mask-position:center,calc(50% - ${(vx*1.11*sc).toFixed(2)}cqw) calc(50% - ${(vy*1.11*sc).toFixed(2)}cqw);mask-position:center,calc(50% - ${(vx*1.11*sc).toFixed(2)}cqw) calc(50% - ${(vy*1.11*sc).toFixed(2)}cqw)"></div>`:'');
+ }
+ const front=subj&&depthOn(s)&&!UI.hide?`<div class="layer-front" aria-hidden="true">${clockTime.replace(/<i class="hdl[^>]*><\/i>/g,'').replace(/ picked/g,'')}</div>`:'';
  const notifs=UI.notifs?`<div class="notifs"><div class="n"><b>Messages · now</b>Aarav: Are we still meeting at 5?</div><div class="n"><b>Calendar · 4:30 PM</b>Project sync starts in 10 min</div><div class="n"><b>Photos</b>Your weekend memories are ready</div></div>`:'';
  const guides=UI.guides?`<div class="g g-top">Status bar</div><div class="g g-notif">Notification zone</div><div class="g g-fp">Fingerprint / gesture</div><div class="g-mid"></div>`:'';
  const tag=UI.compare?'<div class="tag">Stock clock</div>':(UI.hide?'<div class="tag">Clock hidden · double-tap to show</div>':'');
- return `<div class="bg ${bg.cls||''}" style="${bg.style}">${bg.inner}</div><div class="dim" style="opacity:${s.dim/100*.8}"></div>${clock}${subj}${notifs}${guides}${tag}<div class="homebar"></div>`;
+ return `<div class="bg ${bg.cls||''}" style="${bg.style}">${bg.inner}</div><div class="dim" style="opacity:${s.dim/100*.8}"></div>${clock}${subj}${front}${notifs}${guides}${tag}<div class="homebar"></div>`;
 }
 function syncNode(target,source){
  if(target.nodeType!==source.nodeType||target.nodeName!==source.nodeName){target.replaceWith(source.cloneNode(true));return;}
@@ -662,13 +694,21 @@ function syncNode(target,source){
  const old=[...target.childNodes],fresh=[...source.childNodes];for(let i=0;i<Math.max(old.length,fresh.length);i++){if(!fresh[i])old[i].remove();else if(!old[i])target.appendChild(fresh[i].cloneNode(true));else syncNode(old[i],fresh[i]);}
 }
 // Scaled digits keep their layout box, so give stretched wrappers their visual width; rings wrap the larger side.
+let photoDims={src:null,w:0,h:0};
 function fitPreview(root){
+ const photos=root.querySelectorAll('.f-photo');
+ if(photos.length){
+  const R=root.getBoundingClientRect(),s=S;let w=R.width,h=R.height;
+  if(s.bg==='photo'&&assets.photo){if(photoDims.src!==assets.photo){photoDims={src:assets.photo,w:0,h:0};const im=new Image();im.onload=()=>{if(photoDims.src===im.src){photoDims.w=im.naturalWidth;photoDims.h=im.naturalHeight;renderAll()}};im.src=assets.photo}if(photoDims.w){const k=Math.max(R.width/photoDims.w,R.height/photoDims.h);w=photoDims.w*k;h=photoDims.h*k}}
+  photos.forEach(el=>{const r=el.getBoundingClientRect();el.style.backgroundSize=`${w}px ${h}px`;el.style.backgroundPosition=`${R.left-r.left+(R.width-w)/2}px ${R.top-r.top+(R.height-h)/2}px`});
+ }
  root.querySelectorAll('.str').forEach(el=>{const i=el.firstElementChild;if(i){el.style.width=i.offsetWidth*+el.dataset.sxr+'px';el.style.height=i.offsetHeight+'px'}});
  root.querySelectorAll('.chg-ring').forEach(el=>{const p=el.parentElement,d=Math.max(p.offsetWidth,p.offsetHeight)*1.15;el.style.width=el.style.height=d+'px'});
 }
 function renderPreview(root){
  if(!root)return;const s=UI.compare?Object.assign(deepMerge(clone(S),clone(STOCK)),{sx:100,sy:100,styleH:{},styleM:{},styleD:{},detachDate:false,counters:[],quote:{...S.quote,on:false},charge:'none'}):S,p=parts();
  for(const [k,v]of Object.entries({hx:s.hpos,rot:s.rotate,vy:s.vpos,sx:s.subjX,sy:s.subjY,ss:s.subjScale/100}))root.style.setProperty('--'+k,v);
+ root.style.setProperty('--photo',s.bg==='photo'&&assets.photo?`url('${assets.photo}')`:s.bg==='gradient'?(GRADS[s.gradient]||GRADS.dusk).css:'none');root.classList.toggle('parallax',s.movement==='parallax');
  arcN=root.id==='fscreen'?100000:0;
  const frame=document.createElement('div');frame.innerHTML=previewHTML(s,p,root.id==='fscreen');
  const old=[...root.childNodes],fresh=[...frame.childNodes];for(let i=0;i<Math.max(old.length,fresh.length);i++){if(!fresh[i])old[i].remove();else if(!old[i])root.appendChild(fresh[i].cloneNode(true));else syncNode(old[i],fresh[i]);}
@@ -676,7 +716,7 @@ function renderPreview(root){
 }
 let previewFrame=0;
 function renderAll(){if(previewFrame)return;previewFrame=requestAnimationFrame(()=>{previewFrame=0;renderPreview($('#screen'));if(UI.full){if(!pieceIds(S).includes(UI.sel))UI.sel='h';renderFbar();renderPreview($('#fscreen'))}updateContrast();});}
-function tick(){const p=parts();if(p.d.getMinutes()!==tick.m||S.layout==='analog'&&S.secHand){tick.m=p.d.getMinutes();renderAll();return}$$('[data-t]').forEach(el=>{const k=el.dataset.t;el.textContent=(k==='ss'&&el.tagName==='SPAN'?':':'')+p[k]})}
+function tick(){const p=parts();if(p.d.getMinutes()!==tick.m||S.layout==='analog'&&S.secHand){tick.m=p.d.getMinutes();renderAll();return}$$('[data-t="ss"]').forEach(el=>{el.textContent=(el.tagName==='SPAN'?':':'')+p.ss})}
 tick.m=-1;
 
 /* ---------- ui builders ---------- */
@@ -728,7 +768,8 @@ const FCATS=['All','Clean','Display','Serif','Mono','Tech'];
 function tabClock(){
  const lay=S.layout,f=FONTS[S.font]||FONTS.inter;
  const extra=(['single','stacked','stairs','hero','split','bigmin','diagonal','wave','offset','wide'].includes(lay)&&!isSplit(S)?slider('minScale','Minutes size',30,130,1,'%'):'')+(lay==='arc'?slider('arc','Arc curve',-100,100):'');
- const wrow=f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider('weight','Weight',f.wr[0],f.wr[1],50);
+ const wrow=f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider('weight','Weight',f.wr[0],f.wr[1],50)
+  +(NO_DIGITS.includes(lay)?'':toggle('weightFlow.on','Weight follows the hour','Thin at :00, heavier every 10 minutes, boldest from :50','',true)+(S.weightFlow.on?(S.finish==='photo'?`<div class="row"><p class="mu sm">Photo fill already draws each digit separately, so the weight stays fixed with it.</p></div>`:slider('weightFlow.from','Weight at :00',f.wr[0],f.wr[1],50)+slider('weightFlow.to','Weight from :50',f.wr[0],f.wr[1],50)):''));
  return sec('Clock layout','Choose a shape',`<div class="grid g3">${LAYOUTS.slice(0,6).map(([v,n,g])=>tile('layout',v,g,n,true)).join('')}</div><button class="btn block" data-act="layoutPicker" style="margin-top:10px">All ${LAYOUTS.length} layouts · ${LAYOUTS.find(x=>x[0]===lay)[1]} selected</button>`)
  +sec('Size & position','Drag, pinch and twist in the expanded preview',card(slider('size',isSplit(S)?'Hours size':'Clock size',80,600)+slider('vpos','Vertical position',-10,80,1,'%')+slider('hpos','Horizontal position',-80,80)+slider('rotate','Rotation',-180,180,1,'°')+(canSplit(S)?toggle('split','Separate hours, minutes & date','Move, size and rotate each piece on its own','',true)+(S.split?slider('mins.size','Minutes size',60,600)+slider('mins.rot','Minutes rotation',-180,180,1,'°')+slider('meta.rot','Date rotation',-180,180,1,'°'):''):`<div class="row"><p class="mu sm">Hours and minutes stay together in this layout.</p></div>`)
   +(isSplit(S)?'':toggle('detachDate','Move date separately','Place the date anywhere, in any layout','',true)+(S.detachDate?slider('meta.rot','Date rotation',-180,180,1,'°'):'')))
@@ -757,7 +798,7 @@ function tabStyle(){
  return seg+note+colour+sec('Typeface',`For the ${names[sc]}`,card(`<div class="row">${sel(P+'.font',[['','Same as the clock'],...Object.entries(FONTS).map(([k,x])=>[k,x.n])],false,true)}</div>`+(f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider(P+'.weight','Weight',f.wr[0],f.wr[1],50))))
  +sec('Finish',`For the ${names[sc]}`,`<div class="grid g3">${fin}</div>`);
 }
-function tabMotion(){return sec('Movement','Motion costs battery',`<div class="grid g2">${[['still','Still','Lowest battery'],['breathe','Breathe','Slow fade pulse'],['float','Float','Gentle drift'],['tilt','Tilt','Follows motion']].map(([v,n,d])=>`<button class="tile" data-set="movement" data-val="${v}" aria-pressed="${S.movement===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`);}
+function tabMotion(){return sec('Movement','Motion costs battery',`<div class="grid g2">${[['still','Still','Lowest battery'],['breathe','Breathe','Slow fade pulse'],['float','Float','Gentle drift'],['tilt','Tilt','Follows motion'],['parallax','Parallax','Clock and photo drift apart']].map(([v,n,d])=>`<button class="tile" data-set="movement" data-val="${v}" aria-pressed="${S.movement===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`);}
 
 function tabWallpaper(){return sec('Wallpaper & background','Choose what sits behind the clock',`<div class="grid g2">${[['atmos','Atmos / live','Transparent clock'],['photo','Photo','Your picture'],['gradient','Gradient','Built-in looks'],['black','Black','AOD-style']].map(([v,n,d])=>`<button class="tile" data-set="bg" data-val="${v}" data-rerender aria-pressed="${S.bg===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`
  +(S.bg==='photo'?`<div class="stack" style="margin-top:12px"><button class="btn pri" data-act="photo">${assets.photo?'Choose a different photo':'Choose a photo'}</button></div>`:'')
@@ -769,6 +810,8 @@ function tabDepth(){
  if(S.bg!=='photo'||!photoReady)return `<div class="note"><b>Choose a still photo first</b><p class="mu sm">Subject separation places a cut-out in front of the clock. It needs a fixed photo background.</p><button class="btn pri block" data-act="usePhotoBg" style="margin-top:12px">Choose photo for depth</button></div>`;
  return sec('Subject separation','One still photo',`<div class="stack"><button class="btn pri" data-act="autoSubject">${assets.subject?'Separate subject again':'Separate subject with ML Kit'}</button><button class="btn" data-act="subject">${assets.subject?'Replace subject PNG':'Import a transparent PNG instead'}</button></div><p class="mu sm">Google Play services may download the subject model on first use.</p>`)
  +(assets.subject?sec('Depth layer','Ready to use',card(toggle('subjectOn','Subject in front of clock','Turn this off to compare the original photo.'))+`<details class="disclosure" data-disclosure="subjectAlign"><summary>Adjust subject alignment</summary>${slider('subjScale','Subject scale',50,200,1,'%')}${slider('subjX','Horizontal offset',-30,30)}${slider('subjY','Vertical offset',-30,30)}<div class="row"><button class="btn" data-act="subjectReset">Reset alignment</button></div></details><button class="btn danger block" data-act="subjectClear" style="margin-top:12px">Remove subject layer</button>`):'')
+ +(assets.subject?sec('Digits in front','Tap a digit to put it in front of the subject',NO_DEPTH.includes(S.layout)?`<div class="note">${LAYOUTS.find(x=>x[0]===S.layout)[1]} draws the time as one shape, so its digits can’t sit on both sides of the subject.</div>`:`<div class="dgrow">${[0,1,2,3].map(i=>{const pp=parts(),c=(pp.hh+pp.mm)[i];return `<button class="tile" data-act="depthDigit" data-v="${i}" aria-pressed="${!!S.depthFront[i]}"><b style="font-family:${(FONTS[S.font]||FONTS.inter).f}">${c}</b><small>${['Hour 1st','Hour 2nd','Minute 1st','Minute 2nd'][i]}</small></button>`}).join('')}</div><p class="mu sm" style="margin-top:8px">The digit at that position, whatever the time, is drawn in front.</p>`)
+  +sec('Light & shadow','Ties the clock and subject together',card(slider('rimLight','Rim light from the clock',0,100,1,'%')+slider('subjShadow','Subject’s shadow on the clock',0,100,1,'%'))):'')
  +`<details class="disclosure" data-disclosure="subjectHelp"><summary>Separation help</summary><p class="mu sm">For manual cut-outs, export a transparent PNG with the same dimensions as your photo. Import it above, then adjust alignment if needed.</p><div class="row"><button class="btn block" data-act="resetSubject">Reset ML Kit after a crash</button></div></details>`;
 }
 const CHARGES=[['none','Off','No change while charging'],['glow','Glow pulse','A soft halo breathes behind the clock'],['color','Colour shift','The digits turn your charging colour'],['fill','Battery fill','Digits fill up to the battery level'],['ring','Charge ring','A ring around the clock fills up'],['bar','Energy bar','A thin bar fills along the bottom']];
@@ -982,6 +1025,7 @@ document.addEventListener('click',e=>{
   case'pieceReset':resetPiece(curSel());break;
   case'stretchReset':{for(const id of a.dataset.v==='all'?['h','m']:[curSel()]){const k=PIECES[id];if(k.sx){setP(S,k.sx,100);setP(S,k.sy,100)}}changed();commit();renderPanel(true);renderFbar();readout(curSel())}break;
   case'scope':UI.scope=a.dataset.v;renderPanel(true);break;
+  case'depthDigit':{const i=+a.dataset.v;S.depthFront[i]=!S.depthFront[i];changed();commit();renderPanel(true)}break;
   case'scopeReset':{const P={h:'styleH',m:'styleM',d:'styleD'}[UI.scope];if(P){S[P]={};changed();commit();renderPanel(true)}}break;
   case'chargePreview':UI.charging=!UI.charging;renderAll();chrome();if(UI.tab==='extras')renderPanel(true);break;
   case'cntAdd':if(S.counters.length<3){const d=new Date(Date.now()+30*864e5),k=S.counters.length;S.counters.push({on:true,label:'',date:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,yearly:false,x:[0,-45,45][k],y:46,rot:0,size:140});changed();commit();renderPanel(true)}break;
@@ -1065,7 +1109,7 @@ function setPiece(id,v){
  if(v.sx!=null&&k.sx)setP(S,k.sx,Math.round(clamp(v.sx,50,200)));if(v.sy!=null&&k.sy)setP(S,k.sy,Math.round(clamp(v.sy,50,200)));
  for(const key of [k.x,k.y,k.size,k.rot,k.sx,k.sy])if(key)syncRange(key);readout(id);renderAll();
 }
-let gest=null,lastTap=0;
+let gest=null,lastTap=0;const tilting=()=>S.movement==='tilt'||S.movement==='parallax';
 function bindScreen(root){
  const pts=new Map();
  const begin=()=>{
@@ -1101,7 +1145,7 @@ function bindScreen(root){
     const snapped=Math.abs(x)<1.5;if(snapped)x=0;root.classList.toggle('snap-x',snapped);
     setPiece(gest.id,{x,y});
    }
-  }else if(!gest&&S.movement==='tilt'){
+  }else if(!gest&&tilting()){
    const r=root.getBoundingClientRect();root.style.setProperty('--tx',((e.clientX-r.left)/r.width-.5)*-5);root.style.setProperty('--ty',((e.clientY-r.top)/r.height-.5)*-5)
   }
  });
@@ -1117,7 +1161,7 @@ function bindScreen(root){
   if(now-lastTap<320&&S.dbl){UI.hide=!UI.hide;renderAll();chrome();lastTap=0}else lastTap=now;
  };
  root.addEventListener('pointerup',end);root.addEventListener('pointercancel',end);
- root.addEventListener('pointerleave',()=>{if(S.movement==='tilt'&&!gest){root.style.setProperty('--tx',0);root.style.setProperty('--ty',0)}});
+ root.addEventListener('pointerleave',()=>{if(tilting()&&!gest){root.style.setProperty('--tx',0);root.style.setProperty('--ty',0)}});
 }
 /* Expanded preview toolbar: split toggle, piece choice, reset, undo. */
 function seedSplit(){
@@ -1147,7 +1191,7 @@ function renderFbar(){
  if(bar.innerHTML!==html)bar.innerHTML=html;
 }
 bindScreen($('#screen'));bindScreen($('#fscreen'));
-window.addEventListener('deviceorientation',e=>{if(S.movement!=='tilt'||e.gamma==null)return;const r=$('#screen');r.style.setProperty('--tx',clamp(e.gamma/12,-3,3));r.style.setProperty('--ty',clamp((e.beta-45)/14,-3,3))});
+window.addEventListener('deviceorientation',e=>{if(!tilting()||e.gamma==null)return;const r=$('#screen');r.style.setProperty('--tx',clamp(e.gamma/12,-3,3));r.style.setProperty('--ty',clamp((e.beta-45)/14,-3,3))});
 if(navigator.getBattery)navigator.getBattery().then(b=>{const u=()=>{UI.battery=Math.round(b.level*100);renderAll()};u();b.addEventListener('levelchange',u)}).catch(()=>{});
 
 /* ---------- Android integration for the supplied V2 design ---------- */
@@ -1163,10 +1207,10 @@ const fixOriginal=fixState;
 fixState=function(st){
  const out=clone(DEFAULTS);for(const key of Object.keys(DEFAULTS))if(Object.prototype.hasOwnProperty.call(st||{},key))out[key]=clone(st[key]);
  fixOriginal(out);
- const ranges={sx:[50,200],sy:[50,200],weight:[100,900],slant:[0,20],lh:[60,140],minScale:[30,130],rotate:[-180,180],arc:[-100,100],size:[80,600],vpos:[-10,80],hpos:[-80,80],spacing:[-10,30],glow:[0,100],opacity:[10,100],warmFrom:[0,23],warmTo:[0,23],dateSize:[20,120],dateTrack:[0,30],nightDim:[0,70],dim:[0,100],subjScale:[50,200],subjX:[-30,30],subjY:[-30,30]};
+ const ranges={subjShadow:[0,100],rimLight:[0,100],sx:[50,200],sy:[50,200],weight:[100,900],slant:[0,20],lh:[60,140],minScale:[30,130],rotate:[-180,180],arc:[-100,100],size:[80,600],vpos:[-10,80],hpos:[-80,80],spacing:[-10,30],glow:[0,100],opacity:[10,100],warmFrom:[0,23],warmTo:[0,23],dateSize:[20,120],dateTrack:[0,30],nightDim:[0,70],dim:[0,100],subjScale:[50,200],subjX:[-30,30],subjY:[-30,30]};
  for(const [k,[low,high]]of Object.entries(ranges)){const v=Number(out[k]);out[k]=Number.isFinite(v)?clamp(v,low,high):DEFAULTS[k];}
  for(const k of ['color','color2','chargeColor'])if(!HEX.test(out[k]))out[k]=DEFAULTS[k];
- const enums={charge:['none','glow','color','fill','ring','bar'],layout:LAYOUTS.map(x=>x[0]),align:['left','center','right'],finish:FINISH.map(x=>x[0]),bg:['atmos','photo','gradient','black'],gradient:Object.keys(GRADS),movement:['still','breathe','float','tilt'],dateStyle:['full','short','dm','caps','num','day'],dateCase:['normal','upper'],infoPos:['above','below']};
+ const enums={charge:['none','glow','color','fill','ring','bar'],layout:LAYOUTS.map(x=>x[0]),align:['left','center','right'],finish:FINISH.map(x=>x[0]),bg:['atmos','photo','gradient','black'],gradient:Object.keys(GRADS),movement:['still','breathe','float','tilt','parallax'],dateStyle:['full','short','dm','caps','num','day'],dateCase:['normal','upper'],infoPos:['above','below']};
  for(const [k,vs]of Object.entries(enums))if(!vs.includes(out[k]))out[k]=DEFAULTS[k];
  out.caption=String(out.caption||'').replace(/[\x00-\x1f]/g,' ').slice(0,60);out.weatherText=String(out.weatherText||'').replace(/[\x00-\x1f]/g,' ').slice(0,60);
  out.info=Object.fromEntries(['battery','alarm','weather','progress'].map(k=>[k,!!(out.info&&out.info[k])]));
@@ -1176,6 +1220,8 @@ fixState=function(st){
  out.mins={x:num(out.mins&&out.mins.x,-80,80,out.hpos),y:num(out.mins&&out.mins.y,-10,80,clamp(out.vpos+12,-10,80)),size:num(out.mins&&out.mins.size,60,600,out.size),rot:num(out.mins&&out.mins.rot,-180,180,0),sx:num(out.mins&&out.mins.sx,50,200,100),sy:num(out.mins&&out.mins.sy,50,200,100)};
  const obj=o=>o&&typeof o==='object'&&!Array.isArray(o)?o:{},text=(v,n)=>String(v==null?'':v).replace(/[\x00-\x1f]/g,' ').slice(0,n);
  const part=(o,full)=>{o=obj(o);const r={};if(full&&FONTS[o.font])r.font=o.font;if(o.weight!=null&&Number.isFinite(+o.weight))r.weight=clamp(Math.round(+o.weight),100,900);if(full&&FINISH.some(x=>x[0]===o.finish))r.finish=o.finish;if(HEX.test(o.color||''))r.color=String(o.color).toLowerCase();return r};
+ const wf=obj(out.weightFlow);out.weightFlow={on:!!wf.on,from:num(wf.from,100,900,200),to:num(wf.to,100,900,900)};
+ out.depthFront=[0,1,2,3].map(i=>!!(Array.isArray(out.depthFront)&&out.depthFront[i]));
  out.styleH=part(out.styleH,true);out.styleM=part(out.styleM,true);out.styleD=part(out.styleD,false);
  out.counters=(Array.isArray(out.counters)?out.counters:[]).slice(0,3).map((c,k)=>{c=obj(c);return{on:!!c.on,label:text(c.label,24),date:/^\d{4}-\d{2}-\d{2}$/.test(c.date||'')?c.date:'',yearly:!!c.yearly,x:num(c.x,-80,80,[0,-45,45][k]),y:num(c.y,-10,80,46),rot:num(c.rot,-180,180,0),size:num(c.size,60,400,140)}});
  const q=obj(out.quote);out.quote={on:!!q.on,lines:(Array.isArray(q.lines)?q.lines:DEFAULTS.quote.lines).map(x=>text(x,80)).filter(x=>x.trim()).slice(0,30),x:num(q.x,-80,80,0),y:num(q.y,-10,80,58),rot:num(q.rot,-180,180,0),size:num(q.size,20,90,40)};

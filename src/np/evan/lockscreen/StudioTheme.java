@@ -9,19 +9,34 @@ import java.util.zip.*;
 public final class StudioTheme {
  public static final String[] FONTS={"inter","outfit","manrope","sora","lexend","poppins","spacegrotesk","nunito","bebas","anton","archivoblack","bungee","righteous","unbounded","bigshoulders","syne","fraunces","playfair","dmserif","cormorant","robotoslab","abril","jetbrains","spacemono","major","orbitron","audiowide","chakra","rubikmono","barlow"};
  public static final String[] LAYOUTS={"single","stacked","stairs","hero","split","grid","tower","vertical","arc","words","bigmin","diagonal","wave","offset","wide","analog","rings"};
- public static final String[] FINISHES={"solid","glow","outline","neon","gradient","shadow","glass","outlineglow","duo","retro","emboss","chrome","holo","splittone","halftone","glitch","stencil"};
+ public static final String[] FINISHES={"solid","glow","outline","neon","gradient","shadow","glass","outlineglow","duo","retro","emboss","chrome","holo","splittone","halftone","glitch","stencil","photo"};
  /** Layouts that are already single-digit shapes, or a dial, cannot be split into hours/minutes/date pieces. */
  public static final List<String> NO_SPLIT=Arrays.asList("grid","tower","vertical","arc","analog","rings");
  /** Layouts drawn as a dial or along a curve/edge are not stretched. */
  public static final List<String> NO_STRETCH=Arrays.asList("vertical","arc","analog","rings");
  /** Charging styles that redraw the digits themselves only apply to digit layouts. */
+ /** Layouts without digit images: no colour shift/fill, weight flow or per-digit depth. */
+ public static final List<String> NO_DIGITS=Arrays.asList("analog","words","rings");
+ /** Per-digit depth needs separate digit images in straight layouts (Arc is curved text in the preview). */
+ public static final List<String> NO_DEPTH=Arrays.asList("arc","analog","words","rings");
  public static final List<String> CHARGES=Arrays.asList("none","glow","color","fill","ring","bar");
  /** True while charging or full on the charger (MAML battery_state 1 or 3). */
  public static final String CHARGING="gt(eq(#battery_state,1)+eq(#battery_state,3),0)";
  public static final String[] ONES={"zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"};
  public static final class Spec {
   public final JSONObject j;
+  /** Still background for photo-filled digits (null for live wallpaper or black), the screen height, and the depth pass (0 all, 1 behind subject, 2 in front). */
+  public Bitmap backdrop;public int screenH=2400,layer;
   public Spec(JSONObject value){j=value;}
+  private Spec derive(JSONObject m){Spec o=new Spec(m);o.backdrop=backdrop;o.screenH=screenH;o.layer=layer;return o;}
+  public Spec weighted(int w){try{JSONObject m=new JSONObject(j.toString());m.put("weight",w);return derive(m);}catch(JSONException e){return this;}}
+  public boolean photo(){return finish().equals("photo")&&backdrop!=null;}
+  /** Six weights from light to heavy, one per ten minutes of the hour, or null when off. */
+  public int[] flow(){JSONObject f=j.optJSONObject("weightFlow");if(f==null||!f.optBoolean("on",false)||NO_DIGITS.contains(layout())||photo())return null;int a=Spec.n(f,"from",200,100,900),b=Spec.n(f,"to",900,100,900),w[]=new int[6];for(int i=0;i<6;i++)w[i]=Math.round(a+(b-a)*i/5f);return w;}
+  public boolean front(int pos){JSONArray a=j.optJSONArray("depthFront");return a!=null&&!NO_DEPTH.contains(layout())&&a.optBoolean(pos,false);}
+  public boolean anyFront(){for(int i=0;i<4;i++)if(front(i))return true;return false;}
+  /** Whether this pass draws the digit at a position: the back pass skips front digits, the front pass draws only them. */
+  public boolean draws(int pos){return layer==0||(layer==1)!=front(pos);}
   public int n(String k,int def,int lo,int hi){return Math.max(lo,Math.min(hi,j.optInt(k,def)));}
   public static int n(JSONObject o,String k,int def,int lo,int hi){return Math.max(lo,Math.min(hi,o==null?def:o.optInt(k,def)));}
   public boolean split(){return b("split",false)&&!NO_SPLIT.contains(layout());}
@@ -31,7 +46,7 @@ public final class StudioTheme {
   public String charge(){String c=s("charge","none");return CHARGES.contains(c)?c:"none";}
   public int chargeInk(){String v=s("chargeColor","#7be0b0");return v.matches("#[a-fA-F0-9]{6}")?Color.parseColor(v):0xff7be0b0;}
   /** Partial overrides (font, weight, finish, colour) for one part; falls back to the shared style. */
-  public Spec part(String key){JSONObject o=j.optJSONObject(key);if(o==null||o.length()==0)return this;try{JSONObject m=new JSONObject(j.toString());for(String k:new String[]{"font","weight","finish","color"})if(o.has(k))m.put(k,o.get(k));return new Spec(m);}catch(JSONException e){return this;}}
+  public Spec part(String key){JSONObject o=j.optJSONObject(key);if(o==null||o.length()==0)return this;try{JSONObject m=new JSONObject(j.toString());for(String k:new String[]{"font","weight","finish","color"})if(o.has(k))m.put(k,o.get(k));return derive(m);}catch(JSONException e){return this;}}
   public Integer override(String key){JSONObject o=j.optJSONObject(key);String v=o==null?"":o.optString("color","");return v.matches("#[a-fA-F0-9]{6}")?Color.parseColor(v):null;}
   public boolean b(String k,boolean def){return j.optBoolean(k,def);}
   public String s(String k,String def){return j.optString(k,def);}
@@ -136,7 +151,7 @@ public final class StudioTheme {
  private static String alpha(Spec s){return fmt(s.n("opacity",100,10,100)*2.55)+"*(1-("+s.night()+")*"+fmt(s.n("nightDim",0,0,70)/100d)+")"+(s.b("lowBatDim",false)?"*ifelse(lt(#battery_level,20),0.6,1)":"");}
  /** Opens one movable piece, centred on the editor's hpos/vpos percentage mapping and rotated about its centre. */
  private static void open(StringBuilder x,Spec s,String name,int hpos,int vpos,double rotation,double width,double height){
-  String move=s.choice("movement","still","still","breathe","float","tilt"),tx=move.equals("tilt")?"+max(-32,min(32,#studio_gravity_x*5))":"",ty=move.equals("tilt")?"+max(-32,min(32,#studio_gravity_y*3))":"";
+  String move=s.choice("movement","still","still","breathe","float","tilt","parallax");if(move.equals("parallax"))move="tilt";String tx=move.equals("tilt")?"+max(-32,min(32,#studio_gravity_x*5))":"",ty=move.equals("tilt")?"+max(-32,min(32,#studio_gravity_y*3))":"";
   x.append("<Group name=\"").append(name).append("\" x=\"#screen_width*").append(fmt(.5+hpos*.006)).append('-').append(fmt(width/2)).append(tx).append("\" y=\"#screen_height*").append(fmt(.12+vpos*.011)).append('-').append(fmt(height/2)).append(ty).append("\" rotation=\"").append(fmt(rotation)).append("\" pivotX=\"").append(fmt(width/2)).append("\" pivotY=\"").append(fmt(height/2)).append("\" alpha=\"").append(esc(alpha(s))).append("\">");
   if(move.equals("float"))x.append("<PositionAnimation><Position x=\"0\" y=\"0\" time=\"0\"/><Position x=\"0\" y=\"-24\" time=\"3500\"/><Position x=\"0\" y=\"0\" time=\"7000\"/></PositionAnimation>");
   if(move.equals("breathe"))x.append("<AlphaAnimation><Alpha a=\"255\" time=\"0\"/><Alpha a=\"178\" time=\"2500\"/><Alpha a=\"255\" time=\"5000\"/></AlphaAnimation>");
@@ -155,22 +170,36 @@ public final class StudioTheme {
  }
  private static int warmed(int c,boolean warm){return warm?mix(c,0xffffb070,.6f):c;}
  /** Digit images for one part: the normal set, plus the charging variants the chosen style needs. */
- private static void digitSet(Spec ps,String prefix,String name,int ink,int endInk,int size,String charge,int chargeInk,Map<String,byte[]> files)throws Exception{
+ /** Digit images for one part: the normal set (six weights when the weight follows the hour), plus the charging variants. */
+ private static void digitSet(Spec ps,String prefix,String name,int ink,int endInk,int size,String charge,int chargeInk,Matrix toScreen,int maxDigit,Map<String,byte[]> files)throws Exception{
   int cell=(int)Math.ceil(size*.62),glyphH=(int)Math.ceil(size*1.28),pad=(int)Math.ceil(size*.22),cw=cell+pad*2,ch=glyphH+pad*2;
-  Paint paint=paint(ps,ink,endInk,size,false);
-  for(int d=0;d<10;d++)store(files,prefix+name+"_"+d+".png",text(""+d,paint,cw,ch,0,false,look(ps,ink,endInk,size)));
-  if(charge.equals("color")){Paint cp=paint(ps,chargeInk,chargeInk,size,false);for(int d=0;d<10;d++)store(files,prefix+name+"c_"+d+".png",text(""+d,cp,cw,ch,0,false,look(ps,chargeInk,chargeInk,size)));}
+  Paint paint=paint(ps,ink,endInk,size,false);int[] flow=toScreen==null?ps.flow():null;
+  if(flow!=null)for(int k=0;k<6;k++){Spec w=ps.weighted(flow[k]);Paint wp=paint(w,ink,endInk,size,false);for(int d=0;d<10;d++)store(files,prefix+name+"_"+(k*10+d)+".png",text(""+d,wp,cw,ch,0,false,look(w,ink,endInk,size)));}
+  else{if(toScreen!=null)photoFill(paint,ps.backdrop,toScreen);for(int d=0;d<=maxDigit;d++)store(files,prefix+name+"_"+d+".png",text(""+d,paint,cw,ch,0,false,toScreen==null?look(ps,ink,endInk,size):null));}
+  if(charge.equals("color")){Paint cp=paint(ps,chargeInk,chargeInk,size,false);for(int d=0;d<=maxDigit;d++)store(files,prefix+name+"c_"+d+".png",text(""+d,cp,cw,ch,0,false,look(ps,chargeInk,chargeInk,size)));}
   if(charge.equals("fill")){
    // Five fill levels per digit: the digit dimmed, with its lower part in the charging colour up to the battery level.
    Paint base=plain(paint,(ink&0xffffff)|0x59000000),fill=plain(paint,chargeInk);
-   for(int d=0;d<10;d++)for(int l=0;l<5;l++){Bitmap b=text(""+d,base,cw,ch,0,false,null);Canvas c=new Canvas(b);float top=ch/2f+size*.45f-size*.9f*(l+1)/5f;c.save();c.clipRect(0,top,cw,ch);Bitmap f=text(""+d,fill,cw,ch,0,false,null);c.drawBitmap(f,0,0,null);f.recycle();c.restore();store(files,prefix+name+"f_"+(d*5+l)+".png",b);}
+   for(int d=0;d<=maxDigit;d++)for(int l=0;l<5;l++){Bitmap b=text(""+d,base,cw,ch,0,false,null);Canvas c=new Canvas(b);float top=ch/2f+size*.45f-size*.9f*(l+1)/5f;c.save();c.clipRect(0,top,cw,ch);Bitmap f=text(""+d,fill,cw,ch,0,false,null);c.drawBitmap(f,0,0,null);f.recycle();c.restore();store(files,prefix+name+"f_"+(d*5+l)+".png",b);}
   }
  }
+ /** The background photo seen through the digit, lifted a little so the digits read as lit windows. */
+ private static void photoFill(Paint p,Bitmap bg,Matrix toScreen){
+  BitmapShader shader=new BitmapShader(bg,Shader.TileMode.CLAMP,Shader.TileMode.CLAMP);Matrix inverse=new Matrix();if(toScreen.invert(inverse))shader.setLocalMatrix(inverse);
+  p.setShader(shader);p.setColor(Color.WHITE);p.clearShadowLayer();p.setStyle(Paint.Style.FILL);
+  ColorMatrix m=new ColorMatrix();m.setSaturation(1.15f);m.postConcat(new ColorMatrix(new float[]{1.3f,0,0,0,10,0,1.3f,0,0,10,0,0,1.3f,0,10,0,0,0,1,0}));p.setColorFilter(new ColorMatrixColorFilter(m));
+ }
+ /** Screen transform of a placed group, matching open(): rotation about its centre, then its position. */
+ private static Matrix group(Spec s,int hpos,int vpos,double rot,double width,double height){Matrix m=new Matrix();m.setRotate((float)rot,(float)width/2,(float)height/2);m.postTranslate((float)(1080*(.5+hpos*.006)-width/2),(float)(s.screenH*(.12+vpos*.011)-height/2));return m;}
+ /** Maps a digit image's own pixels to the screen: its box, its rotation, then the enclosing groups. */
+ private static Matrix toScreen(int cw,int ch,double ix,double iy,double w,double h,double rot,Matrix parent){Matrix m=new Matrix();m.setScale((float)(w/cw),(float)(h/ch));if(rot!=0)m.postRotate((float)rot,(float)w/2,(float)h/2);m.postTranslate((float)ix,(float)iy);m.postConcat(parent);return m;}
+ /** Highest digit a position can show (hour tens 0-2, minute tens 0-5); photo digits are drawn per position. */
+ private static int maxDigit(Spec s,int pos){return pos==0?(s.b("h12",false)?1:2):pos==2?5:9;}
  /** One digit image (plus charging variants) at a position; fx/fy stretch width and height independently. */
- private static void digit(StringBuilder x,String prefix,String name,String id,double px,double py,double scale,double fx,double fy,int size,String charge,String rot){
+ private static void digit(StringBuilder x,String prefix,String name,String id,double px,double py,double scale,double fx,double fy,int size,String charge,String rot,boolean flow){
   int cell=(int)Math.ceil(size*.62),glyphH=(int)Math.ceil(size*1.28),pad=(int)Math.ceil(size*.22),cw=cell+pad*2,ch=glyphH+pad*2;
   String ix=fmt((px-pad*scale)*fx),iy=fmt((py-pad*scale)*fy),w=fmt(cw*scale*fx),h=fmt(ch*scale*fy);boolean swap=charge.equals("color")||charge.equals("fill");
-  image(x,prefix+name+".png",id,ix,iy,w,h,(swap?" visibility=\"eq("+CHARGING+",0)\"":"")+(rot==null?"":rot));
+  image(x,prefix+name+".png",flow?"("+id+")+10*int(#minute/10)":id,ix,iy,w,h,(swap?" visibility=\"eq("+CHARGING+",0)\"":"")+(rot==null?"":rot));
   if(charge.equals("color"))image(x,prefix+name+"c.png",id,ix,iy,w,h," visibility=\""+CHARGING+"\""+(rot==null?"":rot));
   if(charge.equals("fill"))image(x,prefix+name+"f.png","("+id+")*5+min(4,int(#battery_level/20))",ix,iy,w,h," visibility=\""+CHARGING+"\""+(rot==null?"":rot));
  }
@@ -192,25 +221,28 @@ public final class StudioTheme {
  }
  private static void time(StringBuilder x,Spec s,String prefix,int ink,int ink2,Map<String,byte[]> files)throws Exception{
   boolean warm=prefix.contains("/warm/");int endInk=warm?mix(s.secondary(),0xffff9a55,.6f):s.secondary();
-  Bitmap tint=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);tint.eraseColor(endInk);store(files,prefix+"ink.png",tint);
+  if(s.layer!=2){Bitmap tint=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);tint.eraseColor(endInk);store(files,prefix+"ink.png",tint);}
   Spec hs=s.part("styleH"),ms=s.part("styleM");Integer ho=s.override("styleH"),mo=s.override("styleM"),dov=s.override("styleD");
   int hInk=ho==null?ink:warmed(ho,warm),mInk=mo==null?ink2:warmed(mo,warm),dInk=dov==null?ink:warmed(dov,warm);
-  String charge=s.charge(),name="studio_clock_"+prefix.replace('/','_');int chargeInk=s.chargeInk();
+  if(s.layer==2&&!s.anyFront())return;boolean main=s.layer!=2;
+  String charge=s.charge(),name="studio_clock_"+prefix.replace('/','_')+(main?"":"f");int chargeInk=s.chargeInk();
   if(s.split())splitTime(x,s,hs,ms,prefix,name,hInk,mInk,endInk,charge,chargeInk,files);
   else{
    int size=s.size();Geometry g=geometry(s.layout(),size,s.n("spacing",0,-10,30),s.n("lh",88,60,140),s.n("minScale",100,30,130),s.n("arc",55,-100,100));
    if(s.layout().equals("stairs")&&s.s("align","center").equals("right"))for(Piece piece:g.pieces)piece.x=g.width-piece.x-size*.62*piece.scale;
    double fx=s.stretch(s.j,"sx"),fy=s.stretch(s.j,"sy");boolean digitsLayout=!g.analog&&!g.words&&!g.rings;String cs=digitsLayout?charge:(charge.equals("color")||charge.equals("fill")?"none":charge);
    int cell=(int)Math.ceil(size*.62),pad=(int)Math.ceil(size*.22),glyphH=(int)Math.ceil(size*1.28),ch=glyphH+pad*2;
-   if(digitsLayout){digitSet(hs,prefix,"h",hInk,endInk,size,cs,chargeInk,files);digitSet(ms,prefix,"m",mInk,endInk,size,cs,chargeInk,files);store(files,prefix+"colon.png",text(":",paint(hs,hInk,endInk,size,false),(int)(size*.3)+pad*2,ch,0,false,look(hs,hInk,endInk,size)));
+   if(digitsLayout&&main){if(!hs.photo())digitSet(hs,prefix,"h",hInk,endInk,size,cs,chargeInk,null,9,files);if(!ms.photo())digitSet(ms,prefix,"m",mInk,endInk,size,cs,chargeInk,null,9,files);store(files,prefix+"colon.png",text(":",paint(hs,hInk,endInk,size,false),(int)(size*.3)+pad*2,ch,0,false,look(hs,hInk,endInk,size)));
     if(cs.equals("color"))store(files,prefix+"colonc.png",text(":",paint(hs,chargeInk,chargeInk,size,false),(int)(size*.3)+pad*2,ch,0,false,look(hs,chargeInk,chargeInk,size)));}
    String[] digits=digitIds(s);
    double gw=g.width*fx,gh=g.height*fy,timeWidth=g.rotate==0?gw:gh,timeHeight=g.rotate==0?gh:gw;boolean apart=s.dateApart();
    double width=apart?timeWidth:Math.max(timeWidth,metaWidth(s)),height=timeHeight+(apart?0:metaHeight(s));
    open(x,s,name,s.n("hpos",0,-80,80),s.n("vpos",14,-10,80),s.n("rotate",0,-180,180),width,height);
    double left=s.s("align","center").equals("left")?0:s.s("align","center").equals("right")?width-timeWidth:(width-timeWidth)/2;
-   x.append("<Group x=\"").append(fmt(left+(g.rotate==0?0:gh/2-gw/2))).append("\" y=\"").append(fmt(g.rotate==0?0:gw/2-gh/2)).append("\" rotation=\"").append(fmt(g.rotate)).append("\" pivotX=\"").append(fmt(gw/2)).append("\" pivotY=\"").append(fmt(gh/2)).append("\">");
-   chargeAround(x,prefix,cs,chargeInk,gw,gh,files);
+   double innerX=left+(g.rotate==0?0:gh/2-gw/2),innerY=g.rotate==0?0:gw/2-gh/2;
+   x.append("<Group x=\"").append(fmt(innerX)).append("\" y=\"").append(fmt(innerY)).append("\" rotation=\"").append(fmt(g.rotate)).append("\" pivotX=\"").append(fmt(gw/2)).append("\" pivotY=\"").append(fmt(gh/2)).append("\">");
+   Matrix inner=new Matrix();inner.setRotate((float)g.rotate,(float)gw/2,(float)gh/2);inner.postTranslate((float)innerX,(float)innerY);inner.postConcat(group(s,s.n("hpos",0,-80,80),s.n("vpos",14,-10,80),s.n("rotate",0,-180,180),width,height));
+   if(main)chargeAround(x,prefix,cs,chargeInk,gw,gh,files);
    if(g.analog)analog(x,s,prefix,hInk,mInk,endInk,size,files);
    else if(g.rings)rings(x,s,hs,ms,prefix,hInk,mInk,endInk,size,files);
    else if(g.words){
@@ -220,16 +252,21 @@ public final class StudioTheme {
     image(x,prefix+"wordhour.png","#hour24","0","0",fmt(ww*fx),fmt(hh*fy),null);image(x,prefix+"wordminute.png","#minute","0",fmt(hh*fy),fmt(ww*fx),fmt(mh*fy),null);
    }else for(Piece p:g.pieces){
     String rot=p.rotation==0?null:" rotation=\""+fmt(p.rotation)+"\" pivotX=\""+fmt((cell+2*pad)*p.scale*fx/2)+"\" pivotY=\""+fmt(ch*p.scale*fy/2)+"\"";
+    if(p.colon&&!main)continue;
     if(p.colon){String cx=fmt((p.x-pad*p.scale)*fx),cy=fmt((p.y-pad*p.scale)*fy),cw2=fmt((size*.3+2*pad)*p.scale*fx),chh=fmt(ch*p.scale*fy),r=rot==null?"":rot;boolean swap=cs.equals("color");
      image(x,prefix+"colon.png",null,cx,cy,cw2,chh,(swap?" visibility=\"eq("+CHARGING+",0)\"":"")+r);if(swap)image(x,prefix+"colonc.png",null,cx,cy,cw2,chh," visibility=\""+CHARGING+"\""+r);}
-    else digit(x,prefix,p.minutes?"m":"h",digits[p.digit],p.x,p.y,p.scale,fx,fy,size,cs,rot);
+    else if(s.draws(p.digit)){
+     Spec ps=p.minutes?ms:hs;boolean photo=ps.photo();String nm=(p.minutes?"m":"h")+(photo?"p"+p.digit:"");
+     if(photo&&main)digitSet(ps,prefix,nm,p.minutes?mInk:hInk,endInk,size,cs,chargeInk,toScreen(cell+2*pad,ch,(p.x-pad*p.scale)*fx,(p.y-pad*p.scale)*fy,(cell+2*pad)*p.scale*fx,ch*p.scale*fy,p.rotation,inner),maxDigit(s,p.digit),files);
+     digit(x,prefix,nm,digits[p.digit],p.x,p.y,p.scale,fx,fy,size,cs,rot,!photo&&ps.flow()!=null);
+    }
    }
-   if(g.divider)image(x,prefix+"ink.png",null,fmt((2*(cell+size*s.n("spacing",0,-10,30)*.01)+size*.08)*fx),fmt(size*.16*fy),fmt(size*.035*fx),fmt(size*.78*fy),null);
+   if(g.divider&&main)image(x,prefix+"ink.png",null,fmt((2*(cell+size*s.n("spacing",0,-10,30)*.01)+size*.08)*fx),fmt(size*.16*fy),fmt(size*.035*fx),fmt(size*.78*fy),null);
    x.append("</Group>");
-   if(!apart)meta(x,s,prefix,dInk,mInk,width,timeHeight+12,files);
+   if(!apart&&main)meta(x,s,prefix,dInk,mInk,width,timeHeight+12,files);
    x.append("</Group>");
   }
-  if(s.dateApart())metaPiece(x,s,prefix,name,dInk,mInk,files);
+  if(s.dateApart()&&main)metaPiece(x,s,prefix,name,dInk,mInk,files);
  }
  private static void metaPiece(StringBuilder x,Spec s,String prefix,String name,int ink,int ink2,Map<String,byte[]> files)throws Exception{
   boolean anyMeta=s.b("showDate",true)||!s.s("caption","").isEmpty()||s.b("seconds",false)||s.info("battery")||s.info("alarm")||s.info("weather")||s.info("progress");if(!anyMeta)return;
@@ -243,6 +280,7 @@ public final class StudioTheme {
   int size=s.size(),hpos=s.n("hpos",0,-80,80),vpos=s.n("vpos",14,-10,80),msize=Spec.n(mo,"size",size,60,600);
   int mx=Spec.n(mo,"x",hpos,-80,80),my=Spec.n(mo,"y",vpos+12,-10,80),mrot=Spec.n(mo,"rot",0,-180,180);
   if(s.layout().equals("words")){
+   if(s.layer==2)return;
    double fx=s.stretch(s.j,"sx"),fy=s.stretch(s.j,"sy"),mfx=s.stretch(mo,"sx"),mfy=s.stretch(mo,"sy");String cs=charge.equals("color")||charge.equals("fill")?"none":charge;
    Paint hp=paint(hs,hInk,endInk,size*.5,false),mp=paint(ms,mInk,endInk,msize*.3,false);int hw=1,mw=1,hh=(int)Math.ceil(size*.65),mh=(int)Math.ceil(msize*.43);
    for(int i=1;i<=12;i++)hw=Math.max(hw,(int)Math.ceil(hp.measureText(ONES[i])+size*.2));for(int i=0;i<60;i++)mw=Math.max(mw,(int)Math.ceil(mp.measureText(minuteWords(i))+msize*.15));
@@ -256,10 +294,14 @@ public final class StudioTheme {
   for(int part=0;part<2;part++){
    int sz=part==0?size:msize,cell=(int)Math.ceil(sz*.62),glyphH=(int)Math.ceil(sz*1.28);double gap=sz*s.n("spacing",0,-10,30)*.01;
    double fx=part==0?s.stretch(s.j,"sx"):s.stretch(mo,"sx"),fy=part==0?s.stretch(s.j,"sy"):s.stretch(mo,"sy");String file=part==0?"h":"m";
-   digitSet(part==0?hs:ms,prefix,file,part==0?hInk:mInk,endInk,sz,charge,chargeInk,files);
-   double width=(2*cell+gap)*fx,height=glyphH*fy;open(x,s,name+file,part==0?hpos:mx,part==0?vpos:my,part==0?s.n("rotate",0,-180,180):mrot,width,height);
-   if(part==0)chargeAround(x,prefix,charge,chargeInk,width,height,files);
-   for(int i=0;i<2;i++)digit(x,prefix,file,digits[part*2+i],i*(cell+gap),0,1,fx,fy,sz,charge,null);
+   Spec ps=part==0?hs:ms;boolean main=s.layer!=2,photo=ps.photo();int pad=(int)Math.ceil(sz*.22),ink=part==0?hInk:mInk;
+   if(main&&!photo)digitSet(ps,prefix,file,ink,endInk,sz,charge,chargeInk,null,9,files);
+   int gh=part==0?hpos:mx,gv=part==0?vpos:my;double grot=part==0?s.n("rotate",0,-180,180):mrot;
+   double width=(2*cell+gap)*fx,height=glyphH*fy;open(x,s,name+file,gh,gv,grot,width,height);Matrix placed=group(s,gh,gv,grot,width,height);
+   if(part==0&&main)chargeAround(x,prefix,charge,chargeInk,width,height,files);
+   for(int i=0;i<2;i++){int pos=part*2+i;if(!s.draws(pos))continue;String nm=file+(photo?"p"+pos:"");
+    if(photo&&main)digitSet(ps,prefix,nm,ink,endInk,sz,charge,chargeInk,toScreen(cell+2*pad,glyphH+2*pad,(i*(cell+gap)-pad)*fx,-pad*fy,(cell+2*pad)*fx,(glyphH+2*pad)*fy,0,placed),maxDigit(s,pos),files);
+    digit(x,prefix,nm,digits[pos],i*(cell+gap),0,1,fx,fy,sz,charge,null,!photo&&ps.flow()!=null);}
    x.append("</Group>");
   }
  }
@@ -331,7 +373,7 @@ public final class StudioTheme {
    double cx=(width-dsz)/2;image(x,"cnt"+k+"_disc.png",null,fmt(cx),"0",null,null,null);
    String v="min(999,#"+var+")",ones="int("+v+"%10)",tens="int("+v+"/10)%10",hund="int("+v+"/100)";double top=dsz/2.0-ch/2.0;
    for(int len=1;len<=3;len++){String vis=len==1?"lt("+v+",10)":len==2?"ge("+v+",10)*lt("+v+",100)":"ge("+v+",100)";x.append("<Group visibility=\"").append(vis).append("\">");double start=width/2-len*cell/2.0;String[] ids=len==1?new String[]{ones}:len==2?new String[]{tens,ones}:new String[]{hund,tens,ones};for(int i=0;i<len;i++)image(x,"cnt"+k+".png",ids[i],fmt(start+i*cell-pad),fmt(top),fmt(cw),fmt(ch),null);x.append("</Group>");}
-   if(!label.isEmpty()){Paint lp=paint(s,ink,ink,dsz*.16,true);store(files,"cnt"+k+"_label.png",text(label,lp,(int)Math.ceil(width),lh,0,false,null));image(x,"cnt"+k+"_label.png",null,"0",fmt(dsz),null,null,null);}
+   if(!label.isEmpty()){Paint lp=paint(s,ink,ink,dsz*.2,true);store(files,"cnt"+k+"_label.png",text(label,lp,(int)Math.ceil(width),lh,0,false,null));image(x,"cnt"+k+"_label.png",null,"0",fmt(dsz),null,null,null);}
    x.append("</Group></Group>");
   }
   JSONObject q=s.j.optJSONObject("quote");JSONArray lines=q==null?null:q.optJSONArray("lines");
@@ -384,38 +426,64 @@ public final class StudioTheme {
    boolean scheduled=schedule!=null&&schedule.optBoolean("on",false)&&styles!=null;
    List<Spec> slots=new ArrayList<>();List<String> names=new ArrayList<>();
    if(scheduled){for(String key:new String[]{"day","eve","night"}){JSONObject j=styles.optJSONObject(key);slots.add(new Spec(j==null?base.j:j));names.add(key);}}else{slots.add(base);names.add("current");}
-   boolean moving=false,seconds=false,tilt=false;for(Spec s:slots){moving|=!s.s("movement","still").equals("still")||s.charge().equals("glow");seconds|=s.b("seconds",false)||s.layout().equals("analog")&&s.b("secHand",false);tilt|=s.s("movement","still").equals("tilt");}
+   boolean moving=false,seconds=false,tilt=false;for(Spec s:slots){moving|=!s.s("movement","still").equals("still")||s.charge().equals("glow");seconds|=s.b("seconds",false)||s.layout().equals("analog")&&s.b("secHand",false);tilt|=s.s("movement","still").equals("tilt")||s.s("movement","still").equals("parallax");}
    StringBuilder x=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Lockscreen version=\"1\" screenWidth=\"1080\" frameRate=\"").append(moving?15:1).append("\" useVariableUpdater=\"Battery,DateTime.").append(seconds?"Second":"Minute").append("\"");
    if(base.s("bg","atmos").equals("atmos"))x.append(" showSysWallpaper=\"true\"");x.append("><Var name=\"notification\" expression=\"1\"/><Var name=\"studio_hidden\" expression=\"").append(base.b("startHidden",false)?1:0).append("\"/><Var name=\"studio_day\" expression=\"").append(esc(TODAY)).append("\"/>");
    if(tilt)x.append("<VariableBinders><SensorBinder type=\"gravity\" rate=\"2\"><Variable name=\"studio_gravity_x\" index=\"0\"/><Variable name=\"studio_gravity_y\" index=\"1\"/></SensorBinder></VariableBinders>");
-   String bgMode=base.choice("bg","atmos","atmos","photo","gradient","black");byte[] jpg=null;
+   String bgMode=base.choice("bg","atmos","atmos","photo","gradient","black");byte[] jpg=null;Bitmap bg=null;
+   // Parallax: the photo plane (background, subject, its shadow and rim) drifts against the clock, slightly enlarged so no edge shows.
+   boolean parallax=base.s("movement","still").equals("parallax");double k=parallax?1.045:1;String px=parallax?"-max(-14,min(14,#studio_gravity_x*2))":"",py=parallax?"-max(-14,min(14,#studio_gravity_y*1.5))":"";
    if(!bgMode.equals("atmos")){
-    Bitmap bg=ThemeBuilder.wallpaper(bgMode.equals("photo")?photo:null,d.height);
+    bg=ThemeBuilder.wallpaper(bgMode.equals("photo")?photo:null,d.height);
     if(bgMode.equals("black"))bg.eraseColor(Color.BLACK);
     if(bgMode.equals("gradient")){int[] colors=gradient(base.s("gradient","dusk"));Paint p=new Paint();p.setShader(new LinearGradient(0,0,1080,d.height,colors,null,Shader.TileMode.CLAMP));new Canvas(bg).drawRect(0,0,1080,d.height,p);}
-    ByteArrayOutputStream bytes=new ByteArrayOutputStream();bg.compress(Bitmap.CompressFormat.JPEG,92,bytes);jpg=bytes.toByteArray();bg.recycle();files.put("advance/bg.jpg",jpg);image(x,"bg.jpg",null,"0","0","#screen_width","#screen_height",null);
+    ByteArrayOutputStream bytes=new ByteArrayOutputStream();bg.compress(Bitmap.CompressFormat.JPEG,92,bytes);jpg=bytes.toByteArray();files.put("advance/bg.jpg",jpg);
+    if(parallax)image(x,"bg.jpg",null,"0-#screen_width*"+fmt((k-1)/2)+px,"0-#screen_height*"+fmt((k-1)/2)+py,"#screen_width*"+fmt(k),"#screen_height*"+fmt(k),null);else image(x,"bg.jpg",null,"0","0","#screen_width","#screen_height",null);
    }
    Bitmap pixel=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);pixel.eraseColor(Color.BLACK);files.put("advance/dim.png",png(pixel));pixel.eraseColor(Color.WHITE);files.put("advance/ink.png",png(pixel));pixel.eraseColor(0x66ffffff);files.put("advance/progress-track.png",png(pixel));pixel.recycle();
    if(base.n("dim",0,0,100)>0)image(x,"dim.png",null,"0","0","#screen_width","#screen_height"," alpha=\""+Math.round(base.n("dim",0,0,100)*2.55*.8)+"\"");
-   x.append("<Group name=\"studio_clock\" visibility=\"eq(#studio_hidden,0)\">");
-   for(int i=0;i<slots.size();i++){
-    Spec s=slots.get(i);String visibility=scheduled?(i==0?"gt(#hour24,5)*lt(#hour24,18)":i==1?"gt(#hour24,17)*lt(#hour24,23)":"gt(gt(#hour24,22)+lt(#hour24,6),0)"):"1";x.append("<Group visibility=\"").append(visibility).append("\">");
-    if(s.b("warm",false)){x.append("<Group visibility=\"eq(").append(s.night()).append(",0)\">");time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group><Group visibility=\"").append(s.night()).append("\">");time(x,s,names.get(i)+"/warm/",mix(s.color(false),0xffffb070,.6f),(s.b("twoTone",false)?mix(s.color(true),0xffff9a55,.6f):mix(s.color(false),0xffffb070,.6f)),files);x.append("</Group>");}
-    else time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group>");
-   }
+   boolean subjectShown=base.b("subjectOn",true)&&bgMode.equals("photo")&&subject!=null,front=false;
+   for(Spec s:slots){s.backdrop=bgMode.equals("photo")||bgMode.equals("gradient")?bg:null;s.screenH=d.height;front|=subjectShown&&s.anyFront();}
+   for(Spec s:slots)s.layer=front?1:0;
+   x.append("<Group name=\"studio_clock\" visibility=\"eq(#studio_hidden,0)\">");clocks(x,slots,names,scheduled,files);
    extras(x,base,base.color(false),files);
    if(base.charge().equals("bar")){
     // Energy bar along the bottom edge, filled to the battery level, only while charging.
-    int ci=base.chargeInk();Bitmap px=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);px.eraseColor(0x30ffffff);files.put("advance/charge_track.png",png(px));px.eraseColor(ci);files.put("advance/charge_fill.png",png(px));px.recycle();
+    int ci=base.chargeInk();Bitmap dot=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);dot.eraseColor(0x30ffffff);files.put("advance/charge_track.png",png(dot));dot.eraseColor(ci);files.put("advance/charge_fill.png",png(dot));dot.recycle();
     String vis=" visibility=\""+CHARGING+"\"";image(x,"charge_track.png",null,"#screen_width*0.1","#screen_height*0.93","#screen_width*0.8","10",vis);image(x,"charge_fill.png",null,"#screen_width*0.1","#screen_height*0.93","#screen_width*0.008*#battery_level","10",vis);
    }
    x.append("</Group>");
-   if(base.b("subjectOn",true)&&bgMode.equals("photo")&&subject!=null){Bitmap b=ThemeBuilder.subject(subject,d.height);store(files,"subject.png",b);int scale=base.n("subjScale",100,50,200);image(x,"subject.png",null,"#screen_width*(0.5+"+fmt(base.n("subjX",0,-30,30)/100d)+")-540*"+scale+"/100","#screen_height*(0.5+"+fmt(base.n("subjY",0,-30,30)/100d)+")-#screen_height*"+scale+"/200","1080*"+scale+"/100","#screen_height*"+scale+"/100",null);}
+   if(subjectShown){
+    Bitmap b=ThemeBuilder.subject(subject,d.height);int scale=base.n("subjScale",100,50,200),shadow=base.n("subjShadow",0,0,100),rim=base.n("rimLight",0,0,100);double sc=scale/100d*k,sx=base.n("subjX",0,-30,30)/100d,sy=base.n("subjY",0,-30,30)/100d;
+    // Light comes from the clock: the rim is on the subject's side facing it, and the shadow falls down and toward it.
+    double vx=1080*(.5+base.n("hpos",0,-80,80)*.006)-1080*(.5+sx),vy=d.height*(.12+base.n("vpos",14,-10,80)*.011)-d.height*(.5+sy),len=Math.hypot(vx,vy);if(len<1){vx=0;vy=-1;}else{vx/=len;vy/=len;}
+    String ix="#screen_width*(0.5+"+fmt(sx*k)+")-540*"+fmt(sc)+px,iy="#screen_height*(0.5+"+fmt(sy*k)+")-#screen_height*"+fmt(sc/2)+py,iw="1080*"+fmt(sc),ih="#screen_height*"+fmt(sc);
+    if(shadow>0){double ox=vx*.45,oy=vy*.45+.9,ol=Math.hypot(ox,oy);ox=ox/ol*22*sc;oy=oy/ol*22*sc;Bitmap small=Bitmap.createScaledBitmap(b,180,Math.max(1,d.height/6),true),soft=soften(small,3);soft=tint(soft,0xff000000);store(files,"subject_shadow.png",soft);
+     image(x,"subject_shadow.png",null,ix+"+"+fmt(ox),iy+"+"+fmt(oy),iw,ih," alpha=\""+Math.round(shadow*2.55*.75)+"\"");}
+    Bitmap rimBitmap=null;
+    if(rim>0){Bitmap half=Bitmap.createScaledBitmap(b,540,Math.max(1,d.height/2),true);Bitmap edge=tint(half.copy(Bitmap.Config.ARGB_8888,true),base.color(false));Paint cut=new Paint(Paint.FILTER_BITMAP_FLAG);cut.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));new Canvas(edge).drawBitmap(half,(float)(-vx*6),(float)(-vy*6),cut);half.recycle();rimBitmap=soften(edge,2);}
+    store(files,"subject.png",b);image(x,"subject.png",null,ix,iy,iw,ih,null);
+    if(rimBitmap!=null){store(files,"subject_rim.png",rimBitmap);image(x,"subject_rim.png",null,ix,iy,iw,ih," alpha=\""+Math.round(rim*2.55)+"\"");}
+   }
+   if(front){for(Spec s:slots)s.layer=2;x.append("<Group name=\"studio_front\" visibility=\"eq(#studio_hidden,0)\">");clocks(x,slots,names,scheduled,files);x.append("</Group>");}
    x.append("<Button h=\"#screen_height\" w=\"#screen_width\"><Triggers><Trigger action=\"up\"><ExternCommand command=\"unlock\" condition=\"gt(#touch_begin_y-#touch_y,440)\"/></Trigger>");
    if(base.b("dbl",true))x.append("<Trigger action=\"double\"><VariableCommand name=\"studio_hidden\" expression=\"1-#studio_hidden\"/></Trigger>");x.append("</Triggers></Button></Lockscreen>");
    byte[] manifest=x.toString().getBytes("UTF-8");files.put("advance/manifest.xml",manifest);for(String ratio:new String[]{"11x5","13x6","19x9","20x9","2x1","301x135","403x180","67x30"})files.put("advance/"+ratio+"/manifest.xml",manifest);
+   if(bg!=null)bg.recycle();
    return ThemeBuilder.packageTheme(ThemeBuilder.wallpaperComponent(jpg==null?new byte[0]:jpg,!base.b("replaceWallpaper",false)||bgMode.equals("atmos")),zip(files));
   }catch(Exception e){if(e instanceof IOException)throw (IOException)e;throw new IOException("Studio theme: "+e.getMessage(),e);}
  }
+ /** The clock for every scheduled slot (with its warm night variant), drawn in the slots' current depth pass. */
+ private static void clocks(StringBuilder x,List<Spec> slots,List<String> names,boolean scheduled,Map<String,byte[]> files)throws Exception{
+  for(int i=0;i<slots.size();i++){
+   Spec s=slots.get(i);String visibility=scheduled?(i==0?"gt(#hour24,5)*lt(#hour24,18)":i==1?"gt(#hour24,17)*lt(#hour24,23)":"gt(gt(#hour24,22)+lt(#hour24,6),0)"):"1";x.append("<Group visibility=\"").append(visibility).append("\">");
+   if(s.b("warm",false)){x.append("<Group visibility=\"eq(").append(s.night()).append(",0)\">");time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group><Group visibility=\"").append(s.night()).append("\">");time(x,s,names.get(i)+"/warm/",mix(s.color(false),0xffffb070,.6f),(s.b("twoTone",false)?mix(s.color(true),0xffff9a55,.6f):mix(s.color(false),0xffffb070,.6f)),files);x.append("</Group>");}
+   else time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group>");
+  }
+ }
+ /** Cheap blur by scaling down and back up with filtering. */
+ private static Bitmap soften(Bitmap src,int f){int w=src.getWidth(),h=src.getHeight();Bitmap a=Bitmap.createScaledBitmap(src,Math.max(1,w/f),Math.max(1,h/f),true),b=Bitmap.createScaledBitmap(a,Math.max(1,w/f/2),Math.max(1,h/f/2),true),c=Bitmap.createScaledBitmap(b,Math.max(1,w/f),Math.max(1,h/f),true),out=Bitmap.createScaledBitmap(c,w,h,true);a.recycle();b.recycle();c.recycle();src.recycle();return out;}
+ /** Keeps the alpha of a bitmap and paints it one colour. */
+ private static Bitmap tint(Bitmap src,int color){Bitmap out=src.isMutable()?src:src.copy(Bitmap.Config.ARGB_8888,true);if(out!=src)src.recycle();new Canvas(out).drawColor(color,PorterDuff.Mode.SRC_IN);return out;}
  public static int[] gradient(String key){switch(key){case "aurora":return new int[]{0xff0f2b3a,0xff1d5c63,0xff3a2a6b};case "ember":return new int[]{0xff1a0f14,0xff5a1f2a,0xffc4602f};case "forest":return new int[]{0xff0b1a14,0xff17402f,0xff2d6a4a};case "ocean":return new int[]{0xff06121f,0xff0d3b66,0xff3a86c8};case "mono":return new int[]{0xff0c0d10,0xff22252d};default:return new int[]{0xff1f2340,0xff4a2f63,0xff8a4a6b};}}
 }

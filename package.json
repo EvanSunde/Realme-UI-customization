@@ -4,7 +4,7 @@
   "license": "GPL-3.0-only",
   "description": "Browser checks for the Lockscreen Studio editor (assets/studio.html).",
   "scripts": {
-    "test:ui": "node tests/v2-ui-check.cjs && node tests/responsive-ui-check.cjs && node tests/shade-ui-check.cjs && node tests/aod-display-ui-check.cjs && node tests/preview-ui-check.cjs && node tests/extras-ui-check.cjs"
+    "test:ui": "node tests/v2-ui-check.cjs && node tests/responsive-ui-check.cjs && node tests/shade-ui-check.cjs && node tests/aod-display-ui-check.cjs && node tests/preview-ui-check.cjs && node tests/extras-ui-check.cjs && node tests/depth-ui-check.cjs"
   },
   "devDependencies": {
     "playwright": "1.56.1"
