@@ -10,9 +10,36 @@ as `Evan-*.theme`. From 0.8.0 they are `Download/LockscreenStudio/Lockscreen-*.t
 
 ## Unreleased: pieces, extras, charging and depth
 
-All of these are drawn into the theme by `StudioTheme` and are still to be confirmed on a
-real lock screen. The host checks cover the pure parts: day-number maths and the charging
-condition are evaluated by a small expression evaluator in `V2Check`.
+All of these are drawn into the theme by `StudioTheme`. The host checks cover the pure
+parts: day-number maths and the charging condition are evaluated by a small expression
+evaluator in `V2Check`.
+
+**Checked against Realme's engine.** These points were read from the decompiled
+`com.oplus.uiengine` APK (the phone's lock-screen engine):
+
+- `battery_state` is 0 normal, 1 charging, 2 low (under 20 %, unplugged) and 3 full
+  (plugged in at 100 %). The charging condition (1 or 3) matches.
+- `PositionAnimation` reads `<Position x y time>` children and `AlphaAnimation` reads
+  `<Alpha a time>`. Animations loop once the last keyframe's time has passed. The earlier
+  `<Item>` keyframes were ignored, which is why Breathe and Float did nothing.
+- `rotation`, `pivotX/Y`, `alpha`, `visibility`, `x`, `y`, `w` and `h` are expressions on both
+  `Image` and `Group`. `srcid` loads `name_<int>.png`.
+- The expression functions used are all present: `ifelse`, `eq`, `gt`, `lt`, `ge`, `min`,
+  `max`, `int` and `%`. A `Var` takes `name`, `type`, `expression` and `const`. One whose
+  expression starts with `ifelse` skips a change registration, so the yearly counter is
+  written `0+ifelse(...)`.
+- `month` is 0-based and `day_of_week` is 1 for Sunday. `second` ticks from a one-second
+  handler that starts when `#second` is used; the root `useVariableUpdater` attribute is
+  never read.
+- `hour24` is reported as 12 during the midnight hour when the phone is set to 12-hour time.
+  Studio now uses `hour`, which is always 0–23, for the digits, Words, Rings, warm colours
+  and the day/evening/night schedule.
+- `SensorBinder type="gravity"` maps to Android's gravity sensor, and `Variable index` picks
+  the axis. `showSysWallpaper` is not read; the lock screen is transparent wherever nothing
+  is drawn.
+
+Still to see on a phone: how the photo-fill texture lines up, and the look of the shadow
+and rim.
 
 - **Stretch.** `sx`/`sy` (and `mins.sx`/`mins.sy`), 50–200 %, scale digit images and
   positions horizontally or vertically. The preview scales the font size by height and adds
@@ -26,8 +53,7 @@ condition are evaluated by a small expression evaluator in `V2Check`.
   days to the target, or to its next yearly occurrence; it is capped at 999 and hidden when
   negative. The number picks one of three digit groups by its length. The quote is one
   pre-rendered line per entry, chosen with `#studio_day % n`.
-- **Charging styles** use `gt(eq(#battery_state,1)+eq(#battery_state,3),0)`, following the
-  MIUI convention (1 charging, 3 full); this is not yet verified on Realme's engine.
+- **Charging styles** use `gt(eq(#battery_state,1)+eq(#battery_state,3),0)` (charging or full).
   - **Glow** is a halo with an alpha pulse.
   - **Colour shift** swaps in digit images drawn in the charging colour.
   - **Battery fill** has five fill levels per digit, picked from `#battery_level/20`.

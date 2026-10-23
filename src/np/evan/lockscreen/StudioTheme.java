@@ -58,7 +58,7 @@ public final class StudioTheme {
   public int color(boolean minutes){String v=s(minutes&&b("twoTone",false)?"color2":"color","#ffffff");return v.matches("#[a-fA-F0-9]{6}")?Color.parseColor(v):0xffffffff;}
   public int secondary(){String v=s("color2","#bba7ff");return v.matches("#[a-fA-F0-9]{6}")?Color.parseColor(v):0xffbba7ff;}
   public boolean info(String k){JSONObject i=j.optJSONObject("info");return i!=null&&i.optBoolean(k,false);}
-  public String night(){int a=n("warmFrom",18,0,23),b=n("warmTo",6,0,23);if(a==b)return "0";return a>b?"gt(gt(#hour24,"+(a-1)+")+lt(#hour24,"+b+"),0)":"gt(#hour24,"+(a-1)+")*lt(#hour24,"+b+")";}
+  public String night(){int a=n("warmFrom",18,0,23),b=n("warmTo",6,0,23);if(a==b)return "0";return a>b?"gt(gt(#hour,"+(a-1)+")+lt(#hour,"+b+"),0)":"gt(#hour,"+(a-1)+")*lt(#hour,"+b+")";}
  }
  public static final class Piece {
   public int digit;public double x,y,scale,rotation;public boolean minutes,colon;
@@ -249,7 +249,7 @@ public final class StudioTheme {
     int ww=(int)Math.ceil(g.width),hh=(int)Math.ceil(size*.65),mh=(int)Math.ceil(size*.43);Paint hp=paint(hs,hInk,endInk,size*.5,false),mp=paint(ms,mInk,endInk,size*.3,false);
     for(int i=0;i<24;i++)store(files,prefix+"wordhour_"+i+".png",text(ONES[i%12==0?12:i%12],hp,ww,hh,0,false,look(hs,hInk,endInk,size*.5)));
     for(int i=0;i<60;i++)store(files,prefix+"wordminute_"+i+".png",text(minuteWords(i),mp,ww,mh,0,false,look(ms,mInk,endInk,size*.3)));
-    image(x,prefix+"wordhour.png","#hour24","0","0",fmt(ww*fx),fmt(hh*fy),null);image(x,prefix+"wordminute.png","#minute","0",fmt(hh*fy),fmt(ww*fx),fmt(mh*fy),null);
+    image(x,prefix+"wordhour.png","#hour","0","0",fmt(ww*fx),fmt(hh*fy),null);image(x,prefix+"wordminute.png","#minute","0",fmt(hh*fy),fmt(ww*fx),fmt(mh*fy),null);
    }else for(Piece p:g.pieces){
     String rot=p.rotation==0?null:" rotation=\""+fmt(p.rotation)+"\" pivotX=\""+fmt((cell+2*pad)*p.scale*fx/2)+"\" pivotY=\""+fmt(ch*p.scale*fy/2)+"\"";
     if(p.colon&&!main)continue;
@@ -273,7 +273,8 @@ public final class StudioTheme {
   JSONObject me=s.j.optJSONObject("meta");int hpos=s.n("hpos",0,-80,80),vpos=s.n("vpos",14,-10,80);double width=metaWidth(s);
   open(x,s,name+"d",Spec.n(me,"x",hpos,-80,80),Spec.n(me,"y",vpos+24,-10,80),Spec.n(me,"rot",0,-180,180),width,metaHeight(s));meta(x,s,prefix,ink,ink2,width,0,files);x.append("</Group>");
  }
- private static String[] digitIds(Spec s){String hr=s.b("h12",false)?"ifelse(eq(#hour12,0),12,#hour12)":"#hour24";return new String[]{"int(("+hr+")/10)","int(("+hr+")%10)","int(#minute/10)","int(#minute%10)"};}
+ /** Uses #hour (always 0-23): Realme's engine reports #hour24 as 12 during the midnight hour when the phone is in 12-hour mode. */
+ private static String[] digitIds(Spec s){String hr=s.b("h12",false)?"ifelse(eq(#hour12,0),12,#hour12)":"#hour";return new String[]{"int(("+hr+")/10)","int(("+hr+")%10)","int(#minute/10)","int(#minute%10)"};}
  /** Hours and minutes as two independently placed, sized, stretched and rotated groups. */
  private static void splitTime(StringBuilder x,Spec s,Spec hs,Spec ms,String prefix,String name,int hInk,int mInk,int endInk,String charge,int chargeInk,Map<String,byte[]> files)throws Exception{
   JSONObject mo=s.j.optJSONObject("mins");
@@ -286,7 +287,7 @@ public final class StudioTheme {
    for(int i=1;i<=12;i++)hw=Math.max(hw,(int)Math.ceil(hp.measureText(ONES[i])+size*.2));for(int i=0;i<60;i++)mw=Math.max(mw,(int)Math.ceil(mp.measureText(minuteWords(i))+msize*.15));
    for(int i=0;i<24;i++)store(files,prefix+"wordhour_"+i+".png",text(ONES[i%12==0?12:i%12],hp,hw,hh,0,false,look(hs,hInk,endInk,size*.5)));
    for(int i=0;i<60;i++)store(files,prefix+"wordminute_"+i+".png",text(minuteWords(i),mp,mw,mh,0,false,look(ms,mInk,endInk,msize*.3)));
-   open(x,s,name+"h",hpos,vpos,s.n("rotate",0,-180,180),hw*fx,hh*fy);chargeAround(x,prefix,cs,chargeInk,hw*fx,hh*fy,files);image(x,prefix+"wordhour.png","#hour24","0","0",fmt(hw*fx),fmt(hh*fy),null);x.append("</Group>");
+   open(x,s,name+"h",hpos,vpos,s.n("rotate",0,-180,180),hw*fx,hh*fy);chargeAround(x,prefix,cs,chargeInk,hw*fx,hh*fy,files);image(x,prefix+"wordhour.png","#hour","0","0",fmt(hw*fx),fmt(hh*fy),null);x.append("</Group>");
    open(x,s,name+"m",mx,my,mrot,mw*mfx,mh*mfy);image(x,prefix+"wordminute.png","#minute","0","0",fmt(mw*mfx),fmt(mh*mfy),null);x.append("</Group>");
    return;
   }
@@ -337,7 +338,7 @@ public final class StudioTheme {
   for(int i=0;i<12;i++){Bitmap b=Bitmap.createBitmap(d,d,Bitmap.Config.ARGB_8888);new Canvas(b).drawArc(outer,-90,Math.max(.5f,i*30f),false,hp);store(files,prefix+"rh_"+i+".png",b);}
   Paint mp=paint(ms,ink2,endInk,size,false);mp.setStyle(Paint.Style.STROKE);mp.setStrokeWidth(w);mp.setStrokeCap(Paint.Cap.ROUND);mp.setShader(null);
   for(int i=0;i<60;i++){Bitmap b=Bitmap.createBitmap(d,d,Bitmap.Config.ARGB_8888);new Canvas(b).drawArc(inner,-90,Math.max(.5f,i*6f),false,mp);store(files,prefix+"rm_"+i+".png",b);}
-  image(x,prefix+"rings_track.png",null,"0","0",null,null,null);image(x,prefix+"rh.png","int(#hour24%12)","0","0",null,null,null);image(x,prefix+"rm.png","#minute","0","0",null,null,null);
+  image(x,prefix+"rings_track.png",null,"0","0",null,null,null);image(x,prefix+"rh.png","int(#hour%12)","0","0",null,null,null);image(x,prefix+"rm.png","#minute","0","0",null,null,null);
   // Centre time: small digits sized to fit inside the minute ring.
   int ts=(int)Math.max(20,ri*.55f),cell=(int)Math.ceil(ts*.62),pad=(int)Math.ceil(ts*.22),cw=cell+pad*2,ch=(int)Math.ceil(ts*1.28)+pad*2;
   Paint dh=paint(hs,ink,endInk,ts,false),dm=paint(ms,ink2,endInk,ts,false);
@@ -354,7 +355,9 @@ public final class StudioTheme {
  /** Counter expression: days from today to the target, or to its next yearly occurrence. */
  public static String countdown(int y,int m,int d,boolean yearly){
   if(!yearly)return jdn(y,m,d)+"-#studio_day";
-  String thisYear=jdn("#year",""+m,""+d)+"-#studio_day",nextYear=jdn("#year+1",""+m,""+d)+"-#studio_day";return "ifelse(lt("+thisYear+",0),"+nextYear+","+thisYear+")";
+  String thisYear=jdn("#year",""+m,""+d)+"-#studio_day",nextYear=jdn("#year+1",""+m,""+d)+"-#studio_day";
+  // A Var expression that starts with ifelse skips one change registration in Realme's engine, so lead with 0+.
+  return "0+ifelse(lt("+thisYear+",0),"+nextYear+","+thisYear+")";
  }
  /** Up to three day counters (a number in a circle, optional label) and a daily quote, each a movable piece. */
  private static void extras(StringBuilder x,Spec s,int ink,Map<String,byte[]> files)throws Exception{
@@ -415,7 +418,7 @@ public final class StudioTheme {
     int w=widths.get(i),h=42;String kind=kinds.get(i),name=prefix+"chip-"+kind+".png";Bitmap plate=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(plate);Paint fill=new Paint(Paint.ANTI_ALIAS_FLAG);fill.setColor(0x28ffffff);canvas.drawRoundRect(0,0,w,h,21,21,fill);
     if(!labels.get(i).isEmpty()){Bitmap words=text(labels.get(i),p,w-24,h,0,false,null);canvas.drawBitmap(words,12,0,null);words.recycle();}store(files,name,plate);image(x,name,null,fmt(left),fmt(top),null,null,null);
     if(kind.equals("battery"))x.append("<Text x=\"").append(fmt(left+w/2d)).append("\" y=\"").append(fmt(top+6)).append("\" size=\"28\" color=\"#ffffff\" align=\"center\" format=\"%d%% battery\" paras=\"#battery_level\"/>");
-    if(kind.equals("progress")){x.append("<Text x=\"").append(fmt(left+12)).append("\" y=\"").append(fmt(top+7)).append("\" size=\"26\" color=\"#ffffff\" text=\"Day\"/>");image(x,"progress-track.png",null,fmt(left+70),fmt(top+17),"100","7",null);image(x,"ink.png",null,fmt(left+70),fmt(top+17),"100*(#hour24*60+#minute)/1440","7",null);x.append("<Text x=\"").append(fmt(left+180)).append("\" y=\"").append(fmt(top+7)).append("\" size=\"26\" color=\"#ffffff\" format=\"%d%%\" paras=\"int((#hour24*60+#minute)/14.4)\"/>");}
+    if(kind.equals("progress")){x.append("<Text x=\"").append(fmt(left+12)).append("\" y=\"").append(fmt(top+7)).append("\" size=\"26\" color=\"#ffffff\" text=\"Day\"/>");image(x,"progress-track.png",null,fmt(left+70),fmt(top+17),"100","7",null);image(x,"ink.png",null,fmt(left+70),fmt(top+17),"100*(#hour*60+#minute)/1440","7",null);x.append("<Text x=\"").append(fmt(left+180)).append("\" y=\"").append(fmt(top+7)).append("\" size=\"26\" color=\"#ffffff\" format=\"%d%%\" paras=\"int((#hour*60+#minute)/14.4)\"/>");}
     left+=w+12;
    }start=end;top+=52;
   }return top;
@@ -476,7 +479,7 @@ public final class StudioTheme {
  /** The clock for every scheduled slot (with its warm night variant), drawn in the slots' current depth pass. */
  private static void clocks(StringBuilder x,List<Spec> slots,List<String> names,boolean scheduled,Map<String,byte[]> files)throws Exception{
   for(int i=0;i<slots.size();i++){
-   Spec s=slots.get(i);String visibility=scheduled?(i==0?"gt(#hour24,5)*lt(#hour24,18)":i==1?"gt(#hour24,17)*lt(#hour24,23)":"gt(gt(#hour24,22)+lt(#hour24,6),0)"):"1";x.append("<Group visibility=\"").append(visibility).append("\">");
+   Spec s=slots.get(i);String visibility=scheduled?(i==0?"gt(#hour,5)*lt(#hour,18)":i==1?"gt(#hour,17)*lt(#hour,23)":"gt(gt(#hour,22)+lt(#hour,6),0)"):"1";x.append("<Group visibility=\"").append(visibility).append("\">");
    if(s.b("warm",false)){x.append("<Group visibility=\"eq(").append(s.night()).append(",0)\">");time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group><Group visibility=\"").append(s.night()).append("\">");time(x,s,names.get(i)+"/warm/",mix(s.color(false),0xffffb070,.6f),(s.b("twoTone",false)?mix(s.color(true),0xffff9a55,.6f):mix(s.color(false),0xffffb070,.6f)),files);x.append("</Group>");}
    else time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group>");
   }

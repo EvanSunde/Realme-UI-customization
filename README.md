@@ -103,8 +103,9 @@ After a phone restart, start Shizuku again; Shizuku can't start itself without r
 - Applying shade colours or a lock screen restarts SystemUI, so the screen flickers
   briefly.
 - The new layouts, finishes, pieces and depth extras are drawn into the theme on the
-  phone. The editor preview is a close approximation. Analog hands, rotation, charging
-  styles, motion, digit depth and photo fill are still to be confirmed on a real lock screen.
+  phone, and the editor preview is a close approximation. The theme syntax they use was
+  checked against Realme's lock-screen engine, but how they look (photo fill, shadow and
+  rim) is still to be confirmed on a real lock screen.
 
 ## How it works
 
