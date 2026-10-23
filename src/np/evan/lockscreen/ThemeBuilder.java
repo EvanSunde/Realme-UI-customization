@@ -74,7 +74,7 @@ public final class ThemeBuilder {
         x.append("<Var name=\"clock_x\" expression=\"(#screen_width-").append(total).append(")/2+").append(d.horizontal).append("\"/><Var name=\"clock_y\" expression=\"#screen_height*").append(d.vertical).append("/100\"/>");
         x.append("<Group name=\"studio_clock\" visibility=\"eq(#studio_hidden,0)\" alpha=\"").append(d.opacity).append("\">");
         if(d.nightColor){
-            x.append("<Group visibility=\"eq(gt(#hour24,17)+lt(#hour24,6),0)\">");clock(x,d,"time/",d.color);x.append("</Group><Group visibility=\"gt(gt(#hour24,17)+lt(#hour24,6),0)\">");clock(x,d,"night/",0xffffd7b5);x.append("</Group>");
+            x.append("<Group visibility=\"eq(gt(#hour,17)+lt(#hour,6),0)\">");clock(x,d,"time/",d.color);x.append("</Group><Group visibility=\"gt(gt(#hour,17)+lt(#hour,6),0)\">");clock(x,d,"night/",0xffffd7b5);x.append("</Group>");
         }else clock(x,d,"time/",d.color);
         x.append("</Group>");
         if(d.depth&&d.background!=2)x.append("<Image src=\"subject.png\" x=\"#screen_width/2-540*").append(d.subjectScale).append("/100+").append(d.subjectX).append("\" y=\"(#screen_height-#screen_height*").append(d.subjectScale).append("/100)/2+").append(d.subjectY).append("\" w=\"1080*").append(d.subjectScale).append("/100\" h=\"#screen_height*").append(d.subjectScale).append("/100\"/>");
@@ -84,10 +84,10 @@ public final class ThemeBuilder {
     }
     private static void clock(StringBuilder x,Design d,String prefix,int ink){
         int c=cell(d),gh=glyphHeight(d),colon=Math.max(20,(int)(d.size*.30f)),gap=d.spacing;
-        String hour=d.twelve?"ifelse(eq(#hour12,0),12,#hour12)":"#hour24";
+        String hour=d.twelve?"ifelse(eq(#hour12,0),12,#hour12)":"#hour";
         x.append("<Group>");
-        if(d.motion==1)x.append("<PositionAnimation><Item x=\"0\" y=\"0\" time=\"0\"/><Item x=\"0\" y=\"-18\" time=\"1800\"/><Item x=\"0\" y=\"0\" time=\"3600\"/></PositionAnimation>");
-        if(d.motion==2)x.append("<AlphaAnimation><Item value=\"255\" time=\"0\"/><Item value=\"165\" time=\"2200\"/><Item value=\"255\" time=\"4400\"/></AlphaAnimation>");
+        if(d.motion==1)x.append("<PositionAnimation><Position x=\"0\" y=\"0\" time=\"0\"/><Position x=\"0\" y=\"-18\" time=\"1800\"/><Position x=\"0\" y=\"0\" time=\"3600\"/></PositionAnimation>");
+        if(d.motion==2)x.append("<AlphaAnimation><Alpha a=\"255\" time=\"0\"/><Alpha a=\"165\" time=\"2200\"/><Alpha a=\"255\" time=\"4400\"/></AlphaAnimation>");
         String[] numbers={"int(("+hour+")/10)","int(("+hour+")%10)","int(#minute/10)","int(#minute%10)"};
         for(int i=0;i<4;i++){
             int ox=d.stacked?(i%2)*(c+gap):(i<2?i*(c+gap):i*(c+gap)+colon),oy=d.stacked&&i>=2?gh+gap:0;

@@ -95,6 +95,8 @@ button:disabled{opacity:.4;cursor:default}
 .a-glass text{fill:#ffffff24;stroke:#ffffffaa;stroke-width:1.2}
 .sec{font-size:.45em;opacity:.8}
 .L-stacked .sec,.L-stairs .sec{font-size:.4em}
+/* Per-part styling: hours or minutes carry their own colour, font and finish (.pf), overriding the shared look. */
+.pf{color:var(--c)}
 .tt .min{color:var(--c2)}
 .f-glow{text-shadow:0 0 .16em color-mix(in srgb,var(--c) calc(var(--g)*90%),transparent)}
 .f-outline{color:transparent;-webkit-text-stroke:.022em var(--c)}
@@ -128,15 +130,18 @@ button:disabled{opacity:.4;cursor:default}
 .f-emboss{text-shadow:-.014em -.014em 0 #ffffff80,.014em .014em 0 #0000008c}
 .f-chrome,.f-holo,.f-splittone,.f-halftone{-webkit-background-clip:text;background-clip:text;color:transparent}
 /* Gradient-filled finishes paint each text block; .digits.f-x .min outranks the two-tone colour rule so minutes keep the finish (in colour 2). */
-.digits:is(.f-chrome,.f-holo,.f-splittone,.f-halftone)>*,.digits:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .min,.digits.L-free:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .pc>span{-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0}
-.digits.f-chrome>*,.digits.f-chrome .min,.digits.L-free.f-chrome .pc>span{background-image:linear-gradient(180deg,color-mix(in srgb,var(--c) 20%,#fff) 0,var(--c) 35%,color-mix(in srgb,var(--c) 50%,#000) 50%,color-mix(in srgb,var(--c) 10%,#fff) 62%,var(--c) 100%)}
-.digits.f-holo>*,.digits.f-holo .min,.digits.L-free.f-holo .pc>span{background-image:linear-gradient(90deg,#ff5f6d,#ffc371,#47e5bc,#5f9dff,#c86bff)}
-.digits.f-splittone>*,.digits.f-splittone .min,.digits.L-free.f-splittone .pc>span{background-image:linear-gradient(180deg,var(--c) 50%,var(--c2) 50%)}
-.digits.f-halftone>*,.digits.f-halftone .min,.digits.L-free.f-halftone .pc>span{background-image:radial-gradient(circle,var(--c) 40%,transparent 44%);background-size:.07em .07em}
+.pf:is(.f-chrome,.f-holo,.f-splittone,.f-halftone),.digits:is(.f-chrome,.f-holo,.f-splittone,.f-halftone)>*,.digits:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .min,.digits.L-free:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .pc>span{-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:0}
+.digits.f-chrome>*,.digits.f-chrome .min,.digits.L-free.f-chrome .pc>span,.pf.f-chrome{background-image:linear-gradient(180deg,color-mix(in srgb,var(--c) 20%,#fff) 0,var(--c) 35%,color-mix(in srgb,var(--c) 50%,#000) 50%,color-mix(in srgb,var(--c) 10%,#fff) 62%,var(--c) 100%)}
+.digits.f-holo>*,.digits.f-holo .min,.digits.L-free.f-holo .pc>span,.pf.f-holo{background-image:linear-gradient(90deg,#ff5f6d,#ffc371,#47e5bc,#5f9dff,#c86bff)}
+.digits.f-splittone>*,.digits.f-splittone .min,.digits.L-free.f-splittone .pc>span,.pf.f-splittone{background-image:linear-gradient(180deg,var(--c) 50%,var(--c2) 50%)}
+.digits.f-halftone>*,.digits.f-halftone .min,.digits.L-free.f-halftone .pc>span,.pf.f-halftone{background-image:radial-gradient(circle,var(--c) 40%,transparent 44%);background-size:.07em .07em}
 .digits.L-free:is(.f-chrome,.f-holo,.f-splittone,.f-halftone) .pc{background:none}
+/* Photo fill: the background seen through the digits; fitPreview aligns each block with the screen. */
+.f-photo,.pf.f-photo{color:transparent;-webkit-text-stroke:0;text-shadow:none;background-image:var(--photo,linear-gradient(135deg,#ff9a8b,#7f7fd5 55%,#86e3ce));-webkit-background-clip:text;background-clip:text;filter:brightness(1.3) saturate(1.15)}
+.digits.f-photo *{color:transparent}
 .f-glitch{text-shadow:-.028em 0 #ff2a55cc,.028em 0 #22e5ffcc}
 /* Stencil: a plate in the clock colour with the digits showing what is behind (screen blend approximates the cut-out). */
-.digits.f-stencil>*,.digits.f-stencil .min,.digits.L-free.f-stencil .pc>span{background:var(--c);color:#000;mix-blend-mode:screen;border-radius:.1em;padding:0 .04em;-webkit-text-stroke:0}
+.digits.f-stencil>*,.digits.f-stencil .min,.digits.L-free.f-stencil .pc>span,.pf.f-stencil{background:var(--c);color:#000;mix-blend-mode:screen;border-radius:.1em;padding:0 .04em;-webkit-text-stroke:0}
 .digits.L-free.f-stencil .pc{background:none}.digits.L-free.f-stencil .pc>span{padding:0}
 .meta .date{opacity:calc(var(--op)*.85)}
 .meta .cap{opacity:calc(var(--op)*.6);font-size:.8em;margin-top:.1em}
@@ -293,6 +298,31 @@ ol.steps2{padding-left:20px;display:grid;gap:8px;color:#c9cde2;font-size:0.84375
 .fseg button{min-height:40px;min-width:76px;padding:0 14px;font-weight:600;font-size:.78125rem}
 .fseg button[aria-checked=true]{background:var(--ac);color:var(--ink)}
 .full .clockpos.picked{outline:1.5px dashed #ffffffb0;outline-offset:.6cqw;border-radius:2px}
+.str{display:inline-block;text-align:left}
+/* Digit depth: front digits are hidden in the clock behind the subject and shown in a copy above it. */
+.screen>.clockpos .dg.fr{visibility:hidden}
+.layer-front{position:absolute;inset:0;pointer-events:none;visibility:hidden;z-index:5}.layer-front .dg.fr{visibility:visible}
+.subject.sshadow{filter:brightness(0) blur(1.1cqw);opacity:calc(var(--sa)*.75)}
+.subject.rim{background:var(--rc);opacity:var(--ra);-webkit-mask-size:cover;mask-size:cover;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:source-out;mask-composite:subtract;filter:blur(.15cqw)}
+.screen.parallax .bg,.screen.parallax .subject{translate:calc(var(--tx,0)*-.45cqw) calc(var(--ty,0)*-.45cqw);scale:1.045}
+.dgrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dgrow .tile b{font-size:1.6rem;line-height:1}.stri{display:inline-block;transform-origin:0 0}
+.hdl.hdl-x{bottom:auto;top:calc(50% - 5cqw);width:4.5cqw;height:10cqw;min-height:40px;border-radius:99px;cursor:ew-resize}
+.hdl.hdl-y{right:auto;left:calc(50% - 5cqw);width:10cqw;height:4.5cqw;min-width:40px;border-radius:99px;cursor:ns-resize}
+.cnt{display:flex;flex-direction:column;align-items:center;color:var(--c);opacity:var(--op);line-height:1}
+.cnt .disc{position:relative;width:1em;height:1em;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent)}
+.cnt .disc::after{content:'';position:absolute;inset:.0175em;border-radius:50%;border:.025em solid color-mix(in srgb,var(--c) 69%,transparent)}
+.cnt b{font-family:var(--ff);font-weight:var(--fw);font-size:.42em;font-variant-numeric:tabular-nums}
+.cnt small{font-size:.2em;margin-top:.25em;white-space:nowrap}
+.quote{color:var(--c);opacity:var(--op);white-space:nowrap;line-height:1.5}
+.clockpos.chg-glow::before{content:'';position:absolute;left:50%;top:50%;width:150%;height:150%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--cc) 55%,transparent),color-mix(in srgb,var(--cc) 19%,transparent) 55%,transparent);animation:chgPulse 3.2s ease-in-out infinite;z-index:-1;pointer-events:none}
+@keyframes chgPulse{50%{opacity:.43}}
+.chg-fill .digits,.chg-fill .digits *{color:transparent!important;-webkit-text-stroke:0!important;text-shadow:none!important;mix-blend-mode:normal!important;background:linear-gradient(0deg,var(--cc) var(--lvl),color-mix(in srgb,var(--c) 35%,transparent) var(--lvl))!important;-webkit-background-clip:text!important;background-clip:text!important}
+.chg-ring{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;z-index:-1;background:conic-gradient(var(--cc) calc(var(--p)*1%),#ffffff26 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.4cqw),#000 calc(100% - 1.4cqw));mask:radial-gradient(farthest-side,transparent calc(100% - 1.4cqw),#000 calc(100% - 1.4cqw))}
+.chg-bar{position:absolute;left:10%;width:80%;top:93%;height:.93cqw;min-height:2px;background:#ffffff30;z-index:3;pointer-events:none}.chg-bar i{display:block;height:100%;background:var(--cc)}
+.fseg{max-width:100%;overflow-x:auto;scrollbar-width:none}.fseg button{flex:none}
+.fseg.scope{display:flex;margin-bottom:14px}.fseg.scope button{flex:1;min-width:0}
+textarea.txt{width:100%;min-height:132px;resize:vertical;font:inherit;line-height:1.45;padding:10px 12px}
+.linkbtn{background:none;border:0;color:var(--ac);font:inherit;font-weight:600;padding:0;text-decoration:underline;cursor:pointer}
 .hdl{position:absolute;right:-5cqw;bottom:-5cqw;width:7cqw;height:7cqw;min-width:28px;min-height:28px;border-radius:50%;background:#fff;border:3px solid var(--ac2);box-shadow:0 2px 8px #0009;cursor:nwse-resize;touch-action:none}
 .screen.snap-x::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:#bba7ffcc;pointer-events:none;z-index:4}
 .full .fh{display:flex;justify-content:space-between;align-items:center;width:100%;padding:0 16px}
@@ -343,7 +373,7 @@ ol.steps2{padding-left:20px;display:grid;gap:8px;color:#c9cde2;font-size:0.84375
 /* Shade controls share the studio's responsive editor shell. */
 .large-type .tab{font-size:14px}
 .shade-view .foot .r{display:none}.shade-actions{display:flex;gap:10px;max-width:1120px;margin:auto}.shade-actions[hidden],.shade-actions>[hidden]{display:none}.shade-actions>.apply{flex:1}.shade-view .editor-title>.ib{display:none}
-.shade-preview{border:1px solid var(--line);border-radius:24px;overflow:hidden;position:relative;isolation:isolate;background:linear-gradient(135deg,#7392ae,#ccbdb5 45%,#557a69);padding:24px 18px;min-height:210px}.shade-preview:before{content:'';position:absolute;inset:0;background:var(--shade-panel);z-index:-1;backdrop-filter:blur(18px)}.shade-preview .sp-top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:24px;color:var(--shade-ink)}.shade-preview .sp-card{padding:15px;border-radius:18px;background:var(--shade-card);margin-top:10px;color:var(--shade-card-ink,#172323);font-size:13px;line-height:1.6}.shade-preview .sp-card small{display:block;opacity:.65}.shade-preview .sp-card b{font-weight:600}.shade-swatch{display:flex;gap:12px;align-items:center;padding:12px 0;min-width:0}.shade-swatch-label{flex:none;min-width:64px;font-size:.875rem}.shade-swatch input[type=color]{width:52px;height:48px;flex:none;border:0;border-radius:14px;padding:3px;background:var(--s2)}.shade-swatch input[type=text]{min-width:0;flex:1;font:14px ui-monospace,monospace}.shade-toggle{display:flex;align-items:center;gap:12px;padding:14px 0;min-height:48px}.shade-toggle input{width:22px;height:22px;flex:none;accent-color:var(--ac)}.shade-toggle small,.shade-row label small{display:block;color:var(--mu);font-size:.75rem;line-height:1.6;font-weight:400}.shade-row{padding:14px 0;border-bottom:1px solid var(--line)}.shade-row>label{display:flex;gap:12px;justify-content:space-between;font-size:.875rem;margin-bottom:12px}.shade-row output{font-variant-numeric:tabular-nums;white-space:nowrap}.shade-mini{font:12px/1.7 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.shade-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.shade-presets .btn{min-height:44px}.shade-dot{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}.shade-saved{display:inline-flex;gap:2px}.shade-saved .btn:last-child{padding-inline:12px}.shade-sub[hidden]{display:none}.shade-note{border:1px solid var(--wn);border-radius:16px;padding:12px 14px;margin-bottom:12px;font-size:.8125rem;line-height:1.6;color:var(--tx)}.shade-note b{display:block;color:var(--wn)}.shade-seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}.shade-seg button{min-height:44px;min-width:72px;padding:0 14px;background:var(--s1);font-size:.8125rem;font-weight:600}.shade-seg button[aria-pressed=true]{background:var(--ac);color:var(--ink)}.shade-preview .sp-dark{display:none;margin-top:12px;font-size:12px;color:#ddd}.shade-preview.dark{background:linear-gradient(135deg,#2a3440,#3b3633 45%,#24332c)}.shade-preview.dark .sp-dark{display:block}.shade-save{display:flex;gap:8px;align-items:center}.shade-blur{display:flex;gap:8px;align-items:center;padding:10px 0}.shade-blur .sel{flex:1;min-width:0}.shade-blur .btn{flex:none}.aodd-sub[hidden],.aodd-times[hidden]{display:none}.aodd-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 4px}.aodd-modes button{min-height:64px;border:1px solid var(--line);border-radius:14px;background:var(--s1);padding:8px;text-align:left;display:flex;flex-direction:column;gap:2px}.aodd-modes button b{font-size:.8125rem}.aodd-modes button small{font-size:.6875rem;color:var(--mu);line-height:1.35}.aodd-modes button[aria-checked=true]{border-color:var(--ac);background:var(--s3)}.aodd-times{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.aodd-times label{display:flex;flex-direction:column;gap:6px;font-size:.8125rem;color:var(--mu)}.aodd-times input{height:46px}.shade-save input{flex:1;min-width:0}.shade-report{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.7 ui-monospace,monospace;margin-top:12px}.shade-preview-caption{margin:10px 0 20px}.shade-view .tab{min-width:0}
+.shade-preview{border:1px solid var(--line);border-radius:24px;overflow:hidden;position:relative;isolation:isolate;background:linear-gradient(135deg,#7392ae,#ccbdb5 45%,#557a69);padding:24px 18px;min-height:210px}.shade-preview:before{content:'';position:absolute;inset:0;background:var(--shade-panel);z-index:-1;backdrop-filter:blur(18px)}.shade-preview .sp-top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:24px;color:var(--shade-ink)}.shade-preview .sp-card{padding:15px;border-radius:18px;background:var(--shade-card);margin-top:10px;color:var(--shade-card-ink,#172323);font-size:13px;line-height:1.6}.shade-preview .sp-card small{display:block;opacity:.65}.shade-preview .sp-card b{font-weight:600}.shade-swatch{display:flex;gap:12px;align-items:center;padding:12px 0;min-width:0}.shade-swatch-label{flex:none;min-width:64px;font-size:.875rem}.shade-swatch input[type=color]{width:52px;height:48px;flex:none;border:0;border-radius:14px;padding:3px;background:var(--s2)}.shade-swatch input[type=text]{min-width:0;flex:1;font:14px ui-monospace,monospace}.shade-toggle{display:flex;align-items:center;gap:12px;padding:14px 0;min-height:48px}.shade-toggle input{width:22px;height:22px;flex:none;accent-color:var(--ac)}.shade-toggle small,.shade-row label small{display:block;color:var(--mu);font-size:.75rem;line-height:1.6;font-weight:400}.shade-row{padding:14px 0;border-bottom:1px solid var(--line)}.shade-row>label{display:flex;gap:12px;justify-content:space-between;font-size:.875rem;margin-bottom:12px}.shade-row output{font-variant-numeric:tabular-nums;white-space:nowrap}.shade-mini{font:12px/1.7 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.shade-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.shade-presets .btn{min-height:44px}.shade-dot{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.35)}.shade-saved{display:inline-flex;gap:2px}.shade-saved .btn:last-child{padding-inline:12px}.shade-sub[hidden]{display:none}.shade-note{border:1px solid var(--wn);border-radius:16px;padding:12px 14px;margin-bottom:12px;font-size:.8125rem;line-height:1.6;color:var(--tx)}.shade-note b{display:block;color:var(--wn)}.shade-seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}.shade-seg button{min-height:44px;min-width:72px;padding:0 14px;background:var(--s1);font-size:.8125rem;font-weight:600}.shade-seg button[aria-pressed=true]{background:var(--ac);color:var(--ink)}.shade-preview .sp-dark{display:none;margin-top:12px;font-size:12px;color:#ddd}.shade-preview.dark{background:linear-gradient(135deg,#2a3440,#3b3633 45%,#24332c)}.shade-preview.dark .sp-dark{display:block}.shade-save{display:flex;gap:8px;align-items:center}.shade-sugg{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:2px 0 10px}.shade-sugg .sg-t{font-size:.6875rem;color:var(--mu);margin-left:2px}.shade-sugg .sg-t:not(:first-child){margin-left:8px}.shade-sugg .sg{width:36px;height:36px;border-radius:50%;background:var(--c);border:2px solid #ffffff30;flex:none}.shade-sugg .sg[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px var(--ac)}.shade-blur{display:flex;gap:8px;align-items:center;padding:10px 0}.shade-blur .sel{flex:1;min-width:0}.shade-blur .btn{flex:none}.aodd-sub[hidden],.aodd-times[hidden]{display:none}.aodd-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 4px}.aodd-modes button{min-height:64px;border:1px solid var(--line);border-radius:14px;background:var(--s1);padding:8px;text-align:left;display:flex;flex-direction:column;gap:2px}.aodd-modes button b{font-size:.8125rem}.aodd-modes button small{font-size:.6875rem;color:var(--mu);line-height:1.35}.aodd-modes button[aria-checked=true]{border-color:var(--ac);background:var(--s3)}.aodd-times{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.aodd-times label{display:flex;flex-direction:column;gap:6px;font-size:.8125rem;color:var(--mu)}.aodd-times input{height:46px}.shade-save input{flex:1;min-width:0}.shade-report{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.7 ui-monospace,monospace;margin-top:12px}.shade-preview-caption{margin:10px 0 20px}.shade-view .tab{min-width:0}
 @media(max-width:360px){.tab{padding-inline:2px}.shade-actions{gap:6px}.shade-actions .btn{padding-inline:10px}.shade-save{flex-wrap:wrap}.shade-save input{flex-basis:100%}}
 
 </style>
@@ -444,7 +474,7 @@ const FONTS={
 };
 const LEGACY={light:['inter',300],medium:['inter',500],bold:['inter',800],condensed:['barlow',600],mono:['jetbrains',500],serif:['fraunces',600],rounded:['nunito',800],grotesk:['spacegrotesk',600]};
 function fixState(st){if(LEGACY[st.font]){st.weight=LEGACY[st.font][1];st.font=LEGACY[st.font][0]}if(!FONTS[st.font])st.font='inter';if(st.dateFont!=='same'&&!FONTS[st.dateFont])st.dateFont='inter';return st}
-const FINISH=[['solid','Solid'],['glow','Glow'],['outline','Outline'],['neon','Neon'],['gradient','Gradient'],['shadow','Shadow'],['glass','Glass'],['outlineglow','Outline glow'],['duo','Two-tone stroke'],['retro','Retro 3D'],['emboss','Embossed'],['chrome','Chrome'],['holo','Holo'],['splittone','Split tone'],['halftone','Halftone'],['glitch','Glitch'],['stencil','Stencil']];
+const FINISH=[['solid','Solid'],['glow','Glow'],['outline','Outline'],['neon','Neon'],['gradient','Gradient'],['shadow','Shadow'],['glass','Glass'],['outlineglow','Outline glow'],['duo','Two-tone stroke'],['retro','Retro 3D'],['emboss','Embossed'],['chrome','Chrome'],['holo','Holo'],['splittone','Split tone'],['halftone','Halftone'],['glitch','Glitch'],['stencil','Stencil'],['photo','Photo fill']];
 const GRADS={
  aurora:{n:'Aurora',css:'linear-gradient(160deg,#0f2b3a,#1d5c63 45%,#3a2a6b)',avg:'#1d3f55'},
  dusk:{n:'Dusk',css:'linear-gradient(170deg,#1f2340,#4a2f63 55%,#8a4a6b)',avg:'#3d2c58'},
@@ -464,10 +494,13 @@ const DEFAULTS={
  subjectOn:true,subjScale:100,subjX:0,subjY:5,
  dbl:true,startHidden:false,delay:5,safeRevert:true,
  schedule:{on:false,day:'quiet',eve:'afterglow',night:'cinema'},
- split:false,mins:{x:-3,y:27,size:266,rot:0},meta:{x:-3,y:40,rot:0}
+ split:false,mins:{x:-3,y:27,size:266,rot:0,sx:100,sy:100},meta:{x:-3,y:40,rot:0},
+ sx:100,sy:100,detachDate:false,styleH:{},styleM:{},styleD:{},secHand:false,charge:'none',chargeColor:'#7be0b0',
+ weightFlow:{on:false,from:200,to:900},depthFront:[false,false,false,false],subjShadow:0,rimLight:0,
+ counters:[],quote:{on:false,x:0,y:58,rot:0,size:40,lines:['Make today count.','One step at a time.','Small progress is still progress.','Be where your feet are.','Rest is part of the work.','Stay curious.','Done is better than perfect.']}
 };
 const STOCK={split:false,font:'inter',weight:300,slant:0,lh:88,minScale:100,align:'center',rotate:0,dateFont:'inter',dateCase:'normal',dateTrack:0,layout:'single',color:'#ffffff',color2:'#ffffff',twoTone:false,finish:'solid',opacity:100,size:200,vpos:16,hpos:0,spacing:0,movement:'still',showDate:true,dateStyle:'full',dateSize:38,caption:'',seconds:false,warm:false,nightDim:0,lowBatDim:false,info:{battery:false,alarm:false,weather:false,progress:false}};
-const PBASE={slant:0,lh:88,minScale:100,align:'center',rotate:0,arc:55,twoTone:false,glow:60,spacing:0,hpos:0,movement:'still'};
+const PBASE={sx:100,sy:100,styleH:{},styleM:{},styleD:{},slant:0,lh:88,minScale:100,align:'center',rotate:0,arc:55,twoTone:false,glow:60,spacing:0,hpos:0,movement:'still'};
 const PRESETS=[
  {id:'quiet',name:'Quiet hours',tag:'Clean · light · still',bg:'linear-gradient(135deg,#2a4252,#1c2331)',patch:{font:'inter',weight:300,layout:'single',color:'#bba7ff',finish:'solid',opacity:92,size:230,vpos:12}},
  {id:'editorial',name:'Editorial',tag:'Serif · stacked · warm',bg:'linear-gradient(135deg,#5a3a56,#2b1a2d)',patch:{font:'playfair',weight:700,layout:'stacked',color:'#ffd3b8',finish:'shadow',opacity:96,size:250,vpos:12}},
@@ -530,6 +563,32 @@ const fwOf=s=>{const f=FONTS[s.font]||FONTS.inter;return clamp(s.weight,f.wr[0],
 let arcN=0;
 /* Same arrangement maths as StudioTheme.geometry, in em (1em = clock size), for layouts drawn as positioned digits. */
 const FREE=['bigmin','diagonal','wave','offset','wide'];
+// Same lists as StudioTheme: dials and curved/edge layouts keep their proportions; colour shift and fill need digits.
+const NO_STRETCH=['vertical','arc','analog','rings'],NO_DIGITS=['analog','words','rings'];
+const canStretch=s=>!NO_STRETCH.includes(s.layout),dateApart=s=>isSplit(s)||!!s.detachDate;
+const hasMeta=s=>!!(s.showDate||s.caption||s.seconds||Object.values(s.info).some(Boolean));
+// Julian day numbers, as the native counters and quote compute them from #year/#month/#date.
+const jdn=(y,m,d)=>{const a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045};
+const dayNo=d=>jdn(d.getFullYear(),d.getMonth()+1,d.getDate());
+function daysTo(c,d){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(c.date||'');if(!m)return null;const t=dayNo(d);if(!c.yearly)return jdn(+m[1],+m[2],+m[3])-t;const n=jdn(d.getFullYear(),+m[2],+m[3])-t;return n<0?jdn(d.getFullYear()+1,+m[2],+m[3])-t:n}
+const quoteLines=s=>((s.quote&&s.quote.lines)||[]).map(x=>String(x).trim()).filter(Boolean).slice(0,30);
+const NO_DEPTH=['arc','analog','words','rings'];
+const depthOn=s=>!!(s.subjectOn&&assets.subject&&s.bg==='photo'&&!NO_DEPTH.includes(s.layout)&&(s.depthFront||[]).some(Boolean));
+const hasBackdrop=s=>s.bg==='gradient'||(s.bg==='photo'&&!!assets.photo);
+// Without a still background there is nothing to show through, so Photo fill falls back to solid (as on the phone).
+const finOf=(s,f)=>f==='photo'&&!hasBackdrop(s)?'solid':f;
+// Six weight steps through the hour, as StudioTheme renders them.
+const flowW=(s,d)=>{const f=s.weightFlow||{};return Math.round(f.from+(f.to-f.from)*Math.floor(d.getMinutes()/10)/5)};
+const flowOn=s=>!!(s.weightFlow&&s.weightFlow.on)&&!NO_DIGITS.includes(s.layout)&&s.finish!=='photo';
+// Direction from the subject's centre toward the clock, in screen pixels (1080 wide); light and shadow follow it.
+function lightVec(s){const H=typeof nativeHeight==='number'?nativeHeight:2400,vx=1080*(s.hpos*.006-s.subjX/100),vy=H*(.12+s.vpos*.011-.5-s.subjY/100),l=Math.hypot(vx,vy);return l<1?[0,-1]:[vx/l,vy/l]}
+const hasOv=s=>['styleH','styleM'].some(k=>s[k]&&Object.keys(s[k]).length>0);
+function partOf(s,e,w){
+ const o=(w==='h'?s.styleH:s.styleM)||{},f=FONTS[o.font]||FONTS[s.font]||FONTS.inter,wt=clamp(o.weight!=null?o.weight:s.weight,f.wr[0],f.wr[1]);
+ const c=HEX.test(o.color||'')?(s.warm&&e.night?mixHex(o.color,'#ffb070',.6):o.color):(w==='m'&&s.twoTone?e.c2:e.c);
+ return{c,cls:`pf f-${finOf(s,FINISH.some(x=>x[0]===o.finish)?o.finish:s.finish)}`,st:`--c:${c};font-family:${f.f};font-weight:${wt}`};
+}
+const dateW=s=>{const f0=FONTS[s.font]||FONTS.inter,df=s.dateFont==='same'?f0:(FONTS[s.dateFont]||FONTS.inter);return s.styleD&&s.styleD.weight?clamp(s.styleD.weight,df.wr[0],df.wr[1]):s.dateFont==='same'?clamp(Math.min(fwOf(s),600),f0.wr[0],f0.wr[1]):clamp(500,df.wr[0],df.wr[1])};
 function freeGeom(lay,s){
  const c=.62,h=1.28,gap=s.spacing*.01,step=s.lh*.01,ms=s.minScale/100,P=[];
  for(let i=0;i<4;i++){const min=i>=2;let x=0,y=0,sc=min?ms:1;
@@ -542,37 +601,46 @@ function freeGeom(lay,s){
  let x0=0,y0=0,x1=0,y1=0;for(const q of P){x0=Math.min(x0,q.x);y0=Math.min(y0,q.y);x1=Math.max(x1,q.x+c*q.sc);y1=Math.max(y1,q.y+h*q.sc)}
  P.forEach(q=>{q.x-=x0;q.y-=y0});return{P,w:x1-x0,h:y1-y0};
 }
-function analogSVG(s,d){
+function ringsSVG(p,hc,mc,H,M){
+ const w=11,ro=78,ri=ro-w*1.9,Co=2*Math.PI*ro,Ci=2*Math.PI*ri,hf=(p.d.getHours()%12)/12,mf=p.d.getMinutes()/60,ring=(r,c,C,f)=>`<circle cx="90" cy="90" r="${r}" stroke="${c}" stroke-opacity=".15"/>`+`<circle cx="90" cy="90" r="${r}" stroke="${c}" stroke-dasharray="${Math.max(.5,f*C).toFixed(2)} ${C.toFixed(2)}"/>`;
+ return `<svg class="dial" viewBox="0 0 180 180" aria-hidden="true"><g fill="none" stroke-width="${w}" stroke-linecap="round" transform="rotate(-90 90 90)">${ring(ro,hc,Co,hf)}${ring(ri,mc,Ci,mf)}</g><text x="90" y="90" text-anchor="middle" dominant-baseline="central" font-size="${(ri*.55).toFixed(1)}" style="font-family:var(--ff);font-weight:var(--fw);font-variant-numeric:tabular-nums"><tspan fill="${hc}"${H?` style="${H.st}"`:''}>${p.hh}:</tspan><tspan fill="${mc}"${M?` style="${M.st}"`:''}>${p.mm}</tspan></text></svg>`;
+}
+function analogSVG(s,d,H,M){
  const hr=(d.getHours()%12)*30+d.getMinutes()*.5,mn=d.getMinutes()*6,ticks=[...Array(12).keys()].map(i=>{const a=i*30*Math.PI/180,mj=i%3===0,o=78-7,n=o-(mj?16:8);return `<line x1="${90+Math.sin(a)*n}" y1="${90-Math.cos(a)*n}" x2="${90+Math.sin(a)*o}" y2="${90-Math.cos(a)*o}" stroke-width="${mj?5:2.5}"/>`}).join('');
- return `<svg class="dial" viewBox="0 0 180 180" aria-hidden="true"><g class="face"><circle cx="90" cy="90" r="78" fill="none" stroke-width="3"/>${ticks}<line class="hand" x1="90" y1="90" x2="90" y2="${90-78*.52}" stroke-width="7.5" transform="rotate(${hr} 90 90)"/></g><g class="min"><line class="hand" x1="90" y1="90" x2="90" y2="${90-78*.8}" stroke-width="5" transform="rotate(${mn} 90 90)"/><circle cx="90" cy="90" r="7"/></g></svg>`;
+ return `<svg class="dial" viewBox="0 0 180 180" aria-hidden="true"><g class="face"${H?` style="--c:${H.c}"`:''}><circle cx="90" cy="90" r="78" fill="none" stroke-width="3"/>${ticks}<line class="hand" x1="90" y1="90" x2="90" y2="${90-78*.52}" stroke-width="7.5" transform="rotate(${hr} 90 90)"/></g><g class="min"${M?` style="--c:${M.c}"`:''}><line class="hand" x1="90" y1="90" x2="90" y2="${90-78*.8}" stroke-width="5" transform="rotate(${mn} 90 90)"/><circle cx="90" cy="90" r="7"/></g>${s.secHand?`<g style="stroke:var(--c2);fill:var(--c2)"><line x1="90" y1="${90+78*.15}" x2="90" y2="${90-78*.88}" stroke-width="2" transform="rotate(${d.getSeconds()*6} 90 90)"/><circle cx="90" cy="90" r="3.5"/></g>`:''}</svg>`;
 }
 function digitsHTML(s,e,p,fs,part){
  const f=FONTS[s.font]||FONTS.inter,lay=s.layout,ms=part?1:(s.minScale/100)*(lay==='hero'?.4:1);
  const size=lay==='words'?`calc(${fs} * .5)`:fs;
  const st=`--c:${e.c};--c2:${e.c2};--ff:${f.f};--fw:${fwOf(s)};--ls:${s.spacing*.01}em;--op:${e.op};--g:${s.glow/100};--ms:${ms};--lh:${s.lh/100};--sl:${s.slant};font-size:${size}`;
- const hh=p.hh,mm=p.mm,cls=`f-${s.finish} ${s.twoTone?'tt':''}`;
+ const hh0=p.hh,mm0=p.mm,ov=hasOv(s),H=ov?partOf(s,e,'h'):null,M=ov?partOf(s,e,'m'):null,cls=ov?'f-plain':`f-${finOf(s,s.finish)} ${s.twoTone?'tt':''}`;
+ // With digit depth on, each digit is its own span so it can sit in front of or behind the subject.
+ const F=depthOn(s)?s.depthFront:null,D=(t,b)=>F?[...t].map((c,i)=>`<span class="dg${F[b+i]?' fr':''}">${c}</span>`).join(''):t,fr=i=>F?'dg'+(F[i]?' fr':''):'',hh=D(hh0,0),mm=D(mm0,2);
+ // Attributes for an hours ('h') or minutes ('m') element: its own finish, colour and font when overridden.
+ const at=(w,x='',xs='')=>{const P=w==='h'?H:M,c=[x,w==='m'?'min':'',P?P.cls:''].filter(Boolean).join(' '),y=[xs,P?P.st:''].filter(Boolean).join(';');return `${c?` class="${c}"`:''}${y?` style="${y}"`:''}`};
  // A split piece is just the hours, or just the minutes, as its own block.
  if(part){
-  if(lay==='words'){const hr=p.d.getHours()%12||12;return `<div class="digits L-words ${cls}" style="${st}">${part==='h'?`<div class="wd">${ONES[hr]}</div>`:`<div class="wm min">${minWords(p.d.getMinutes())}</div>`}</div>`}
-  return `<div class="digits L-piece ${cls}" style="${st}">${part==='h'?`<span data-t="hh">${hh}</span>`:`<span class="min" data-t="mm">${mm}</span>`}</div>`;
+  if(lay==='words'){const hr=p.d.getHours()%12||12;return `<div class="digits L-words ${cls}" style="${st}">${part==='h'?`<div${at('h','wd')}>${ONES[hr]}</div>`:`<div${at('m','wm')}>${minWords(p.d.getMinutes())}</div>`}</div>`}
+  return `<div class="digits L-piece ${cls}" style="${st}">${part==='h'?`<span${at('h')} data-t="hh">${hh}</span>`:`<span${at('m')} data-t="mm">${mm}</span>`}</div>`;
  }
- if(lay==='analog')return `<div class="digits L-analog ${cls}" style="${st}">${analogSVG(s,p.d)}</div>`;
- if(FREE.includes(lay)){const g=freeGeom(lay,s),dg=[hh[0],hh[1],mm[0],mm[1]];return `<div class="digits L-free ${cls}" style="${st};width:${g.w.toFixed(3)}em;height:${g.h.toFixed(3)}em">${g.P.map(q=>`<span class="pc" style="left:${q.x.toFixed(3)}em;top:${q.y.toFixed(3)}em;width:${(.62*q.sc).toFixed(3)}em;height:${(1.28*q.sc).toFixed(3)}em"><span class="${q.min?'min':''}" style="font-size:${q.sc}em">${dg[q.i]}</span></span>`).join('')}</div>`}
+ if(lay==='analog')return `<div class="digits L-analog ${cls}" style="${st}">${analogSVG(s,p.d,H,M)}</div>`;
+ if(lay==='rings')return `<div class="digits L-analog L-rings ${cls}" style="${st}">${ringsSVG({...p,hh:hh0,mm:mm0},H?H.c:e.c,M?M.c:(s.twoTone?e.c2:e.c),H,M)}</div>`;
+ if(FREE.includes(lay)){const g=freeGeom(lay,s),dg=[hh0[0],hh0[1],mm0[0],mm0[1]];return `<div class="digits L-free ${cls}" style="${st};width:${g.w.toFixed(3)}em;height:${g.h.toFixed(3)}em">${g.P.map(q=>`<span class="pc" style="left:${q.x.toFixed(3)}em;top:${q.y.toFixed(3)}em;width:${(.62*q.sc).toFixed(3)}em;height:${(1.28*q.sc).toFixed(3)}em"><span${at(q.min?'m':'h',fr(q.i),`font-size:${q.sc}em`)}>${dg[q.i]}</span></span>`).join('')}</div>`}
  if(lay==='arc'){
   const id='a'+(++arcN),cy=200-2*s.arc,grad=s.finish==='gradient';
-  return `<div class="digits arcw L-arc" style="${st}"><svg class="arcs a-${s.finish} ${s.twoTone?'tt':''}" viewBox="0 -60 400 330" style="width:calc(${fs} * 3.4)">${grad?`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${e.c}"/><stop offset="1" stop-color="${e.c2}"/></linearGradient></defs>`:''}<path id="${id}" d="M 20 200 Q 200 ${cy} 380 200" fill="none"/><text style="font-size:100px;letter-spacing:${s.spacing*1.2}px${grad?`;fill:url(#g${id})`:''}"><textPath href="#${id}" startOffset="50%" text-anchor="middle"><tspan>${hh}</tspan><tspan>:</tspan><tspan class="min">${mm}</tspan></textPath></text></svg></div>`;
+  return `<div class="digits arcw L-arc" style="${st}"><svg class="arcs a-${s.finish} ${s.twoTone?'tt':''}" viewBox="0 -60 400 330" style="width:calc(${fs} * 3.4)">${grad?`<defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${e.c}"/><stop offset="1" stop-color="${e.c2}"/></linearGradient></defs>`:''}<path id="${id}" d="M 20 200 Q 200 ${cy} 380 200" fill="none"/><text style="font-size:100px;letter-spacing:${s.spacing*1.2}px${grad?`;fill:url(#g${id})`:''}"><textPath href="#${id}" startOffset="50%" text-anchor="middle"><tspan${H?` style="fill:${H.c};font-family:inherit"`:''}>${hh0}</tspan><tspan${H?` style="fill:${H.c}"`:''}>:</tspan><tspan class="min"${M?` style="fill:${M.c}"`:''}>${mm0}</tspan></textPath></text></svg></div>`;
  }
  let inner='';
  switch(lay){
-  case'single':inner=`<span data-t="hh">${hh}</span><span class="colon">:</span><span class="min" data-t="mm">${mm}</span>${s.seconds?`<span class="sec" data-t="ss">:${p.ss}</span>`:''}`;break;
-  case'stairs':case'stacked':inner=`<div data-t="hh">${hh}</div><div class="min" data-t="mm">${mm}</div>${s.seconds?`<div class="sec" data-t="ss">${p.ss}</div>`:''}`;break;
-  case'hero':inner=`<span data-t="hh">${hh}</span><span class="min" data-t="mm">${mm}</span>`;break;
-  case'split':inner=`<span data-t="hh">${hh}</span><i class="bar"></i><span class="min" data-t="mm">${mm}</span>`;break;
-  case'grid':case'tower':inner=`<span>${hh[0]}</span><span>${hh[1]}</span><span class="min">${mm[0]}</span><span class="min">${mm[1]}</span>`;break;
-  case'vertical':inner=`<span data-t="hh">${hh}</span><span class="colon">:</span><span class="min" data-t="mm">${mm}</span>`;break;
-  case'words':{const hr=p.d.getHours()%12||12;inner=`<div class="wd">${ONES[hr]}</div><div class="wm min">${minWords(p.d.getMinutes())}</div>`}break;
+  case'single':inner=`<span${at('h')} data-t="hh">${hh}</span><span${at('h','colon')}>:</span><span${at('m')} data-t="mm">${mm}</span>${s.seconds?`<span class="sec" data-t="ss">:${p.ss}</span>`:''}`;break;
+  case'stairs':case'stacked':inner=`<div${at('h')} data-t="hh">${hh}</div><div${at('m')} data-t="mm">${mm}</div>${s.seconds?`<div class="sec" data-t="ss">${p.ss}</div>`:''}`;break;
+  case'hero':inner=`<span${at('h')} data-t="hh">${hh}</span><span${at('m')} data-t="mm">${mm}</span>`;break;
+  case'split':inner=`<span${at('h')} data-t="hh">${hh}</span><i class="bar"></i><span${at('m')} data-t="mm">${mm}</span>`;break;
+  case'grid':case'tower':inner=`<span${at('h',fr(0))}>${hh0[0]}</span><span${at('h',fr(1))}>${hh0[1]}</span><span${at('m',fr(2))}>${mm0[0]}</span><span${at('m',fr(3))}>${mm0[1]}</span>`;break;
+  case'vertical':inner=`<span${at('h')} data-t="hh">${hh}</span><span${at('h','colon')}>:</span><span${at('m')} data-t="mm">${mm}</span>`;break;
+  case'words':{const hr=p.d.getHours()%12||12;inner=`<div${at('h','wd')}>${ONES[hr]}</div><div${at('m','wm')}>${minWords(p.d.getMinutes())}</div>`}break;
  }
- return `<div class="digits L-${lay} f-${s.finish} ${s.twoTone?'tt':''} ${s.align==='right'?'rt':''}" style="${st}">${inner}</div>`;
+ return `<div class="digits L-${lay} ${cls} ${s.align==='right'?'rt':''}" style="${st}">${inner}</div>`;
 }
 function infoHTML(s){
  const c=[];
@@ -583,19 +651,39 @@ function infoHTML(s){
  return c.length?`<div class="inforow">${c.join('')}</div>`:'';
 }
 function previewHTML(s,p,full){
+ // Charging preview: colour shift recolours the digits; the other styles are drawn around the clock below.
+ const chg=UI.charging&&s.charge&&s.charge!=='none'?s.charge:'',cc=s.chargeColor||'#7be0b0',digitLay=!NO_DIGITS.includes(s.layout);
+ if(flowOn(s)){const w=flowW(s,p.d),nw=o=>{const c={...o};delete c.weight;return c};s={...s,weight:w,styleH:nw(s.styleH||{}),styleM:nw(s.styleM||{})}}
+ if(chg==='color'&&digitLay){const o=k=>s[k]&&s[k].color?{...s[k],color:cc}:s[k];s={...s,color:cc,color2:cc,styleH:o('styleH'),styleM:o('styleM')}}
  const e=eff(s,p.d),bg=bgLayer(s);
- const anim=s.movement==='breathe'?'breathe':s.movement==='float'?'float':s.movement==='tilt'?'tilt':'';
+ const anim=s.movement==='breathe'?'breathe':s.movement==='float'?'float':s.movement==='tilt'||s.movement==='parallax'?'tilt':'';
  const f0=FONTS[s.font]||FONTS.inter,df=s.dateFont==="same"?f0:(FONTS[s.dateFont]||FONTS.inter),dw=s.dateFont==="same"?clamp(Math.min(fwOf(s),600),f0.wr[0],f0.wr[1]):clamp(500,df.wr[0],df.wr[1]),jc=s.align==="left"?"flex-start":s.align==="right"?"flex-end":"center";
- const meta=`<div class="meta" style="--c:${e.c};--op:${e.op};--jc:${jc};font-family:${df.f};font-weight:${dw};text-transform:${s.dateCase==="upper"?"uppercase":"none"};letter-spacing:${s.dateTrack*.01}em;font-size:calc(${s.dateSize} * 100cqw / 1080)">${s.infoPos==='above'?infoHTML(s):''}${s.showDate?`<div class="date">${dateText(s.dateStyle,p.d)}</div>`:''}${s.caption?`<div class="cap">${s.caption.replace(/</g,'&lt;')}</div>`:''}${s.infoPos!=='above'?infoHTML(s):''}</div>`;
- const fs=n=>`calc(${n} * 100cqw / 1080)`,hasMeta=s.showDate||s.caption||s.seconds||Object.values(s.info).some(Boolean);
- const piece=(id,x,y,rot,body)=>{const sel=full&&(isSplit(s)?UI.sel:'h')===id;return `<div class="clockpos${sel?' picked':''}" data-piece="${id}" style="--hx:${x};--vy:${y};--rot:${rot};text-align:${s.align}"><div class="anim ${anim}">${body}</div>${sel?'<i class="hdl" data-handle aria-hidden="true"></i>':''}</div>`};
- const clock=UI.hide?'':isSplit(s)?piece('h',s.hpos,s.vpos,s.rotate,digitsHTML(s,e,p,fs(s.size),'h'))+piece('m',s.mins.x,s.mins.y,s.mins.rot,digitsHTML(s,e,p,fs(s.mins.size),'m'))+(hasMeta?piece('d',s.meta.x,s.meta.y,s.meta.rot,meta.replace('class="meta"','class="meta solo"')):'')
-  :piece('h',s.hpos,s.vpos,s.rotate,digitsHTML(s,e,p,fs(s.size))+meta);
- const subj=(s.subjectOn&&assets.subject&&s.bg==='photo')?`<img class="subject" alt="" src="${assets.subject}">`:'';
+ const dc=s.styleD&&HEX.test(s.styleD.color||'')?(s.warm&&e.night?mixHex(s.styleD.color,'#ffb070',.6):s.styleD.color):e.c;
+ const meta=`<div class="meta" style="--c:${dc};--op:${e.op};--jc:${jc};font-family:${df.f};font-weight:${dateW(s)};text-transform:${s.dateCase==="upper"?"uppercase":"none"};letter-spacing:${s.dateTrack*.01}em;font-size:calc(${s.dateSize} * 100cqw / 1080)">${s.infoPos==='above'?infoHTML(s):''}${s.showDate?`<div class="date">${dateText(s.dateStyle,p.d)}</div>`:''}${s.caption?`<div class="cap">${s.caption.replace(/</g,'&lt;')}</div>`:''}${s.infoPos!=='above'?infoHTML(s):''}</div>`;
+ const fs=n=>`calc(${n} * 100cqw / 1080)`,ids=pieceIds(s),selId=ids.includes(UI.sel)?UI.sel:'h',lvl=UI.battery;
+ const piece=(id,x,y,rot,body,cls='',inner='')=>{const sel=full&&selId===id,str=sel&&(id==='h'||id==='m')&&canStretch(s);return `<div class="clockpos${sel?' picked':''}${cls?' '+cls:''}" data-piece="${id}" style="--hx:${x};--vy:${y};--rot:${rot};--cc:${cc};--lvl:${(Math.min(4,Math.floor(lvl/20))+1)*20}%;text-align:${s.align}">${inner}<div class="anim ${anim}">${body}</div>${sel?'<i class="hdl" data-handle="" aria-hidden="true"></i>':''}${str?'<i class="hdl hdl-x" data-handle="x" aria-hidden="true"></i><i class="hdl hdl-y" data-handle="y" aria-hidden="true"></i>':''}</div>`};
+ // Stretch: font size follows the height factor, and a horizontal scale makes up the width factor.
+ const digits=(size,fx,fy,part)=>{const d=digitsHTML(s,e,p,fs(size*(canStretch(s)?fy:100)/100),part),r=canStretch(s)?fx/fy:1;return Math.abs(r-1)<.005?d:`<span class="str" data-sxr="${r.toFixed(4)}"><span class="stri" style="transform:scaleX(${r.toFixed(4)})">${d}</span></span>`};
+ const chgCls=w=>[chg==='glow'&&w==='h'?'chg-glow':'',chg==='fill'&&digitLay?'chg-fill':''].filter(Boolean).join(' '),ring=chg==='ring'?`<i class="chg-ring" style="--p:${Math.floor(lvl/5)*5}"></i>`:'';
+ const metaPiece=dateApart(s)&&hasMeta(s)?piece('d',s.meta.x,s.meta.y,s.meta.rot,meta.replace('class="meta"','class="meta solo"')):'';
+ const cnt=(s.counters||[]).map((c,k)=>{const n=c.on?daysTo(c,p.d):null;return n==null||n<0?'':piece('c'+k,c.x,c.y,c.rot,`<div class="cnt" style="--c:${s.color};--op:${e.op};--ff:${f0.f};--fw:${fwOf(s)};font-size:${fs(c.size)}"><div class="disc"><b>${Math.min(n,999)}</b></div>${c.label?`<small style="font-family:${df.f}">${escapeHTML(c.label)}</small>`:''}</div>`)}).join('');
+ const ql=quoteLines(s),qt=ql.length?ql[dayNo(p.d)%ql.length]:'';
+ const quote=s.quote&&s.quote.on&&qt?piece('q',s.quote.x,s.quote.y,s.quote.rot,`<div class="quote" style="--c:${s.color};--op:${e.op};font-family:${df.f};font-size:${fs(Math.min(s.quote.size,2000/Math.max(1,qt.length)).toFixed(1))}">${escapeHTML(qt)}</div>`):'';
+ const clockTime=UI.hide?'':isSplit(s)?piece('h',s.hpos,s.vpos,s.rotate,digits(s.size,s.sx,s.sy,'h'),chgCls('h'),ring)+piece('m',s.mins.x,s.mins.y,s.mins.rot,digits(s.mins.size,s.mins.sx,s.mins.sy,'m'),chgCls('m'))
+  :piece('h',s.hpos,s.vpos,s.rotate,digits(s.size,s.sx,s.sy)+(dateApart(s)?'':meta),chgCls('h'),ring);
+ const clock=UI.hide?'':clockTime+metaPiece+cnt+quote+(chg==='bar'?`<div class="chg-bar" style="--cc:${cc}"><i style="width:${lvl}%"></i></div>`:'');
+ let subj='';
+ if(s.subjectOn&&assets.subject&&s.bg==='photo'){
+  // Shadow cast down and toward the clock, the subject, then a rim of clock-coloured light on the side facing the clock.
+  const [vx,vy]=lightVec(s),sc=s.subjScale/100,u=`url('${assets.subject}')`;let ox=vx*.45,oy=vy*.45+.9;const ol=Math.hypot(ox,oy);ox=ox/ol*22*sc/10.8;oy=oy/ol*22*sc/10.8;
+  subj=(s.subjShadow?`<img class="subject sshadow" alt="" src="${assets.subject}" style="--sa:${s.subjShadow/100};left:${ox.toFixed(2)}cqw;top:${oy.toFixed(2)}cqw">`:'')+`<img class="subject" alt="" src="${assets.subject}">`
+   +(s.rimLight?`<div class="subject rim" aria-hidden="true" style="--rc:${s.color};--ra:${s.rimLight/100};-webkit-mask-image:${u},${u};mask-image:${u},${u};-webkit-mask-position:center,calc(50% - ${(vx*1.11*sc).toFixed(2)}cqw) calc(50% - ${(vy*1.11*sc).toFixed(2)}cqw);mask-position:center,calc(50% - ${(vx*1.11*sc).toFixed(2)}cqw) calc(50% - ${(vy*1.11*sc).toFixed(2)}cqw)"></div>`:'');
+ }
+ const front=subj&&depthOn(s)&&!UI.hide?`<div class="layer-front" aria-hidden="true">${clockTime.replace(/<i class="hdl[^>]*><\/i>/g,'').replace(/ picked/g,'')}</div>`:'';
  const notifs=UI.notifs?`<div class="notifs"><div class="n"><b>Messages · now</b>Aarav: Are we still meeting at 5?</div><div class="n"><b>Calendar · 4:30 PM</b>Project sync starts in 10 min</div><div class="n"><b>Photos</b>Your weekend memories are ready</div></div>`:'';
  const guides=UI.guides?`<div class="g g-top">Status bar</div><div class="g g-notif">Notification zone</div><div class="g g-fp">Fingerprint / gesture</div><div class="g-mid"></div>`:'';
  const tag=UI.compare?'<div class="tag">Stock clock</div>':(UI.hide?'<div class="tag">Clock hidden · double-tap to show</div>':'');
- return `<div class="bg ${bg.cls||''}" style="${bg.style}">${bg.inner}</div><div class="dim" style="opacity:${s.dim/100*.8}"></div>${clock}${subj}${notifs}${guides}${tag}<div class="homebar"></div>`;
+ return `<div class="bg ${bg.cls||''}" style="${bg.style}">${bg.inner}</div><div class="dim" style="opacity:${s.dim/100*.8}"></div>${clock}${subj}${front}${notifs}${guides}${tag}<div class="homebar"></div>`;
 }
 function syncNode(target,source){
  if(target.nodeType!==source.nodeType||target.nodeName!==source.nodeName){target.replaceWith(source.cloneNode(true));return;}
@@ -605,16 +693,30 @@ function syncNode(target,source){
  for(const a of [...source.attributes])if(target.getAttribute(a.name)!==a.value)target.setAttribute(a.name,a.value);
  const old=[...target.childNodes],fresh=[...source.childNodes];for(let i=0;i<Math.max(old.length,fresh.length);i++){if(!fresh[i])old[i].remove();else if(!old[i])target.appendChild(fresh[i].cloneNode(true));else syncNode(old[i],fresh[i]);}
 }
+// Scaled digits keep their layout box, so give stretched wrappers their visual width; rings wrap the larger side.
+let photoDims={src:null,w:0,h:0};
+function fitPreview(root){
+ const photos=root.querySelectorAll('.f-photo');
+ if(photos.length){
+  const R=root.getBoundingClientRect(),s=S;let w=R.width,h=R.height;
+  if(s.bg==='photo'&&assets.photo){if(photoDims.src!==assets.photo){photoDims={src:assets.photo,w:0,h:0};const im=new Image();im.onload=()=>{if(photoDims.src===im.src){photoDims.w=im.naturalWidth;photoDims.h=im.naturalHeight;renderAll()}};im.src=assets.photo}if(photoDims.w){const k=Math.max(R.width/photoDims.w,R.height/photoDims.h);w=photoDims.w*k;h=photoDims.h*k}}
+  photos.forEach(el=>{const r=el.getBoundingClientRect();el.style.backgroundSize=`${w}px ${h}px`;el.style.backgroundPosition=`${R.left-r.left+(R.width-w)/2}px ${R.top-r.top+(R.height-h)/2}px`});
+ }
+ root.querySelectorAll('.str').forEach(el=>{const i=el.firstElementChild;if(i){el.style.width=i.offsetWidth*+el.dataset.sxr+'px';el.style.height=i.offsetHeight+'px'}});
+ root.querySelectorAll('.chg-ring').forEach(el=>{const p=el.parentElement,d=Math.max(p.offsetWidth,p.offsetHeight)*1.15;el.style.width=el.style.height=d+'px'});
+}
 function renderPreview(root){
- if(!root)return;const s=UI.compare?deepMerge(clone(S),clone(STOCK)):S,p=parts();
+ if(!root)return;const s=UI.compare?Object.assign(deepMerge(clone(S),clone(STOCK)),{sx:100,sy:100,styleH:{},styleM:{},styleD:{},detachDate:false,counters:[],quote:{...S.quote,on:false},charge:'none'}):S,p=parts();
  for(const [k,v]of Object.entries({hx:s.hpos,rot:s.rotate,vy:s.vpos,sx:s.subjX,sy:s.subjY,ss:s.subjScale/100}))root.style.setProperty('--'+k,v);
+ root.style.setProperty('--photo',s.bg==='photo'&&assets.photo?`url('${assets.photo}')`:s.bg==='gradient'?(GRADS[s.gradient]||GRADS.dusk).css:'none');root.classList.toggle('parallax',s.movement==='parallax');
  arcN=root.id==='fscreen'?100000:0;
  const frame=document.createElement('div');frame.innerHTML=previewHTML(s,p,root.id==='fscreen');
  const old=[...root.childNodes],fresh=[...frame.childNodes];for(let i=0;i<Math.max(old.length,fresh.length);i++){if(!fresh[i])old[i].remove();else if(!old[i])root.appendChild(fresh[i].cloneNode(true));else syncNode(old[i],fresh[i]);}
+ fitPreview(root);
 }
 let previewFrame=0;
-function renderAll(){if(previewFrame)return;previewFrame=requestAnimationFrame(()=>{previewFrame=0;renderPreview($('#screen'));if(UI.full){if(!isSplit(S))UI.sel='h';renderFbar();renderPreview($('#fscreen'))}updateContrast();});}
-function tick(){const p=parts();if(p.d.getMinutes()!==tick.m){tick.m=p.d.getMinutes();renderAll();return}$$('[data-t]').forEach(el=>{const k=el.dataset.t;el.textContent=(k==='ss'&&el.tagName==='SPAN'?':':'')+p[k]})}
+function renderAll(){if(previewFrame)return;previewFrame=requestAnimationFrame(()=>{previewFrame=0;renderPreview($('#screen'));if(UI.full){if(!pieceIds(S).includes(UI.sel))UI.sel='h';renderFbar();renderPreview($('#fscreen'))}updateContrast();});}
+function tick(){const p=parts();if(p.d.getMinutes()!==tick.m||S.layout==='analog'&&S.secHand){tick.m=p.d.getMinutes();renderAll();return}$$('[data-t="ss"]').forEach(el=>{el.textContent=(el.tagName==='SPAN'?':':'')+p.ss})}
 tick.m=-1;
 
 /* ---------- ui builders ---------- */
@@ -622,13 +724,21 @@ const BD={n:['n','Native'],t:['t','Test'],p:['p','Preview'],s:['s','Planned']};
 const bdg=k=>k?`<em class="bd ${BD[k][0]}">${BD[k][1]}</em>`:'';
 const sec=(t,h,b)=>`<section class="sec-b"><div class="sec-h"><h3>${t}</h3>${h?`<span>${h}</span>`:''}</div>${b}</section>`;
 const card=b=>`<div class="card">${b}</div>`;
-const slider=(k,l,min,max,step=1,unit='',badge='')=>{const v=getP(S,k);return `<div class="row slider"><label><span>${l}${bdg(badge)}</span><output data-out="${k}">${v}${unit}</output></label><input type="range" min="${min}" max="${max}" step="${step}" value="${v}" data-key="${k}" data-unit="${unit}" aria-label="${l}"></div>`};
+// Value of a key, or what it falls back to: per-part style keys show the shared value until they are overridden.
+function pv(k){
+ const v=getP(S,k);if(v!==undefined&&v!=='')return v;const m=/^style([HMD])\.(\w+)$/.exec(k);if(!m)return v;const o=S['style'+m[1]]||{};
+ if(m[2]==='color')return m[1]==='M'&&S.twoTone?S.color2:S.color;
+ if(m[2]==='weight'){if(m[1]==='D')return dateW(S);const f=FONTS[o.font||S.font]||FONTS.inter;return clamp(S.weight,f.wr[0],f.wr[1])}
+ return S[m[2]];
+}
+const isColorKey=k=>/(^|\.)color2?$|Color$/.test(k||'');
+const slider=(k,l,min,max,step=1,unit='',badge='')=>{const v=pv(k);return `<div class="row slider"><label><span>${l}${bdg(badge)}</span><output data-out="${k}">${v}${unit}</output></label><input type="range" min="${min}" max="${max}" step="${step}" value="${v}" data-key="${k}" data-unit="${unit}" aria-label="${l}"></div>`};
 const toggle=(k,l,d='',badge='',re=false)=>`<label class="row tog"><span class="tl"><b>${l}${bdg(badge)}</b>${d?`<small>${d}</small>`:''}</span><input type="checkbox" role="switch" data-key="${k}" ${getP(S,k)?'checked':''} ${re?'data-rerender':''}><i class="swt"></i></label>`;
 const tile=(k,v,glyph,label,re)=>`<button class="tile" data-set="${k}" data-val="${v}" ${re?'data-rerender':''} aria-pressed="${S[k]===v}">${glyph}<small>${label}</small></button>`;
-const sel=(k,opts,num)=>`<select class="sel" data-key="${k}" ${num?'data-num':''} aria-label="${k}">${opts.map(([v,l])=>`<option value="${v}" ${String(getP(S,k))===String(v)?'selected':''}>${l}</option>`).join('')}</select>`;
+const sel=(k,opts,num,re)=>`<select class="sel" data-key="${k}" ${num?'data-num':''} ${re?'data-rerender':''} aria-label="${k}">${opts.map(([v,l])=>`<option value="${v}" ${String(getP(S,k)??'')===String(v)?'selected':''}>${l}</option>`).join('')}</select>`;
 const SWATCH=['#ffffff','#a8e6cf','#bba7ff','#9ec5ff','#ffd3a5','#ffb3c7','#ffe27a','#ff8c7a'];
-const swatches=k=>`<div class="swrow">${SWATCH.map(c=>`<button class="dot" style="--c:${c}" data-set="${k}" data-val="${c}" aria-label="${c}" aria-pressed="${S[k].toLowerCase()===c}"></button>`).join('')}<label class="dot custom" aria-label="Pick any colour"><input type="color" value="${S[k]}" data-key="${k}"></label></div>`;
-const hexrow=k=>`<div class="hexrow" style="--c:${S[k]}"><span class="cc"></span><input class="txt" data-key="${k}" value="${S[k]}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Hex colour"></div>`;
+const swatches=k=>`<div class="swrow">${SWATCH.map(c=>`<button class="dot" style="--c:${c}" data-set="${k}" data-val="${c}" aria-label="${c}" aria-pressed="${String(pv(k)).toLowerCase()===c}"></button>`).join('')}<label class="dot custom" aria-label="Pick any colour"><input type="color" value="${pv(k)}" data-key="${k}"></label></div>`;
+const hexrow=k=>`<div class="hexrow" style="--c:${pv(k)}"><span class="cc"></span><input class="txt" data-key="${k}" value="${pv(k)}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Hex colour"></div>`;
 const hours=[...Array(24).keys()].map(h=>[h,pad(h)+':00']);
 
 const LAYOUTS=[
@@ -647,36 +757,48 @@ const LAYOUTS=[
  ['wave','Wave','<span class="lg">1<span style="position:relative;top:.25em">0</span>2<span style="position:relative;top:.25em">4</span></span>'],
  ['offset','Offset','<span class="lg" style="text-align:left">10<br><i style="margin-left:1.2em">24</i></span>'],
  ['wide','Wide','<span class="lg">10&nbsp;&nbsp;&nbsp;24</span>'],
+ ['rings','Rings','<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="3"/><path d="M15 3a12 12 0 0 1 10.4 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="15" r="7" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="2.4"/><path d="M15 8a7 7 0 1 1-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'],
  ['analog','Analog','<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15V8M15 15l5 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>']
 ];
 // Layouts that are already single-digit shapes (or a dial) cannot be split into hours/minutes/date pieces.
-const NO_SPLIT=['grid','tower','vertical','arc','analog'];
+const NO_SPLIT=['grid','tower','vertical','arc','analog','rings'];
 const canSplit=s=>!NO_SPLIT.includes(s.layout),isSplit=s=>!!s.split&&canSplit(s);
-const LHINT={single:'Classic one-line clock.',stacked:'Hours over minutes.',stairs:'Minutes step to the side.',hero:'Big hours with small minutes beside them.',split:'Hours and minutes divided by a line.',grid:'A 2×2 block of digits.',tower:'One digit per line.',vertical:'Runs along the screen edge. Try the “Left edge” position.',arc:'Curved along an arc. Use the curve slider.',words:'Spoken time, for example “six thirty-one”.',bigmin:'Small hours with big minutes.',diagonal:'Digits step down at an angle.',wave:'Digits alternate up and down.',offset:'Minutes start where the hours end.',wide:'One line with a wide gap instead of a colon.',analog:'A dial whose hands move live on your lock screen.'};
+const LHINT={single:'Classic one-line clock.',stacked:'Hours over minutes.',stairs:'Minutes step to the side.',hero:'Big hours with small minutes beside them.',split:'Hours and minutes divided by a line.',grid:'A 2×2 block of digits.',tower:'One digit per line.',vertical:'Runs along the screen edge. Try the “Left edge” position.',arc:'Curved along an arc. Use the curve slider.',words:'Spoken time, for example “six thirty-one”.',bigmin:'Small hours with big minutes.',diagonal:'Digits step down at an angle.',wave:'Digits alternate up and down.',offset:'Minutes start where the hours end.',wide:'One line with a wide gap instead of a colon.',analog:'A dial whose hands move live on your lock screen.',rings:'An hour ring and a minute ring fill up, with the time in the middle.'};
 const FCATS=['All','Clean','Display','Serif','Mono','Tech'];
 function tabClock(){
  const lay=S.layout,f=FONTS[S.font]||FONTS.inter;
  const extra=(['single','stacked','stairs','hero','split','bigmin','diagonal','wave','offset','wide'].includes(lay)&&!isSplit(S)?slider('minScale','Minutes size',30,130,1,'%'):'')+(lay==='arc'?slider('arc','Arc curve',-100,100):'');
- const wrow=f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider('weight','Weight',f.wr[0],f.wr[1],50);
+ const wrow=f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider('weight','Weight',f.wr[0],f.wr[1],50)
+  +(NO_DIGITS.includes(lay)?'':toggle('weightFlow.on','Weight follows the hour','Thin at :00, heavier every 10 minutes, boldest from :50','',true)+(S.weightFlow.on?(S.finish==='photo'?`<div class="row"><p class="mu sm">Photo fill already draws each digit separately, so the weight stays fixed with it.</p></div>`:slider('weightFlow.from','Weight at :00',f.wr[0],f.wr[1],50)+slider('weightFlow.to','Weight from :50',f.wr[0],f.wr[1],50)):''));
  return sec('Clock layout','Choose a shape',`<div class="grid g3">${LAYOUTS.slice(0,6).map(([v,n,g])=>tile('layout',v,g,n,true)).join('')}</div><button class="btn block" data-act="layoutPicker" style="margin-top:10px">All ${LAYOUTS.length} layouts · ${LAYOUTS.find(x=>x[0]===lay)[1]} selected</button>`)
- +sec('Size & position','Drag, pinch and twist in the expanded preview',card(slider('size',isSplit(S)?'Hours size':'Clock size',80,600)+slider('vpos','Vertical position',-10,80,1,'%')+slider('hpos','Horizontal position',-80,80)+slider('rotate','Rotation',-180,180,1,'°')+(canSplit(S)?toggle('split','Separate hours, minutes & date','Move, size and rotate each piece on its own','',true)+(S.split?slider('mins.size','Minutes size',60,600)+slider('mins.rot','Minutes rotation',-180,180,1,'°')+slider('meta.rot','Date rotation',-180,180,1,'°'):''):`<div class="row"><p class="mu sm">This layout can’t be separated into pieces.</p></div>`))
+ +sec('Size & position','Drag, pinch and twist in the expanded preview',card(slider('size',isSplit(S)?'Hours size':'Clock size',80,600)+slider('vpos','Vertical position',-10,80,1,'%')+slider('hpos','Horizontal position',-80,80)+slider('rotate','Rotation',-180,180,1,'°')+(canSplit(S)?toggle('split','Separate hours, minutes & date','Move, size and rotate each piece on its own','',true)+(S.split?slider('mins.size','Minutes size',60,600)+slider('mins.rot','Minutes rotation',-180,180,1,'°')+slider('meta.rot','Date rotation',-180,180,1,'°'):''):`<div class="row"><p class="mu sm">Hours and minutes stay together in this layout.</p></div>`)
+  +(isSplit(S)?'':toggle('detachDate','Move date separately','Place the date anywhere, in any layout','',true)+(S.detachDate?slider('meta.rot','Date rotation',-180,180,1,'°'):'')))
+ +(canStretch(S)?`<details class="disclosure" data-disclosure="stretch"><summary>Stretch width & height</summary>${slider('sx',isSplit(S)?'Hours width':'Width',50,200,1,'%')}${slider('sy',isSplit(S)?'Hours height':'Height',50,200,1,'%')}${isSplit(S)?slider('mins.sx','Minutes width',50,200,1,'%')+slider('mins.sy','Minutes height',50,200,1,'%'):''}<div class="row"><p class="mu sm">Or drag the side and bottom handles in the expanded preview. Condensed fonts stay crisp when stretched tall:</p><div class="chips">${[['bebas','Bebas Neue'],['anton','Anton'],['barlow','Barlow Condensed']].map(([v,n])=>`<button class="cp" data-set="font" data-val="${v}" data-rerender aria-pressed="${S.font===v}">${n}</button>`).join('')}<button class="cp" data-act="stretchReset" data-v="all">Reset stretch</button></div></div></details>`:'')
  +`<div class="chips">${[['Upper','14,0'],['Centre','35,0'],['Lower','55,0'],['Left edge','35,-40'],['Right edge','35,40']].map(([l,v])=>`<button class="cp" data-act="place" data-v="${v}">${l}</button>`).join('')}</div>`)
  +sec('Typography','30 offline typefaces',card(`<button class="choice-row" data-act="fontPicker"><span class="sample" style="font-family:${f.f};font-weight:${fwOf(S)}">10:24</span><span class="choice-text"><b>${f.n}</b><small>Browse fonts</small></span><span aria-hidden="true">›</span></button>`+wrow)
  +`<details class="disclosure" data-disclosure="type"><summary>Fine-tune typography</summary>${slider('slant','Slant',0,20,1,'°')}${slider('spacing','Digit spacing',-10,30)}${slider('lh','Line spacing',60,140,1,'%')}${extra}<div class="row">${sel('align',[['left','Align left'],['center','Align centre'],['right','Align right']])}</div></details>`)
  +sec('Date & caption','Under the clock',card(toggle('showDate','Show date')+`<div class="row">${sel('dateStyle',['full','short','dm','caps','num','day'].map(v=>[v,dateText(v,new Date())]))}</div>`+slider('dateSize','Date size',20,120)+`<div class="row grid g2">${sel('dateFont',[['same','Match clock'],['inter','Inter'],['jetbrains','JetBrains Mono'],['fraunces','Fraunces'],['barlow','Barlow Condensed'],['spacegrotesk','Space Grotesk']])}${sel('dateCase',[['normal','Normal case'],['upper','UPPERCASE']])}</div>`+slider('dateTrack','Date tracking',0,30)+`<div class="row"><p class="mu sm" style="margin-bottom:8px">Personal caption</p><input class="txt" data-key="caption" value="${S.caption.replace(/"/g,'&quot;')}" maxlength="60" placeholder="Name, motto, or contact for lost phone"><div class="chips">${[['Name','Your name'],['If found, call…','If found, call +977-'],['Motto','Stay curious'],['Clear','']].map(([l,v])=>`<button class="cp" data-act="caption" data-v="${v}">${l}</button>`).join('')}</div></div>`))
- +sec('Time','Format & behaviour',card(toggle('h12','12-hour time')+toggle('seconds','Show seconds','Small seconds beside the minutes','t')+toggle('warm','Warm colour after dark',`Shifts the clock warmer (${pad(S.warmFrom)}:00 – ${pad(S.warmTo)}:00)`,'',true)+(S.warm?`<div class="row grid g2"><div><p class="mu sm" style="margin-bottom:6px">From</p>${sel('warmFrom',hours,1)}</div><div><p class="mu sm" style="margin-bottom:6px">Until</p>${sel('warmTo',hours,1)}</div></div>`:'')))
+ +sec('Time','Format & behaviour',card(toggle('h12','12-hour time')+(lay==='analog'?toggle('secHand','Seconds hand','Updates every second while the lock screen is on','t'):lay==='rings'?'':toggle('seconds','Show seconds','Small seconds beside the minutes','t'))+toggle('warm','Warm colour after dark',`Shifts the clock warmer (${pad(S.warmFrom)}:00 – ${pad(S.warmTo)}:00)`,'',true)+(S.warm?`<div class="row grid g2"><div><p class="mu sm" style="margin-bottom:6px">From</p>${sel('warmFrom',hours,1)}</div><div><p class="mu sm" style="margin-bottom:6px">Until</p>${sel('warmTo',hours,1)}</div></div>`:'')))
 ;
 }
 function tabStyle(){
- // Suggested colours from the selected photo and from the phone's wallpaper (works for live/Atmos wallpapers that report colours).
- const pal=k=>[['From your photo',UI.palette],['From your wallpaper',UI.wallColors]].filter(([,cs])=>cs.length).map(([t,cs])=>`<p class="mu sm" style="margin:10px 0 8px">${t}</p><div class="swrow">${cs.map(c=>`<button class="dot" style="--c:${c}" data-set="${k}" data-val="${c}" aria-label="${c}" aria-pressed="${S[k].toLowerCase()===c}"></button>`).join('')}</div>`).join('');
- const fin=FINISH.map(([v,n])=>`<button class="tile" data-set="finish" data-val="${v}" data-rerender aria-pressed="${S.finish===v}"><span class="digits f-${v}" style="--c:${S.color};--c2:${S.color2};--g:.7;--op:1;--ff:'Inter',sans-serif;--fw:800;--ls:0;font-size:28px">10</span><small>${n}</small></button>`).join('');
- return sec('Colour','Pick, type or sample',card(`<div class="row">${swatches('color')}${hexrow('color')}${pal('color')}</div>`+toggle('twoTone','Two-tone minutes','Give the minutes their own colour or gradient end','',true)+(S.twoTone?`<div class="row"><p class="mu sm" style="margin-bottom:10px">Minutes / gradient end</p>${swatches('color2')}${hexrow('color2')}${pal('color2')}</div>`:'')))
+ // One set of controls; the scope chooses whether they change everything or only the hours, minutes or date.
+ const sc=['h','m','d'].includes(UI.scope)?UI.scope:'all',P={h:'styleH',m:'styleM',d:'styleD'}[sc],names={h:'hours',m:'minutes',d:'date'};
+ const pal=k=>[['From your photo',UI.palette],['From your wallpaper',UI.wallColors]].filter(([,cs])=>cs.length).map(([t,cs])=>`<p class="mu sm" style="margin:10px 0 8px">${t}</p><div class="swrow">${cs.map(c=>`<button class="dot" style="--c:${c}" data-set="${k}" data-val="${c}" aria-label="${c}" aria-pressed="${String(pv(k)).toLowerCase()===c}"></button>`).join('')}</div>`).join('');
+ const seg=`<div class="fseg scope" role="radiogroup" aria-label="Style applies to">${[['all','All'],['h','Hours'],['m','Minutes'],['d','Date']].map(([v,l])=>`<button role="radio" data-act="scope" data-v="${v}" aria-checked="${sc===v}">${l}</button>`).join('')}</div>`;
+ const finKey=P?P+'.finish':'finish',col=P?pv(P+'.color'):S.color;
+ const fin=FINISH.map(([v,n])=>`<button class="tile" data-set="${finKey}" data-val="${v}" data-rerender aria-pressed="${pv(finKey)===v}"><span class="digits f-${v}" style="--c:${col};--c2:${S.color2};--g:.7;--op:1;--ff:'Inter',sans-serif;--fw:800;--ls:0;font-size:28px">10</span><small>${n}</small></button>`).join('');
+ if(sc==='all')return seg+sec('Colour','Pick, type or sample',card(`<div class="row">${swatches('color')}${hexrow('color')}${pal('color')}</div>`+toggle('twoTone','Two-tone minutes','Give the minutes their own colour or gradient end','',true)+(S.twoTone?`<div class="row"><p class="mu sm" style="margin-bottom:10px">Minutes / gradient end</p>${swatches('color2')}${hexrow('color2')}${pal('color2')}</div>`:'')))
  +sec('Readability','Checked against your background',`<div class="card contrast" id="contrast" style="padding:12px 14px"></div>`)
- +sec('Finish',`${FINISH.length} looks`,`<div class="grid g3">${fin}</div><div class="card" style="margin-top:12px">${slider('opacity','Clock opacity',10,100,1,'%')}${(S.finish==='glow'||S.finish==='neon')?slider('glow','Glow strength',0,100,1,'%'):''}</div>`)
-;
+ +sec('Finish',`${FINISH.length} looks`,`<div class="grid g3">${fin}</div><div class="card" style="margin-top:12px">${slider('opacity','Clock opacity',10,100,1,'%')}${(S.finish==='glow'||S.finish==='neon')?slider('glow','Glow strength',0,100,1,'%'):''}</div>`);
+ const own=Object.keys(S[P]||{}).length,note=`<p class="mu sm" style="margin:-4px 0 12px">Changes here apply to the ${names[sc]} only${['grid','tower','vertical','arc'].includes(S.layout)&&sc!=='d'?' (colour only in this layout’s preview)':''}.${own?` <button class="linkbtn" data-act="scopeReset">Match the rest again</button>`:''}</p>`;
+ const colour=sec('Colour',`For the ${names[sc]}`,card(`<div class="row">${swatches(P+'.color')}${hexrow(P+'.color')}${pal(P+'.color')}</div>`));
+ if(sc==='d'){const df=S.dateFont==='same'?FONTS[S.font]||FONTS.inter:FONTS[S.dateFont]||FONTS.inter;return seg+note+colour+sec('Typeface','Date size is in the Clock tab',card(`<div class="row">${sel('dateFont',[['same','Match clock'],['inter','Inter'],['jetbrains','JetBrains Mono'],['fraunces','Fraunces'],['barlow','Barlow Condensed'],['spacegrotesk','Space Grotesk']],false,true)}</div>`+(df.wr[0]===df.wr[1]?'':slider('styleD.weight','Weight',df.wr[0],df.wr[1],50))));}
+ const f=FONTS[(S[P]||{}).font]||FONTS[S.font]||FONTS.inter;
+ return seg+note+colour+sec('Typeface',`For the ${names[sc]}`,card(`<div class="row">${sel(P+'.font',[['','Same as the clock'],...Object.entries(FONTS).map(([k,x])=>[k,x.n])],false,true)}</div>`+(f.wr[0]===f.wr[1]?`<div class="row"><p class="mu sm">${f.n} uses a fixed weight.</p></div>`:slider(P+'.weight','Weight',f.wr[0],f.wr[1],50))))
+ +sec('Finish',`For the ${names[sc]}`,`<div class="grid g3">${fin}</div>`);
 }
-function tabMotion(){return sec('Movement','Motion costs battery',`<div class="grid g2">${[['still','Still','Lowest battery'],['breathe','Breathe','Slow fade pulse'],['float','Float','Gentle drift'],['tilt','Tilt','Follows motion']].map(([v,n,d])=>`<button class="tile" data-set="movement" data-val="${v}" aria-pressed="${S.movement===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`);}
+function tabMotion(){return sec('Movement','Motion costs battery',`<div class="grid g2">${[['still','Still','Lowest battery'],['breathe','Breathe','Slow fade pulse'],['float','Float','Gentle drift'],['tilt','Tilt','Follows motion'],['parallax','Parallax','Clock and photo drift apart']].map(([v,n,d])=>`<button class="tile" data-set="movement" data-val="${v}" aria-pressed="${S.movement===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`);}
 
 function tabWallpaper(){return sec('Wallpaper & background','Choose what sits behind the clock',`<div class="grid g2">${[['atmos','Atmos / live','Transparent clock'],['photo','Photo','Your picture'],['gradient','Gradient','Built-in looks'],['black','Black','AOD-style']].map(([v,n,d])=>`<button class="tile" data-set="bg" data-val="${v}" data-rerender aria-pressed="${S.bg===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`
  +(S.bg==='photo'?`<div class="stack" style="margin-top:12px"><button class="btn pri" data-act="photo">${assets.photo?'Choose a different photo':'Choose a photo'}</button></div>`:'')
@@ -688,10 +810,20 @@ function tabDepth(){
  if(S.bg!=='photo'||!photoReady)return `<div class="note"><b>Choose a still photo first</b><p class="mu sm">Subject separation places a cut-out in front of the clock. It needs a fixed photo background.</p><button class="btn pri block" data-act="usePhotoBg" style="margin-top:12px">Choose photo for depth</button></div>`;
  return sec('Subject separation','One still photo',`<div class="stack"><button class="btn pri" data-act="autoSubject">${assets.subject?'Separate subject again':'Separate subject with ML Kit'}</button><button class="btn" data-act="subject">${assets.subject?'Replace subject PNG':'Import a transparent PNG instead'}</button></div><p class="mu sm">Google Play services may download the subject model on first use.</p>`)
  +(assets.subject?sec('Depth layer','Ready to use',card(toggle('subjectOn','Subject in front of clock','Turn this off to compare the original photo.'))+`<details class="disclosure" data-disclosure="subjectAlign"><summary>Adjust subject alignment</summary>${slider('subjScale','Subject scale',50,200,1,'%')}${slider('subjX','Horizontal offset',-30,30)}${slider('subjY','Vertical offset',-30,30)}<div class="row"><button class="btn" data-act="subjectReset">Reset alignment</button></div></details><button class="btn danger block" data-act="subjectClear" style="margin-top:12px">Remove subject layer</button>`):'')
+ +(assets.subject?sec('Digits in front','Tap a digit to put it in front of the subject',NO_DEPTH.includes(S.layout)?`<div class="note">${LAYOUTS.find(x=>x[0]===S.layout)[1]} draws the time as one shape, so its digits can’t sit on both sides of the subject.</div>`:`<div class="dgrow">${[0,1,2,3].map(i=>{const pp=parts(),c=(pp.hh+pp.mm)[i];return `<button class="tile" data-act="depthDigit" data-v="${i}" aria-pressed="${!!S.depthFront[i]}"><b style="font-family:${(FONTS[S.font]||FONTS.inter).f}">${c}</b><small>${['Hour 1st','Hour 2nd','Minute 1st','Minute 2nd'][i]}</small></button>`}).join('')}</div><p class="mu sm" style="margin-top:8px">The digit at that position, whatever the time, is drawn in front.</p>`)
+  +sec('Light & shadow','Ties the clock and subject together',card(slider('rimLight','Rim light from the clock',0,100,1,'%')+slider('subjShadow','Subject’s shadow on the clock',0,100,1,'%'))):'')
  +`<details class="disclosure" data-disclosure="subjectHelp"><summary>Separation help</summary><p class="mu sm">For manual cut-outs, export a transparent PNG with the same dimensions as your photo. Import it above, then adjust alignment if needed.</p><div class="row"><button class="btn block" data-act="resetSubject">Reset ML Kit after a crash</button></div></details>`;
 }
+const CHARGES=[['none','Off','No change while charging'],['glow','Glow pulse','A soft halo breathes behind the clock'],['color','Colour shift','The digits turn your charging colour'],['fill','Battery fill','Digits fill up to the battery level'],['ring','Charge ring','A ring around the clock fills up'],['bar','Energy bar','A thin bar fills along the bottom']];
+function cntInfo(c){const n=daysTo(c,new Date());return n==null?'Pick a date':n<0?'This date has passed, so the counter is hidden':n===0?'Today · shows 0':`${n} day${n===1?'':'s'} to go`}
 function tabExtras(){
- return sec('Info row','Small chips with the clock',card(toggle('info.battery','Battery percentage','Uses the native engine\'s live battery variable.','n')+toggle('info.alarm','Next alarm','Captured from Android when you apply the theme.')+toggle('info.weather','Weather text','Enter your own label below; no weather provider is connected.','',true)+(S.info.weather?`<div class="row"><input class="txt" data-key="weatherText" value="${escapeHTML(S.weatherText||'')}" maxlength="60" placeholder="Kathmandu · 24°C"></div>`:'')+toggle('info.progress','Day progress bar','How much of today has passed')+`<div class="row"><p class="mu sm" style="margin-bottom:8px">Position</p><div class="grid g2">${[['above','Above date'],['below','Below date']].map(([v,n])=>`<button class="tile" style="min-height:44px" data-set="infoPos" data-val="${v}" aria-pressed="${S.infoPos===v}"><b>${n}</b></button>`).join('')}</div></div>`))
+ const ch=S.charge,ql=quoteLines(S),qt=ql.length?ql[dayNo(new Date())%ql.length]:'';
+ return sec('Charging style'+bdg('t'),'Only while the phone charges',`<div class="grid g2">${CHARGES.map(([v,n,d])=>`<button class="tile" data-set="charge" data-val="${v}" data-rerender aria-pressed="${ch===v}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`
+  +(ch!=='none'?`<div class="card" style="margin-top:12px"><div class="row"><p class="mu sm" style="margin-bottom:10px">Charging colour</p>${swatches('chargeColor')}${hexrow('chargeColor')}</div>${['color','fill'].includes(ch)&&NO_DIGITS.includes(S.layout)?`<div class="row"><p class="mu sm">${LAYOUTS.find(x=>x[0]===S.layout)[1]} has no digits to ${ch==='fill'?'fill':'recolour'}, so it stays as it is while charging.</p></div>`:''}<div class="row"><button class="btn block" data-act="chargePreview" aria-pressed="${!!UI.charging}">${UI.charging?'Stop charging preview':'Preview charging'}</button></div></div>`:''))
+ +sec('Day counters',`${S.counters.length} of 3 · drag them in the expanded preview`,S.counters.map((c,k)=>`<div class="card" style="margin-bottom:12px">${toggle(`counters.${k}.on`,c.label?escapeHTML(c.label):`Counter ${k+1}`,cntInfo(c),'',true)}<div class="row grid g2"><input class="txt" data-key="counters.${k}.label" value="${escapeHTML(c.label)}" maxlength="24" placeholder="Label (optional)" aria-label="Counter label"><input class="txt" type="date" data-key="counters.${k}.date" value="${c.date}" aria-label="Count down to"></div>${toggle(`counters.${k}.yearly`,'Repeat every year','For birthdays and anniversaries','',true)}${slider(`counters.${k}.size`,'Size',60,400)}<div class="row"><button class="btn danger sm" data-act="cntDel" data-v="${k}">Remove counter</button></div></div>`).join('')
+  +(S.counters.length<3?`<button class="btn block" data-act="cntAdd">Add a day counter</button>`:'<p class="mu sm">Up to three counters, so the lock screen stays clear.</p>'))
+ +sec('Daily quote','A different line each day',card(toggle('quote.on','Show a daily quote',S.quote.on&&qt?`Today: “${escapeHTML(qt)}”`:'Picks one line from your list each day','',true)+(S.quote.on?`<div class="row"><p class="mu sm" style="margin-bottom:8px">One per line, up to 30 lines of 80 characters</p><textarea class="txt" data-key="quote.lines" rows="6" spellcheck="true" aria-label="Quotes, one per line">${escapeHTML(S.quote.lines.join('\n'))}</textarea></div>`+slider('quote.size','Text size',20,90):'')))
+ +sec('Info row','Small chips with the clock',card(toggle('info.battery','Battery percentage','Uses the native engine\'s live battery variable.','n')+toggle('info.alarm','Next alarm','Captured from Android when you apply the theme.')+toggle('info.weather','Weather text','Enter your own label below; no weather provider is connected.','',true)+(S.info.weather?`<div class="row"><input class="txt" data-key="weatherText" value="${escapeHTML(S.weatherText||'')}" maxlength="60" placeholder="Kathmandu · 24°C"></div>`:'')+toggle('info.progress','Day progress bar','How much of today has passed')+`<div class="row"><p class="mu sm" style="margin-bottom:8px">Position</p><div class="grid g2">${[['above','Above date'],['below','Below date']].map(([v,n])=>`<button class="tile" style="min-height:44px" data-set="infoPos" data-val="${v}" aria-pressed="${S.infoPos===v}"><b>${n}</b></button>`).join('')}</div></div>`))
  +sec('Battery & night','Calmer at bedtime',card(slider('nightDim','Night dimming',0,70,1,'%')+toggle('lowBatDim','Dim clock under 20% battery','Uses the native battery level')))
  +sec('Interactions','Gestures',card(toggle('dbl','Double-tap to hide / show','Gesture support depends on your native engine.','t')+toggle('startHidden','Start with clock hidden','Double-tap on the lock screen to reveal it.','t',true)))
  +sec('Test your layout','Check for collisions',`<div class="grid g2"><button class="btn" data-act="notifs">Notification stack</button><button class="btn" data-act="guides">Safe zones</button></div><p class="mu sm">Turn these on to see whether notifications or the fingerprint area cover the clock.</p>`);
@@ -748,7 +880,7 @@ function renderPanel(keep){
 }
 function navigate(tab){openDetails[UI.tab]=new Set($$('details[open]',$('#panel')).map(x=>x.dataset.disclosure));paneScroll[UI.tab]=Math.max(0,$('#workspace').scrollTop-($('.editor-pane').offsetTop-$('#workspace').offsetTop));UI.tab=tab;renderTabs();renderPanel();const w=$('#workspace');w.scrollTop=Math.max(0,$('.editor-pane').offsetTop-w.offsetTop)+(paneScroll[tab]||0);chrome();if(tab==='aod'&&UI.shizuku==='connected')readAod();if(tab==='shade'&&UI.shizuku==='connected')native('shadeRead');}
 function paintRange(r){r.style.setProperty('--p',((r.value-r.min)/(r.max-r.min))*100+'%')}
-function pillsHTML(){return `<button class="pill" data-act="photo">${ic.img}Photo</button><button class="pill" data-act="hide" data-p="hide" aria-pressed="false">${ic.eye}Hide clock</button><button class="pill" data-act="night" data-p="night" aria-pressed="false">${ic.moon}Night preview</button><button class="pill" data-act="notifs" data-p="notifs" aria-pressed="false">${ic.bell}Notifications</button><button class="pill" data-act="guides" data-p="guides" aria-pressed="false">${ic.grid}Safe zones</button><button class="pill" data-act="compare" data-p="compare" aria-pressed="false">${ic.cmp}Hold to compare</button>`}
+function pillsHTML(){return `<button class="pill" data-act="photo">${ic.img}Photo</button><button class="pill" data-act="hide" data-p="hide" aria-pressed="false">${ic.eye}Hide clock</button><button class="pill" data-act="night" data-p="night" aria-pressed="false">${ic.moon}Night preview</button><button class="pill" data-act="notifs" data-p="notifs" aria-pressed="false">${ic.bell}Notifications</button><button class="pill" data-act="guides" data-p="guides" aria-pressed="false">${ic.grid}Safe zones</button><button class="pill" data-act="compare" data-p="compare" aria-pressed="false">${ic.cmp}Hold to compare</button><button class="pill" data-act="chargePreview" data-p="charging" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Charging</button>`}
 
 function updateContrast(){
  const el=$('#contrast');if(!el)return;
@@ -765,7 +897,7 @@ function chrome(){
  const sh=$('#shz');sh.classList.toggle('ok',UI.shizuku==='connected');
  $('#shzTxt').textContent=UI.shizuku==='connected'?'Shizuku connected':UI.shizuku==='connecting'?'Connecting to Shizuku…':'Shizuku is running · tap Connect to authorise';
  $('#shzBtn').style.display=UI.shizuku==='connected'?'none':'';$('#shzBtn').disabled=UI.shizuku==='connecting';
- $$('.pill[data-p]').forEach(b=>b.setAttribute('aria-pressed',String({hide:UI.hide,night:UI.night,notifs:UI.notifs,guides:UI.guides,compare:UI.compare}[b.dataset.p])));
+ $$('.pill[data-p]').forEach(b=>b.setAttribute('aria-pressed',String({hide:UI.hide,night:UI.night,notifs:UI.notifs,guides:UI.guides,compare:UI.compare,charging:!!UI.charging}[b.dataset.p])));
 }
 
 /* ---------- toast & sheet ---------- */
@@ -808,14 +940,15 @@ function palette(img){
  [...m.values()].sort((a,b)=>b.n-a.n).forEach(e=>{if(out.length>=5)return;const rgb=[e.r/e.n,e.g/e.n,e.b/e.n],[h,s,l]=rgb2hsl(...rgb),lit=hsl2rgb(h,Math.max(s,.3),Math.max(l,.78)),hx=rgb2hex(...lit);if(!out.some(o=>Math.abs(hex2rgb(o)[0]-lit[0])+Math.abs(hex2rgb(o)[1]-lit[1])+Math.abs(hex2rgb(o)[2]-lit[2])<70))out.push(hx)});
  return{avg,colors:out};
 }
-function syncRange(k){const r=$(`input[data-key="${k}"][type=range]`);if(!r)return;r.value=getP(S,k);paintRange(r);const o=$(`[data-out="${k}"]`);if(o)o.textContent=getP(S,k)+(r.dataset.unit||'')}
+function syncRange(k){const r=$(`input[data-key="${k}"][type=range]`);if(!r)return;r.value=pv(k);paintRange(r);const o=$(`[data-out="${k}"]`);if(o)o.textContent=pv(k)+(r.dataset.unit||'')}
 function refreshColors(skip){
- ['color','color2'].forEach(k=>{
-  $$(`input[data-key="${k}"]`).forEach(i=>{if(i!==skip)i.value=S[k]});
-  $$(`[data-set="${k}"]`).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.val.toLowerCase()===S[k].toLowerCase())));
+ const keys=new Set($$('#panel [data-set],#panel [data-key]').map(el=>el.dataset.set||el.dataset.key).filter(isColorKey));
+ keys.forEach(k=>{const v=String(pv(k)||'');
+  $$(`#panel input[data-key="${k}"]`).forEach(i=>{if(i!==skip)i.value=v});
+  $$(`#panel [data-set="${k}"]`).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.val.toLowerCase()===v.toLowerCase())));
  });
- $$('.hexrow').forEach((h,i)=>{const k=h.querySelector('input').dataset.key;h.style.setProperty('--c',S[k])});
- $$('.tile .digits').forEach(d=>{d.style.setProperty('--c',S.color);d.style.setProperty('--c2',S.color2)});
+ $$('#panel .hexrow').forEach(h=>{const k=h.querySelector('input').dataset.key;h.style.setProperty('--c',pv(k))});
+ const P={h:'styleH',m:'styleM',d:'styleD'}[UI.scope];$$('#panel .tile .digits').forEach(d=>{d.style.setProperty('--c',P?pv(P+'.color'):S.color);d.style.setProperty('--c2',S.color2)});
 }
 
 /* ---------- sliders ----------
@@ -845,24 +978,30 @@ panel.addEventListener('input',e=>{
  if(t.type==='range'){const v=+t.value;setP(S,k,v);paintRange(t);const o=$(`[data-out="${k}"]`);if(o)o.textContent=v+(t.dataset.unit||'');changed()}
  else if(t.type==='color'){setP(S,k,t.value);refreshColors(t);changed()}
  else if(t.classList.contains('txt')&&t.type!=='range'){
-  if(k==='color'||k==='color2'){if(!HEX.test(t.value))return;setP(S,k,t.value.toLowerCase());refreshColors(t);changed()}
+  if(isColorKey(k)){if(!HEX.test(t.value))return;setP(S,k,t.value.toLowerCase());refreshColors(t);changed()}
+  else if(k==='quote.lines'){S.quote.lines=t.value.split('\n').slice(0,30).map(x=>x.replace(/[\x00-\x1f]/g,' ').slice(0,80));changed()}
   else if(k){setP(S,k,t.value);changed()}
  }
 });
 panel.addEventListener('change',e=>{
  const t=e.target,k=t.dataset.key;if(!k)return;
- if(t.type==='checkbox'){if(k==='split'){toggleSplit(t.checked);return}setP(S,k,t.checked);if(k==='startHidden')UI.hide=t.checked;changed();if(t.hasAttribute('data-rerender'))renderPanel(true)}
- else if(t.tagName==='SELECT'){setP(S,k,t.hasAttribute('data-num')?+t.value:t.value);changed()}
- else if(t.type==='color'||t.classList.contains('txt')){commit()}
+ if(t.type==='checkbox'){if(k==='split'){toggleSplit(t.checked);return}if(k==='detachDate'){S.detachDate=t.checked;if(t.checked)seedDate();changed();commit();renderPanel(true);return}setP(S,k,t.checked);if(k==='startHidden')UI.hide=t.checked;changed();if(t.hasAttribute('data-rerender'))renderPanel(true)}
+ else if(t.tagName==='SELECT'){
+  const v=t.hasAttribute('data-num')?+t.value:t.value,m=/^(style[HMD])\.(\w+)$/.exec(k);
+  if(m&&v==='')delete S[m[1]][m[2]];else setP(S,k,v);
+  if(m&&m[2]==='font'){if(v)S[m[1]].weight=(FONTS[v]||FONTS.inter).w;else delete S[m[1]].weight}
+  changed();if(t.hasAttribute('data-rerender'))renderPanel(true);
+ }
+ else if(t.type==='color'||t.classList.contains('txt')){commit();if(/^counters\.\d\.(date|label)$/.test(k))renderPanel(true)}
 });
 document.addEventListener('click',e=>{
  const tabB=e.target.closest('[data-tab]');
  if(tabB){navigate(tabB.dataset.tab);return}
  const setB=e.target.closest('[data-set]');
  if(setB){
-  const k=setB.dataset.set,v=setB.dataset.val;S[k]=v;if(k==='font')S.weight=(FONTS[v]||FONTS.inter).w;
+  const k=setB.dataset.set,v=setB.dataset.val;setP(S,k,v);if(k==='font')S.weight=(FONTS[v]||FONTS.inter).w;
   setB.parentElement.querySelectorAll('[data-set]').forEach(b=>b.setAttribute('aria-pressed',String(b===setB)));
-  if(k==='color'||k==='color2')refreshColors();
+  if(isColorKey(k))refreshColors();
   if(navigator.vibrate)navigator.vibrate(6);
   changed();if(setB.hasAttribute('data-rerender'))renderPanel(true);return;
  }
@@ -878,12 +1017,19 @@ document.addEventListener('click',e=>{
   case'closeSheet':closeSheet();break;
   case'keep':clearInterval(applyTimer);closeSheet();toast('Kept · lock screen updated');break;
   case'revert':clearInterval(applyTimer);UI.applied=UI.prevApplied||UI.applied;chrome();closeSheet();if(UI.tab==='setup')renderPanel(true);toast('Reverted to your previous lock screen');break;
-  case'full':UI.full=true;if(!isSplit(S))UI.sel='h';$('#full').classList.add('on');renderFbar();readout(isSplit(S)?UI.sel:'h');renderPreview($('#fscreen'));break;
+  case'full':UI.full=true;if(!pieceIds(S).includes(UI.sel))UI.sel='h';$('#full').classList.add('on');renderFbar();readout(curSel());renderPreview($('#fscreen'));break;
   case'fullClose':UI.full=false;$('#full').classList.remove('on');break;
   case'fullTools':UI.fullTools=!UI.fullTools;$('#fpills').hidden=!UI.fullTools;a.setAttribute('aria-pressed',String(UI.fullTools));break;
   case'splitToggle':toggleSplit(!isSplit(S));break;
   case'pieceSel':UI.sel=a.dataset.v;renderFbar();readout(UI.sel);renderAll();break;
-  case'pieceReset':resetPiece(isSplit(S)?UI.sel:'h');break;
+  case'pieceReset':resetPiece(curSel());break;
+  case'stretchReset':{for(const id of a.dataset.v==='all'?['h','m']:[curSel()]){const k=PIECES[id];if(k.sx){setP(S,k.sx,100);setP(S,k.sy,100)}}changed();commit();renderPanel(true);renderFbar();readout(curSel())}break;
+  case'scope':UI.scope=a.dataset.v;renderPanel(true);break;
+  case'depthDigit':{const i=+a.dataset.v;S.depthFront[i]=!S.depthFront[i];changed();commit();renderPanel(true)}break;
+  case'scopeReset':{const P={h:'styleH',m:'styleM',d:'styleD'}[UI.scope];if(P){S[P]={};changed();commit();renderPanel(true)}}break;
+  case'chargePreview':UI.charging=!UI.charging;renderAll();chrome();if(UI.tab==='extras')renderPanel(true);break;
+  case'cntAdd':if(S.counters.length<3){const d=new Date(Date.now()+30*864e5),k=S.counters.length;S.counters.push({on:true,label:'',date:`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,yearly:false,x:[0,-45,45][k],y:46,rot:0,size:140});changed();commit();renderPanel(true)}break;
+  case'cntDel':S.counters.splice(+a.dataset.v,1);changed();commit();renderPanel(true);break;
   case'photo':$('#photoIn').click();break;
   case'subject':$('#subjectIn').click();break;
   case'subjectClear':if(assets.subject)URL.revokeObjectURL(assets.subject);assets.subject=null;changed();renderPanel(true);break;
@@ -943,18 +1089,27 @@ $('#importIn').addEventListener('change',e=>{
 
 /* Direct manipulation of the clock pieces: drag moves by the finger's offset (never jumps to the touch point),
    two fingers pinch to resize and twist to rotate, and the corner handle does both with one finger. */
-const PIECES={h:{x:'hpos',y:'vpos',size:'size',rot:'rotate',lo:80,name:'Hours'},m:{x:'mins.x',y:'mins.y',size:'mins.size',rot:'mins.rot',lo:60,name:'Minutes'},d:{x:'meta.x',y:'meta.y',size:'dateSize',rot:'meta.rot',lo:20,hi:120,name:'Date'}};
-const pieceState=id=>{const k=PIECES[id];return{x:getP(S,k.x),y:getP(S,k.y),size:getP(S,k.size),rot:getP(S,k.rot)}};
+const PIECES={h:{x:'hpos',y:'vpos',size:'size',rot:'rotate',sx:'sx',sy:'sy',lo:80,name:'Hours'},m:{x:'mins.x',y:'mins.y',size:'mins.size',rot:'mins.rot',sx:'mins.sx',sy:'mins.sy',lo:60,name:'Minutes'},d:{x:'meta.x',y:'meta.y',size:'dateSize',rot:'meta.rot',lo:20,hi:120,name:'Date'}};
+for(let k=0;k<3;k++)PIECES['c'+k]={x:`counters.${k}.x`,y:`counters.${k}.y`,size:`counters.${k}.size`,rot:`counters.${k}.rot`,lo:60,hi:400,name:'Counter '+(k+1)};
+PIECES.q={x:'quote.x',y:'quote.y',size:'quote.size',rot:'quote.rot',lo:20,hi:90,name:'Quote'};
+// Movable pieces in this design: the clock (or hours), then minutes, date, counters and quote when present.
+function pieceIds(s){const ids=['h'];if(isSplit(s))ids.push('m');if(dateApart(s)&&hasMeta(s))ids.push('d');(s.counters||[]).forEach((c,k)=>{const n=c.on?daysTo(c,new Date()):null;if(n!=null&&n>=0)ids.push('c'+k)});if(s.quote&&s.quote.on&&quoteLines(s).length)ids.push('q');return ids}
+const curSel=()=>pieceIds(S).includes(UI.sel)?UI.sel:'h',pieceName=id=>id==='h'&&!isSplit(S)?'Clock':PIECES[id].name;
+const pieceState=id=>{const k=PIECES[id];return{x:getP(S,k.x),y:getP(S,k.y),size:getP(S,k.size),rot:getP(S,k.rot),sx:k.sx?getP(S,k.sx):100,sy:k.sy?getP(S,k.sy):100}};
 const normDeg=a=>((a+180)%360+360)%360-180;
 function snapRot(a){a=normDeg(a);const n=Math.round(a/15)*15;return Math.abs(a-n)<=3?n:Math.round(a)}
-function readout(id){const o=$('#freadout');if(!o)return;const st=pieceState(id),label=isSplit(S)?PIECES[id].name:'Clock';o.textContent=`${label} · Size ${Math.round(st.size)} · ${Math.round(st.rot)}°`}
+function readout(id){
+ const o=$('#freadout');if(!o)return;const st=pieceState(id),str=PIECES[id].sx&&canStretch(S)&&(st.sx!==100||st.sy!==100);
+ o.textContent=`${pieceName(id)} · Size ${Math.round(st.size)} · ${Math.round(st.rot)}°`+(str?` · W ${st.sx}% H ${st.sy}%`:'')+(UI.stretching&&!['bebas','anton','barlow','bigshoulders'].includes(S.font)?' · Tip: condensed fonts stretch best':'');
+}
 function setPiece(id,v){
  const k=PIECES[id];
  if(v.x!=null)setP(S,k.x,Math.round(clamp(v.x,-80,80)));if(v.y!=null)setP(S,k.y,Math.round(clamp(v.y,-10,80)));
  if(v.size!=null)setP(S,k.size,Math.round(clamp(v.size,k.lo,k.hi||600)));if(v.rot!=null)setP(S,k.rot,snapRot(v.rot));
- for(const key of [k.x,k.y,k.size,k.rot])syncRange(key);readout(id);renderAll();
+ if(v.sx!=null&&k.sx)setP(S,k.sx,Math.round(clamp(v.sx,50,200)));if(v.sy!=null&&k.sy)setP(S,k.sy,Math.round(clamp(v.sy,50,200)));
+ for(const key of [k.x,k.y,k.size,k.rot,k.sx,k.sy])if(key)syncRange(key);readout(id);renderAll();
 }
-let gest=null,lastTap=0;
+let gest=null,lastTap=0;const tilting=()=>S.movement==='tilt'||S.movement==='parallax';
 function bindScreen(root){
  const pts=new Map();
  const begin=()=>{
@@ -962,13 +1117,18 @@ function bindScreen(root){
   gest.start=pieceState(gest.id);gest.rect=root.getBoundingClientRect();
   if(b){gest.mode='pinch';gest.d0=Math.hypot(b.x-a.x,b.y-a.y)||1;gest.a0=Math.atan2(b.y-a.y,b.x-a.x)}
   else if(gest.mode==='handle'){const el=root.querySelector(`.clockpos[data-piece="${gest.id}"]`),r=el?el.getBoundingClientRect():gest.rect;gest.cx=r.left+r.width/2;gest.cy=r.top+r.height/2;gest.d0=Math.hypot(a.x-gest.cx,a.y-gest.cy)||1;gest.a0=Math.atan2(a.y-gest.cy,a.x-gest.cx)}
+  else if(gest.mode==='handlex'||gest.mode==='handley'){
+   // Stretch along the piece's own (rotated) axis: the factor follows the finger's distance from the centre.
+   const el=root.querySelector(`.clockpos[data-piece="${gest.id}"]`),r=el?el.getBoundingClientRect():gest.rect,t=gest.start.rot*Math.PI/180;gest.cx=r.left+r.width/2;gest.cy=r.top+r.height/2;
+   gest.ax=gest.mode==='handlex'?[Math.cos(t),Math.sin(t)]:[-Math.sin(t),Math.cos(t)];gest.p0=Math.max(8,(a.x-gest.cx)*gest.ax[0]+(a.y-gest.cy)*gest.ax[1]);UI.stretching=true;
+  }
   else{gest.mode='move';gest.x0=a.x;gest.y0=a.y}
  };
  root.addEventListener('pointerdown',e=>{
   const pc=e.target.closest('.clockpos[data-piece]'),handle=e.target.closest('[data-handle]');
   if(!gest&&!pc&&!handle)return;
   pts.set(e.pointerId,{x:e.clientX,y:e.clientY});try{root.setPointerCapture(e.pointerId)}catch(err){}
-  if(!gest){const id=pc?pc.dataset.piece:'h';gest={root,id:isSplit(S)?id:'h',mode:handle?'handle':'move',moved:false};if(root.id==='fscreen'&&isSplit(S)&&UI.sel!==gest.id){UI.sel=gest.id;renderFbar();renderAll()}}
+  if(!gest){const id=pc?pc.dataset.piece:curSel();gest={root,id:pieceIds(S).includes(id)?id:'h',mode:handle?'handle'+(handle.dataset.handle||''):'move',moved:false};if(root.id==='fscreen'&&UI.sel!==gest.id){UI.sel=gest.id;renderFbar();renderAll()}}
   else if(gest.root!==root)return;
   begin();readout(gest.id);
  });
@@ -977,6 +1137,7 @@ function bindScreen(root){
    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});const ids=[...pts.keys()],a=pts.get(ids[0]),b=pts.get(ids[1]),st=gest.start,r=gest.rect;
    if(gest.mode==='pinch'&&b){const d=Math.hypot(b.x-a.x,b.y-a.y),ang=Math.atan2(b.y-a.y,b.x-a.x);gest.moved=true;setPiece(gest.id,{size:st.size*d/gest.d0,rot:st.rot+(ang-gest.a0)*180/Math.PI})}
    else if(gest.mode==='handle'){const d=Math.hypot(a.x-gest.cx,a.y-gest.cy),ang=Math.atan2(a.y-gest.cy,a.x-gest.cx);gest.moved=true;setPiece(gest.id,{size:st.size*d/gest.d0,rot:st.rot+(ang-gest.a0)*180/Math.PI})}
+   else if(gest.mode==='handlex'||gest.mode==='handley'){const f=Math.max(8,(a.x-gest.cx)*gest.ax[0]+(a.y-gest.cy)*gest.ax[1])/gest.p0;gest.moved=true;setPiece(gest.id,gest.mode==='handlex'?{sx:st.sx*f}:{sy:st.sy*f})}
    else if(gest.mode==='move'){
     if(!gest.moved&&Math.hypot(a.x-gest.x0,a.y-gest.y0)<4)return;gest.moved=true;
     let x=st.x+(a.x-gest.x0)/r.width*100/.6;const y=st.y+(a.y-gest.y0)/r.height*100/1.1;
@@ -984,7 +1145,7 @@ function bindScreen(root){
     const snapped=Math.abs(x)<1.5;if(snapped)x=0;root.classList.toggle('snap-x',snapped);
     setPiece(gest.id,{x,y});
    }
-  }else if(!gest&&S.movement==='tilt'){
+  }else if(!gest&&tilting()){
    const r=root.getBoundingClientRect();root.style.setProperty('--tx',((e.clientX-r.left)/r.width-.5)*-5);root.style.setProperty('--ty',((e.clientY-r.top)/r.height-.5)*-5)
   }
  });
@@ -992,7 +1153,7 @@ function bindScreen(root){
   const tracked=pts.delete(e.pointerId);
   if(tracked&&gest&&gest.root===root){
    if(pts.size){gest.mode='move';begin();return}
-   const moved=gest.moved;gest=null;root.classList.remove('snap-x');if(moved){changed();return}
+   const moved=gest.moved,was=gest.mode;gest=null;root.classList.remove('snap-x');if(UI.stretching){UI.stretching=false;readout(curSel())}if(moved){changed();if(was.startsWith('handle'))renderFbar();return}
   }else if(gest)return;
   // A tap that did not move anything (on the clock or an empty area): double-tap hides/shows the clock.
   if(e.type==='pointercancel')return;
@@ -1000,29 +1161,37 @@ function bindScreen(root){
   if(now-lastTap<320&&S.dbl){UI.hide=!UI.hide;renderAll();chrome();lastTap=0}else lastTap=now;
  };
  root.addEventListener('pointerup',end);root.addEventListener('pointercancel',end);
- root.addEventListener('pointerleave',()=>{if(S.movement==='tilt'&&!gest){root.style.setProperty('--tx',0);root.style.setProperty('--ty',0)}});
+ root.addEventListener('pointerleave',()=>{if(tilting()&&!gest){root.style.setProperty('--tx',0);root.style.setProperty('--ty',0)}});
 }
 /* Expanded preview toolbar: split toggle, piece choice, reset, undo. */
 function seedSplit(){
  // Place minutes below the hours and the date below the minutes, sized like the current arrangement.
  const u=n=>n*1.28/26.4,ms=S.minScale/100*(S.layout==='hero'?.4:S.layout==='bigmin'?1:1),msize=clamp(Math.round(S.size*ms),60,600);
- S.mins={x:S.hpos,y:clamp(Math.round(S.vpos+u(S.size)/2+u(msize)/2),-10,80),size:msize,rot:0};
+ S.mins={x:S.hpos,y:clamp(Math.round(S.vpos+u(S.size)/2+u(msize)/2),-10,80),size:msize,rot:0,sx:S.sx,sy:S.sy};
  S.meta={x:S.hpos,y:clamp(Math.round(S.mins.y+u(msize)/2+3),-10,80),rot:0};
+}
+// Put a detached date just below the clock as it is drawn now.
+function seedDate(){
+ const r=$('#screen'),R=r&&r.getBoundingClientRect(),el=r&&r.querySelector('.clockpos[data-piece="h"] .digits'),h=el&&R.height?el.getBoundingClientRect().height/R.height*100/1.1:S.size*1.28/26.4;
+ S.meta={x:S.hpos,y:clamp(Math.round(S.vpos+h/2+3),-10,80),rot:S.meta.rot||0};
 }
 function toggleSplit(on){if(!canSplit(S))return;S.split=on;if(on)seedSplit();UI.sel='h';changed();commit();renderPanel(true);renderFbar();readout(UI.sel);const msg=on?'Hours, minutes and date are separate. Drag each piece.':'Pieces joined back into one clock';if(UI.full){const o=$('#freadout');if(o)o.textContent=msg}else toast(msg)}
 function resetPiece(id){
- if(id==='h'){S.hpos=DEFAULTS.hpos;S.vpos=DEFAULTS.vpos;S.rotate=0;if(isSplit(S))seedSplit()}
- else{const keep=id==='m'?S.meta:S.mins;seedSplit();if(id==='m')S.meta=keep;else S.mins=keep}
+ if(id==='h'){S.hpos=DEFAULTS.hpos;S.vpos=DEFAULTS.vpos;S.rotate=0;if(isSplit(S))seedSplit();else if(S.detachDate)seedDate()}
+ else if(id==='m'||id==='d'&&isSplit(S)){const keep=id==='m'?S.meta:S.mins;seedSplit();if(id==='m')S.meta=keep;else S.mins=keep}
+ else if(id==='d')seedDate();
+ else if(id==='q')Object.assign(S.quote,{x:0,y:58,rot:0});
+ else{const k=+id.slice(1),c=S.counters[k];if(c)Object.assign(c,{x:[0,-45,45][k],y:46,rot:0})}
  changed();commit();renderPanel(true);readout(id);
 }
 function renderFbar(){
- const bar=$('#fbar');if(!bar)return;const split=isSplit(S),sel=split?UI.sel:'h';
- const html=(split?`<div class="fseg" role="radiogroup" aria-label="Piece to edit">${['h','m','d'].map(id=>`<button role="radio" data-act="pieceSel" data-v="${id}" aria-checked="${sel===id}">${PIECES[id].name}</button>`).join('')}</div>`:'')
-  +`<div class="frow">${canSplit(S)?`<button class="pill" data-act="splitToggle" aria-pressed="${split}">${split?'Join pieces':'Split hours / minutes'}</button>`:''}<button class="pill" data-act="pieceReset">Reset ${split?PIECES[sel].name.toLowerCase():'position'}</button><button class="pill" data-act="undo">Undo</button></div>`;
+ const bar=$('#fbar');if(!bar)return;const split=isSplit(S),ids=pieceIds(S),sel=curSel(),k=PIECES[sel],stretched=k.sx&&canStretch(S)&&(getP(S,k.sx)!==100||getP(S,k.sy)!==100);
+ const html=(ids.length>1?`<div class="fseg" role="radiogroup" aria-label="Piece to edit">${ids.map(id=>`<button role="radio" data-act="pieceSel" data-v="${id}" aria-checked="${sel===id}">${pieceName(id)}</button>`).join('')}</div>`:'')
+  +`<div class="frow">${canSplit(S)?`<button class="pill" data-act="splitToggle" aria-pressed="${split}">${split?'Join pieces':'Split hours / minutes'}</button>`:''}${stretched?'<button class="pill" data-act="stretchReset">Reset stretch</button>':''}<button class="pill" data-act="pieceReset">Reset ${sel==='h'&&!split?'position':pieceName(sel).toLowerCase()}</button><button class="pill" data-act="undo">Undo</button></div>`;
  if(bar.innerHTML!==html)bar.innerHTML=html;
 }
 bindScreen($('#screen'));bindScreen($('#fscreen'));
-window.addEventListener('deviceorientation',e=>{if(S.movement!=='tilt'||e.gamma==null)return;const r=$('#screen');r.style.setProperty('--tx',clamp(e.gamma/12,-3,3));r.style.setProperty('--ty',clamp((e.beta-45)/14,-3,3))});
+window.addEventListener('deviceorientation',e=>{if(!tilting()||e.gamma==null)return;const r=$('#screen');r.style.setProperty('--tx',clamp(e.gamma/12,-3,3));r.style.setProperty('--ty',clamp((e.beta-45)/14,-3,3))});
 if(navigator.getBattery)navigator.getBattery().then(b=>{const u=()=>{UI.battery=Math.round(b.level*100);renderAll()};u();b.addEventListener('levelchange',u)}).catch(()=>{});
 
 /* ---------- Android integration for the supplied V2 design ---------- */
@@ -1038,17 +1207,24 @@ const fixOriginal=fixState;
 fixState=function(st){
  const out=clone(DEFAULTS);for(const key of Object.keys(DEFAULTS))if(Object.prototype.hasOwnProperty.call(st||{},key))out[key]=clone(st[key]);
  fixOriginal(out);
- const ranges={weight:[100,900],slant:[0,20],lh:[60,140],minScale:[30,130],rotate:[-180,180],arc:[-100,100],size:[80,600],vpos:[-10,80],hpos:[-80,80],spacing:[-10,30],glow:[0,100],opacity:[10,100],warmFrom:[0,23],warmTo:[0,23],dateSize:[20,120],dateTrack:[0,30],nightDim:[0,70],dim:[0,100],subjScale:[50,200],subjX:[-30,30],subjY:[-30,30]};
+ const ranges={subjShadow:[0,100],rimLight:[0,100],sx:[50,200],sy:[50,200],weight:[100,900],slant:[0,20],lh:[60,140],minScale:[30,130],rotate:[-180,180],arc:[-100,100],size:[80,600],vpos:[-10,80],hpos:[-80,80],spacing:[-10,30],glow:[0,100],opacity:[10,100],warmFrom:[0,23],warmTo:[0,23],dateSize:[20,120],dateTrack:[0,30],nightDim:[0,70],dim:[0,100],subjScale:[50,200],subjX:[-30,30],subjY:[-30,30]};
  for(const [k,[low,high]]of Object.entries(ranges)){const v=Number(out[k]);out[k]=Number.isFinite(v)?clamp(v,low,high):DEFAULTS[k];}
- for(const k of ['color','color2'])if(!HEX.test(out[k]))out[k]=DEFAULTS[k];
- const enums={layout:LAYOUTS.map(x=>x[0]),align:['left','center','right'],finish:FINISH.map(x=>x[0]),bg:['atmos','photo','gradient','black'],gradient:Object.keys(GRADS),movement:['still','breathe','float','tilt'],dateStyle:['full','short','dm','caps','num','day'],dateCase:['normal','upper'],infoPos:['above','below']};
+ for(const k of ['color','color2','chargeColor'])if(!HEX.test(out[k]))out[k]=DEFAULTS[k];
+ const enums={charge:['none','glow','color','fill','ring','bar'],layout:LAYOUTS.map(x=>x[0]),align:['left','center','right'],finish:FINISH.map(x=>x[0]),bg:['atmos','photo','gradient','black'],gradient:Object.keys(GRADS),movement:['still','breathe','float','tilt','parallax'],dateStyle:['full','short','dm','caps','num','day'],dateCase:['normal','upper'],infoPos:['above','below']};
  for(const [k,vs]of Object.entries(enums))if(!vs.includes(out[k]))out[k]=DEFAULTS[k];
  out.caption=String(out.caption||'').replace(/[\x00-\x1f]/g,' ').slice(0,60);out.weatherText=String(out.weatherText||'').replace(/[\x00-\x1f]/g,' ').slice(0,60);
  out.info=Object.fromEntries(['battery','alarm','weather','progress'].map(k=>[k,!!(out.info&&out.info[k])]));
  out.schedule={on:!!(out.schedule&&out.schedule.on),day:String(out.schedule&&out.schedule.day||'quiet'),eve:String(out.schedule&&out.schedule.eve||'afterglow'),night:String(out.schedule&&out.schedule.night||'cinema')};
  for(const k of Object.keys(DEFAULTS))if(typeof DEFAULTS[k]==='boolean')out[k]=!!out[k];
  const num=(v,lo,hi,d)=>{v=Number(v);return Number.isFinite(v)?clamp(Math.round(v),lo,hi):d};
- out.mins={x:num(out.mins&&out.mins.x,-80,80,out.hpos),y:num(out.mins&&out.mins.y,-10,80,clamp(out.vpos+12,-10,80)),size:num(out.mins&&out.mins.size,60,600,out.size),rot:num(out.mins&&out.mins.rot,-180,180,0)};
+ out.mins={x:num(out.mins&&out.mins.x,-80,80,out.hpos),y:num(out.mins&&out.mins.y,-10,80,clamp(out.vpos+12,-10,80)),size:num(out.mins&&out.mins.size,60,600,out.size),rot:num(out.mins&&out.mins.rot,-180,180,0),sx:num(out.mins&&out.mins.sx,50,200,100),sy:num(out.mins&&out.mins.sy,50,200,100)};
+ const obj=o=>o&&typeof o==='object'&&!Array.isArray(o)?o:{},text=(v,n)=>String(v==null?'':v).replace(/[\x00-\x1f]/g,' ').slice(0,n);
+ const part=(o,full)=>{o=obj(o);const r={};if(full&&FONTS[o.font])r.font=o.font;if(o.weight!=null&&Number.isFinite(+o.weight))r.weight=clamp(Math.round(+o.weight),100,900);if(full&&FINISH.some(x=>x[0]===o.finish))r.finish=o.finish;if(HEX.test(o.color||''))r.color=String(o.color).toLowerCase();return r};
+ const wf=obj(out.weightFlow);out.weightFlow={on:!!wf.on,from:num(wf.from,100,900,200),to:num(wf.to,100,900,900)};
+ out.depthFront=[0,1,2,3].map(i=>!!(Array.isArray(out.depthFront)&&out.depthFront[i]));
+ out.styleH=part(out.styleH,true);out.styleM=part(out.styleM,true);out.styleD=part(out.styleD,false);
+ out.counters=(Array.isArray(out.counters)?out.counters:[]).slice(0,3).map((c,k)=>{c=obj(c);return{on:!!c.on,label:text(c.label,24),date:/^\d{4}-\d{2}-\d{2}$/.test(c.date||'')?c.date:'',yearly:!!c.yearly,x:num(c.x,-80,80,[0,-45,45][k]),y:num(c.y,-10,80,46),rot:num(c.rot,-180,180,0),size:num(c.size,60,400,140)}});
+ const q=obj(out.quote);out.quote={on:!!q.on,lines:(Array.isArray(q.lines)?q.lines:DEFAULTS.quote.lines).map(x=>text(x,80)).filter(x=>x.trim()).slice(0,30),x:num(q.x,-80,80,0),y:num(q.y,-10,80,58),rot:num(q.rot,-180,180,0),size:num(q.size,20,90,40)};
  out.meta={x:num(out.meta&&out.meta.x,-80,80,out.hpos),y:num(out.meta&&out.meta.y,-10,80,clamp(out.vpos+24,-10,80)),rot:num(out.meta&&out.meta.rot,-180,180,0)};
  return out;
 };
@@ -1061,7 +1237,7 @@ function fromNative(d){
 }
 function nativeDesign(state=S){
  const doc=fixState(state);doc.nextAlarm=UI.nextAlarm||'None set';
- if(doc.schedule.on){doc.scheduleStyles={};for(const key of ['day','eve','night']){const scene=allScenes().find(x=>x.id===doc.schedule[key]);let style=scene?(scene.patch?deepMerge(deepMerge(clone(doc),clone(PBASE)),clone(scene.patch)):fixState(scene.state)):clone(doc);delete style.scheduleStyles;style.schedule={on:false,day:'quiet',eve:'afterglow',night:'cinema'};style.nextAlarm=UI.nextAlarm||'None set';doc.scheduleStyles[key]=style;}}
+ if(doc.schedule.on){doc.scheduleStyles={};for(const key of ['day','eve','night']){const scene=allScenes().find(x=>x.id===doc.schedule[key]);let style=scene?(scene.patch?deepMerge(Object.assign(clone(doc),clone(PBASE)),clone(scene.patch)):fixState(scene.state)):clone(doc);delete style.scheduleStyles;style.schedule={on:false,day:'quiet',eve:'afterglow',night:'cinema'};style.nextAlarm=UI.nextAlarm||'None set';doc.scheduleStyles[key]=style;}}
  return {size:Math.round(doc.size),height:nativeHeight,background:doc.bg==='atmos'?2:1,depth:doc.subjectOn&&subjectReady&&doc.bg==='photo',hidden:doc.startHidden,tapHide:doc.dbl,v2:JSON.stringify(doc)};
 }
 save=function(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>native('change',{design:nativeDesign()}),160);};
@@ -1207,7 +1383,14 @@ const SHADE_BLUR=[['-1','Device default'],['0','Off · see-through'],['1','Blur 
 function shadeEdited(){shadeDraft=true;clearTimeout(shadeSaveTimer);shadeSaveTimer=setTimeout(()=>native('shadeChange',shade),160);drawShadePreview();chrome();}
 function readShadeColors(state){const c=state.colors||{};shade.panelEnabled=!!c[SHADE_KEYS.panel];shade.cardsEnabled=!!(c[SHADE_KEYS.tint]||c[SHADE_KEYS.base]||c[SHADE_KEYS.blur]);for(const [resource,color,alpha]of [[SHADE_KEYS.panel,'panelColor','panelAlpha'],[SHADE_KEYS.tint,'cardColor','cardTintAlpha'],[SHADE_KEYS.blur,'blurColor','blurAlpha'],[SHADE_KEYS.base,null,'cardOpacity']]){const v=c[resource];if(typeof v==='string'&&/^#[0-9a-f]{8}$/i.test(v)){if(color)shade[color]='#'+v.slice(3).toUpperCase();shade[alpha]=Math.round(parseInt(v.slice(1,3),16)*100/255);}}const mode=state.blur===''?-1:Number(state.blur);if([-1,0,1,2,3].includes(mode))shade.blurMode=mode;native('shadeChange',{...shade,_draft:false});}
 function shadeRange(key,label,hint=''){return `<div class="shade-row"><label for="shade-${key}"><span>${label}${hint?`<small>${hint}</small>`:''}</span><output data-shade-out="${key}">${shade[key]}%</output></label><input id="shade-${key}" type="range" min="0" max="100" value="${shade[key]}" data-shade="${key}" aria-label="${label}"></div>`;}
-function shadeColor(key,label){return `<label class="shade-swatch"><span class="shade-swatch-label">${label}</span><input type="color" data-shade="${key}" value="${shade[key]}" aria-label="${label}"><input class="txt" type="text" maxlength="7" spellcheck="false" data-shade="${key}" value="${shade[key]}" aria-label="${label} hex"></label>`;}
+// Tap-to-use suggestions: the phone's wallpaper colours, the lock-screen clock colours, and colours from the selected photo.
+function shadeSuggest(key){
+ const uniq=a=>[...new Set(a.filter(c=>HEX.test(c||'')).map(c=>c.toUpperCase()))];
+ const groups=[['Wallpaper',uniq(UI.wallColors)],['Your clock',uniq([S.color,S.twoTone?S.color2:''])],['Photo',uniq(UI.palette)]].filter(([,cs])=>cs.length);
+ if(!groups.length)return '';
+ return `<div class="shade-sugg">${groups.map(([t,cs])=>`<span class="sg-t">${t}</span>${cs.map(c=>`<button class="sg" style="--c:${c}" data-shade-pick="${key}" data-val="${c}" aria-label="Use ${t.toLowerCase()} colour ${c}" aria-pressed="${shade[key]===c}"></button>`).join('')}`).join('')}</div>`;
+}
+function shadeColor(key,label){return `<label class="shade-swatch"><span class="shade-swatch-label">${label}</span><input type="color" data-shade="${key}" value="${shade[key]}" aria-label="${label}"><input class="txt" type="text" maxlength="7" spellcheck="false" data-shade="${key}" value="${shade[key]}" aria-label="${label} hex"></label>${shadeSuggest(key)}`;}
 function shadeToggle(key,label,detail=''){return `<label class="shade-toggle"><input type="checkbox" data-shade="${key}" ${shade[key]?'checked':''}><span><b>${label}</b>${detail?`<small>${detail}</small>`:''}</span></label>`;}
 function shadeSub(key,body){return `<div class="shade-sub" data-shade-sub="${key}" ${shade[key]?'':'hidden'}>${body}</div>`;}
 function shadeDark(){return shadeView===null?!!shadeState.night:shadeView==='dark';}
@@ -1231,7 +1414,7 @@ function handleShadeAction(action,el){switch(action){case 'shadeApply':if(UI.shi
  case 'shadeRestore':shadeDraft=false;native('shadeRestore');break;case 'shadeCopy':native('copy',{text:shadeState.report||''});toast('Shade report copied');break;case 'shadeSavePreset':native('shadeSavePreset',{name:$('#shadePresetName')?.value||'My shade',settings:shade});break;case 'shadeDeletePreset':native('shadeDeletePreset',{id:el.dataset.id});break;}}
 $('#panel').addEventListener('input',e=>{const t=e.target,k=t.dataset.shade;if(!k||t.type==='checkbox'||t.tagName==='SELECT')return;if(t.type==='range'){shade[k]=Number(t.value);const o=$(`[data-shade-out="${k}"]`);if(o)o.textContent=shade[k]+'%';paintRange(t);}else{if(!HEX.test(t.value)){t.setAttribute('aria-invalid','true');return;}t.removeAttribute('aria-invalid');shade[k]=t.value.toUpperCase();$$(`[data-shade="${k}"]`).forEach(x=>{if(x!==t)x.value=shade[k];});}shadeEdited();});
 $('#panel').addEventListener('change',e=>{const t=e.target,k=t.dataset.shade;if(!k)return;if(t.type==='checkbox'){shade[k]=t.checked;const sub=$(`[data-shade-sub="${k}"]`);if(sub)sub.hidden=!t.checked;}else if(k==='blur'){shade.blurMode=Number(t.value);native('shadeChange',{...shade,_draft:shadeDraft});return;}else return;shadeEdited();});
-$('#panel').addEventListener('click',e=>{const m=e.target.closest('[data-aodd-mode]');if(m&&!m.disabled){aodDisplayDraft={...aodDisplayView(),mode:m.dataset.aoddMode};renderPanel(true);return;}const v=e.target.closest('[data-shade-view]');if(v){shadeView=v.dataset.shadeView;drawShadePreview();return;}const b=e.target.closest('[data-shade-preset],[data-shade-load]');if(!b||nativeBusy||recoveryLock)return;if(b.dataset.shadeLoad){const p=shadePresets.find(x=>x.id===b.dataset.shadeLoad);if(p)shade=fixShade(p.settings);}else{const look=SHADE_LOOKS.find(x=>x[0]===b.dataset.shadePreset);shade={...SHADE_DEFAULTS,...(look?look[2]:{}),blurMode:shade.blurMode};}shadeEdited();renderPanel(true);toast('Look loaded. Apply when ready.');});
+$('#panel').addEventListener('click',e=>{const pick=e.target.closest('[data-shade-pick]');if(pick&&!nativeBusy&&!recoveryLock){shade[pick.dataset.shadePick]=pick.dataset.val;shadeEdited();renderPanel(true);return;}const m=e.target.closest('[data-aodd-mode]');if(m&&!m.disabled){aodDisplayDraft={...aodDisplayView(),mode:m.dataset.aoddMode};renderPanel(true);return;}const v=e.target.closest('[data-shade-view]');if(v){shadeView=v.dataset.shadeView;drawShadePreview();return;}const b=e.target.closest('[data-shade-preset],[data-shade-load]');if(!b||nativeBusy||recoveryLock)return;if(b.dataset.shadeLoad){const p=shadePresets.find(x=>x.id===b.dataset.shadeLoad);if(p)shade=fixShade(p.settings);}else{const look=SHADE_LOOKS.find(x=>x[0]===b.dataset.shadePreset);shade={...SHADE_DEFAULTS,...(look?look[2]:{}),blurMode:shade.blurMode};}shadeEdited();renderPanel(true);toast('Look loaded. Apply when ready.');});
 
 /* ---------- boot ---------- */
 

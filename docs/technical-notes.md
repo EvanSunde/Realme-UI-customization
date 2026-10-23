@@ -8,6 +8,83 @@ kept as the project's change history. The user-facing overview is the
 "Evan Lockscreen Studio" up to 0.7.0; exports then lived in `Download/EvanLockscreen`
 as `Evan-*.theme`. From 0.8.0 they are `Download/LockscreenStudio/Lockscreen-*.theme`.
 
+## Unreleased: pieces, extras, charging and depth
+
+All of these are drawn into the theme by `StudioTheme`. The host checks cover the pure
+parts: day-number maths and the charging condition are evaluated by a small expression
+evaluator in `V2Check`.
+
+**Checked against Realme's engine.** These points were read from the decompiled
+`com.oplus.uiengine` APK (the phone's lock-screen engine):
+
+- `battery_state` is 0 normal, 1 charging, 2 low (under 20 %, unplugged) and 3 full
+  (plugged in at 100 %). The charging condition (1 or 3) matches.
+- `PositionAnimation` reads `<Position x y time>` children and `AlphaAnimation` reads
+  `<Alpha a time>`. Animations loop once the last keyframe's time has passed. The earlier
+  `<Item>` keyframes were ignored, which is why Breathe and Float did nothing.
+- `rotation`, `pivotX/Y`, `alpha`, `visibility`, `x`, `y`, `w` and `h` are expressions on both
+  `Image` and `Group`. `srcid` loads `name_<int>.png`.
+- The expression functions used are all present: `ifelse`, `eq`, `gt`, `lt`, `ge`, `min`,
+  `max`, `int` and `%`. A `Var` takes `name`, `type`, `expression` and `const`. One whose
+  expression starts with `ifelse` skips a change registration, so the yearly counter is
+  written `0+ifelse(...)`.
+- `month` is 0-based and `day_of_week` is 1 for Sunday. `second` ticks from a one-second
+  handler that starts when `#second` is used; the root `useVariableUpdater` attribute is
+  never read.
+- `hour24` is reported as 12 during the midnight hour when the phone is set to 12-hour time.
+  Studio now uses `hour`, which is always 0–23, for the digits, Words, Rings, warm colours
+  and the day/evening/night schedule.
+- `SensorBinder type="gravity"` maps to Android's gravity sensor, and `Variable index` picks
+  the axis. `showSysWallpaper` is not read; the lock screen is transparent wherever nothing
+  is drawn.
+
+Still to see on a phone: how the photo-fill texture lines up, and the look of the shadow
+and rim.
+
+- **Stretch.** `sx`/`sy` (and `mins.sx`/`mins.sy`), 50–200 %, scale digit images and
+  positions horizontally or vertically. The preview scales the font size by height and adds
+  `scaleX` for the rest. Vertical, Arc, Analog and Rings keep their proportions.
+- **Per-part styles.** `styleH`/`styleM` hold optional `font`, `weight`, `finish` and `color`.
+  `styleD` holds `weight` and `color`. `Spec.part()` merges them over the shared style, so
+  they work whether or not the clock is split.
+- **Movable date.** `detachDate` gives every layout a separate date group placed with `meta`.
+- **Day counters** (up to three) and **daily quote.** `studio_day` is today's Julian day
+  number, built from `#year`, `#month` (0-based) and `#date`. A counter is a `Var` holding
+  days to the target, or to its next yearly occurrence; it is capped at 999 and hidden when
+  negative. The number picks one of three digit groups by its length. The quote is one
+  pre-rendered line per entry, chosen with `#studio_day % n`.
+- **Charging styles** use `gt(eq(#battery_state,1)+eq(#battery_state,3),0)` (charging or full).
+  - **Glow** is a halo with an alpha pulse.
+  - **Colour shift** swaps in digit images drawn in the charging colour.
+  - **Battery fill** has five fill levels per digit, picked from `#battery_level/20`.
+  - **Charge ring** has 21 arcs, picked from `#battery_level/5`.
+  - **Energy bar** is an image whose width follows `#battery_level`.
+- **Rings** layout. It uses 12 hour-arc images and 60 minute-arc images, with the time in
+  the centre. **Seconds hand** (Analog) rotates with `#second*6`; the theme then uses the
+  `DateTime.Second` updater.
+- **Digit depth.** `depthFront` marks which of the four digit positions sit in front of the
+  subject. The clock is emitted twice. The first pass, before `subject.png`, skips the front
+  digits. A second `studio_front` group, after the subject, has the same group transforms
+  and draws only the front digits. Arc, Analog, Words and Rings have no per-digit images,
+  so depth is off for them.
+- **Subject shadow and rim light.** Both are built once from the subject's alpha.
+  - **Shadow:** downscaled, blurred, painted black and drawn under the subject. It is offset
+    downward and toward the clock.
+  - **Rim:** the subject in the clock colour minus itself shifted away from the clock. This
+    leaves a lit edge on the side facing the clock. It is drawn above the subject.
+- **Photo fill** (`finish: photo`). It needs a photo or gradient background. Each digit
+  position gets its own images, filled through a `BitmapShader` of the background. The
+  shader's matrix is the inverse of the digit's full transform: image box, piece rotation,
+  inner group and placed group. As a result the texture lines up with the wallpaper behind
+  it. Hour tens need only 0–2 and minute tens only 0–5. It cannot be combined with the
+  hourly weight, which would multiply the image count.
+- **Weight through the hour** (`weightFlow`). It renders six weights from the variable font.
+  The image is chosen with `digit + 10*int(#minute/10)`.
+- **Parallax** (`movement: parallax`). The clock moves with the gravity sensor like Tilt.
+  The background, subject, shadow and rim move the other way by a smaller amount. They are
+  drawn 4.5 % larger so no edge shows. The subject is cut from the photo, so it moves with
+  the photo: moving it on its own would reveal its copy in the background.
+
 ## New in 0.8.0: preview, split pieces, layouts and finishes
 
 - **Expanded preview** fills the screen at the phone's real shape. One finger drags by

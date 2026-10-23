@@ -19,8 +19,8 @@ backs up everything before it changes it, and can put it all back with one tap.
 ## Features
 
 **Lock screen**
-- Clock designer with 16 layouts (including Analog with live hands, Big minutes,
-  Diagonal, Wave, Offset and Wide), 30 bundled fonts, and 17 finishes (glow, neon, chrome,
+- Clock designer with 17 layouts (including Analog with live hands, Rings, Big minutes,
+  Diagonal, Wave, Offset and Wide), 30 bundled fonts, and 18 finishes (including Photo fill) (glow, neon, chrome,
   holo, retro 3D, glitch, stencil and more). Also date styles, motion, and
   day/evening/night schedules.
 - Full-screen preview: drag the clock (it moves with your finger instead of jumping),
@@ -31,6 +31,16 @@ backs up everything before it changes it, and can put it all back with one tap.
   wallpapers that report their colours), for both the hours and two-tone minutes.
 - Depth effect: put the subject of your photo in front of the clock (ML Kit separation
   or your own PNG). Works with Atmos live wallpapers.
+- Stretch the clock wider or taller with the side and bottom handles.
+- Give the hours, minutes and date their own colour, font, weight and finish, whether or
+  not the clock is split. The date can be moved on its own in every layout.
+- Up to three day counters (a number in a circle with an optional label, optionally
+  yearly) and a daily quote from your own list. Both can be moved like the clock.
+- Charging styles: glow pulse, colour shift, battery fill, charge ring or energy bar.
+- Rings layout, and an optional seconds hand for Analog.
+- Depth extras: choose which digits sit in front of the subject. Also: the subject's shadow
+  on the clock, rim light from the clock, digits filled with your photo, a weight that
+  changes through the hour, and parallax between the clock and the photo.
 - Applies as a native Theme Store theme, with a confirm-or-revert timer in case
   something looks wrong.
 
@@ -92,9 +102,10 @@ After a phone restart, start Shizuku again; Shizuku can't start itself without r
   [docs/AOD-research.md](docs/AOD-research.md).
 - Applying shade colours or a lock screen restarts SystemUI, so the screen flickers
   briefly.
-- The new layouts, finishes and split pieces are drawn into the theme on the phone. The
-  editor preview is a close approximation, and Analog hands, separate-piece rotation and
-  the new finishes are still to be confirmed on a real lock screen.
+- The new layouts, finishes, pieces and depth extras are drawn into the theme on the
+  phone, and the editor preview is a close approximation. The theme syntax they use was
+  checked against Realme's lock-screen engine, but how they look (photo fill, shadow and
+  rim) is still to be confirmed on a real lock screen.
 
 ## How it works
 
