@@ -25,6 +25,8 @@ public class StudioCheck {
    check(s.contains("DateTime.Second")&&s.contains("#battery_level"),"Native dynamic sources missing");
    check(root.getElementsByTagName("PositionAnimation").getLength()==(motion==1?(night?2:1):0),"Float animation");
    check(root.getElementsByTagName("AlphaAnimation").getLength()==(motion==2?(night?2:1):0),"Breathing animation");
+   // Keyframes use MAML's documented child tags; generic <Item> keyframes did not animate on the phone.
+   check(root.getElementsByTagName("Item").getLength()==0&&root.getElementsByTagName("Position").getLength()==(motion==1?(night?6:3):0)&&root.getElementsByTagName("Alpha").getLength()==(motion==2?(night?6:3):0),"Keyframe tags");
    NodeList texts=root.getElementsByTagName("Text");boolean escaped=false;for(int i=0;i<texts.getLength();i++)if(((Element)texts.item(i)).getAttribute("text").equals(d.customText))escaped=true;check(escaped,"Caption must escape XML without losing text");
    ThemeBuilder.Design copy=d.copy();for(Field field:ThemeBuilder.Design.class.getFields())check(Objects.equals(field.get(d),field.get(copy)),"Scene snapshot lost "+field.getName());
    checked++;

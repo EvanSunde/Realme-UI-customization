@@ -29,7 +29,7 @@ const ROOT=path.resolve(__dirname,'..'),ASSETS=path.join(ROOT,'assets');
   st=await page.evaluate(()=>({size:S.size,rot:S.rotate}));assert(st.size>266*1.2,'Pinch enlarges '+JSON.stringify(st));assert(st.rot!==0,'Twist rotates');
   assert.match(await page.locator('#freadout').textContent(),/Size \d+ · -?\d+°/);
   // Handle: one-finger resize to the maximum, clamped.
-  await page.waitForTimeout(80);const h=await box('#fscreen .hdl');await ptr('pointerdown',1,h.x+h.width/2,h.y+h.height/2);await ptr('pointermove',1,h.x+2000,h.y+2000,'#fscreen');await ptr('pointerup',1,0,0,'#fscreen');
+  await page.waitForTimeout(80);const h=await box('#fscreen .hdl[data-handle=""]');await ptr('pointerdown',1,h.x+h.width/2,h.y+h.height/2);await ptr('pointermove',1,h.x+2000,h.y+2000,'#fscreen');await ptr('pointerup',1,0,0,'#fscreen');
   assert.equal(await page.evaluate(()=>S.size),600,'Size clamps at 600');
   await page.evaluate(()=>{S.size=266;S.rotate=0;changed()});await page.waitForTimeout(80);
   // Split into three pieces and move only the minutes.
@@ -64,5 +64,5 @@ const ROOT=path.resolve(__dirname,'..'),ASSETS=path.join(ROOT,'assets');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),'No horizontal overflow');
   assert.deepEqual(errors,[]);console.log('Preview UI passed '+width+'x'+height);await page.close();
  }
- await browser.close();server.close();console.log('Relative drag, pinch/twist, handle, split pieces, native payload, slider guard, colour suggestions, 16 layouts and finishes passed.');
+ await browser.close();server.close();console.log('Relative drag, pinch/twist, handle, split pieces, native payload, slider guard, colour suggestions, 17 layouts and finishes passed.');
 })().catch(e=>{console.error(e);process.exit(1)});

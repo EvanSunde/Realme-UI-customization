@@ -86,8 +86,8 @@ public final class ThemeBuilder {
         int c=cell(d),gh=glyphHeight(d),colon=Math.max(20,(int)(d.size*.30f)),gap=d.spacing;
         String hour=d.twelve?"ifelse(eq(#hour12,0),12,#hour12)":"#hour24";
         x.append("<Group>");
-        if(d.motion==1)x.append("<PositionAnimation><Item x=\"0\" y=\"0\" time=\"0\"/><Item x=\"0\" y=\"-18\" time=\"1800\"/><Item x=\"0\" y=\"0\" time=\"3600\"/></PositionAnimation>");
-        if(d.motion==2)x.append("<AlphaAnimation><Item value=\"255\" time=\"0\"/><Item value=\"165\" time=\"2200\"/><Item value=\"255\" time=\"4400\"/></AlphaAnimation>");
+        if(d.motion==1)x.append("<PositionAnimation><Position x=\"0\" y=\"0\" time=\"0\"/><Position x=\"0\" y=\"-18\" time=\"1800\"/><Position x=\"0\" y=\"0\" time=\"3600\"/></PositionAnimation>");
+        if(d.motion==2)x.append("<AlphaAnimation><Alpha a=\"255\" time=\"0\"/><Alpha a=\"165\" time=\"2200\"/><Alpha a=\"255\" time=\"4400\"/></AlphaAnimation>");
         String[] numbers={"int(("+hour+")/10)","int(("+hour+")%10)","int(#minute/10)","int(#minute%10)"};
         for(int i=0;i<4;i++){
             int ox=d.stacked?(i%2)*(c+gap):(i<2?i*(c+gap):i*(c+gap)+colon),oy=d.stacked&&i>=2?gh+gap:0;
