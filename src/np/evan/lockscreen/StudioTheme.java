@@ -37,6 +37,8 @@ public final class StudioTheme {
   public boolean anyFront(){for(int i=0;i<4;i++)if(front(i))return true;return false;}
   /** Whether this pass draws the digit at a position: the back pass skips front digits, the front pass draws only them. */
   public boolean draws(int pos){return layer==0||(layer==1)!=front(pos);}
+  /** Clock colours for light mode (dark theme off), or null when the light set is off. */
+  public int[] lightInks(){JSONObject l=j.optJSONObject("lightMode");if(l==null||!l.optBoolean("on",false))return null;String a=l.optString("color","#1d1d24"),b=l.optString("color2","#4b4b60");int c=a.matches("#[a-fA-F0-9]{6}")?Color.parseColor(a):0xff1d1d24,d=b.matches("#[a-fA-F0-9]{6}")?Color.parseColor(b):0xff4b4b60;return new int[]{c,b("twoTone",false)?d:c};}
   public int n(String k,int def,int lo,int hi){return Math.max(lo,Math.min(hi,j.optInt(k,def)));}
   public static int n(JSONObject o,String k,int def,int lo,int hi){return Math.max(lo,Math.min(hi,o==null?def:o.optInt(k,def)));}
   public boolean split(){return b("split",false)&&!NO_SPLIT.contains(layout());}
@@ -150,8 +152,18 @@ public final class StudioTheme {
  private static void image(StringBuilder x,String path,String srcid,String px,String py,String w,String h,String extra){x.append("<Image src=\"").append(path).append("\"");if(srcid!=null)x.append(" srcid=\"").append(esc(srcid)).append("\"");x.append(" x=\"").append(esc(px)).append("\" y=\"").append(esc(py)).append("\"");if(w!=null)x.append(" w=\"").append(w).append("\" h=\"").append(h).append("\"");x.append(extra==null?"":extra).append("/>");}
  private static String alpha(Spec s){return fmt(s.n("opacity",100,10,100)*2.55)+"*(1-("+s.night()+")*"+fmt(s.n("nightDim",0,0,70)/100d)+")"+(s.b("lowBatDim",false)?"*ifelse(lt(#battery_level,20),0.6,1)":"");}
  /** Opens one movable piece, centred on the editor's hpos/vpos percentage mapping and rotated about its centre. */
+ /** Parallax source: the gravity sensor, a finger dragging across the lock screen, or both. */
+ static boolean gyro(Spec s){String m=s.s("movement","still");return m.equals("tilt")||m.equals("parallax")&&!s.s("parallaxSrc","gyro").equals("drag");}
+ static boolean drag(Spec s){return s.s("movement","still").equals("parallax")&&!s.s("parallaxSrc","gyro").equals("gyro");}
+ /** Offset added to a placed group: the clock follows the tilt or the finger; the photo plane (scale<0) drifts the other way. */
+ static String motion(Spec s,boolean horizontal,double scale){
+  StringBuilder o=new StringBuilder();
+  if(gyro(s))o.append("+(").append(fmt(scale)).append(")*max(-32,min(32,#studio_gravity_").append(horizontal?"x*5":"y*3").append("))");
+  if(drag(s))o.append("+(").append(fmt(scale)).append(")*#studio_drag*max(-").append(horizontal?"60,min(60,(#touch_x-#touch_begin_x)*0.25":"30,min(30,(#touch_y-#touch_begin_y)*0.1").append("))");
+  return o.toString();
+ }
  private static void open(StringBuilder x,Spec s,String name,int hpos,int vpos,double rotation,double width,double height){
-  String move=s.choice("movement","still","still","breathe","float","tilt","parallax");if(move.equals("parallax"))move="tilt";String tx=move.equals("tilt")?"+max(-32,min(32,#studio_gravity_x*5))":"",ty=move.equals("tilt")?"+max(-32,min(32,#studio_gravity_y*3))":"";
+  String move=s.choice("movement","still","still","breathe","float","tilt","parallax"),tx=motion(s,true,1),ty=motion(s,false,1);
   x.append("<Group name=\"").append(name).append("\" x=\"#screen_width*").append(fmt(.5+hpos*.006)).append('-').append(fmt(width/2)).append(tx).append("\" y=\"#screen_height*").append(fmt(.12+vpos*.011)).append('-').append(fmt(height/2)).append(ty).append("\" rotation=\"").append(fmt(rotation)).append("\" pivotX=\"").append(fmt(width/2)).append("\" pivotY=\"").append(fmt(height/2)).append("\" alpha=\"").append(esc(alpha(s))).append("\">");
   if(move.equals("float"))x.append("<PositionAnimation><Position x=\"0\" y=\"0\" time=\"0\"/><Position x=\"0\" y=\"-24\" time=\"3500\"/><Position x=\"0\" y=\"0\" time=\"7000\"/></PositionAnimation>");
   if(move.equals("breathe"))x.append("<AlphaAnimation><Alpha a=\"255\" time=\"0\"/><Alpha a=\"178\" time=\"2500\"/><Alpha a=\"255\" time=\"5000\"/></AlphaAnimation>");
@@ -222,7 +234,7 @@ public final class StudioTheme {
  private static void time(StringBuilder x,Spec s,String prefix,int ink,int ink2,Map<String,byte[]> files)throws Exception{
   boolean warm=prefix.contains("/warm/");int endInk=warm?mix(s.secondary(),0xffff9a55,.6f):s.secondary();
   if(s.layer!=2){Bitmap tint=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);tint.eraseColor(endInk);store(files,prefix+"ink.png",tint);}
-  Spec hs=s.part("styleH"),ms=s.part("styleM");Integer ho=s.override("styleH"),mo=s.override("styleM"),dov=s.override("styleD");
+  boolean lightSet=prefix.contains("/light/");Spec hs=s.part("styleH"),ms=s.part("styleM");Integer ho=lightSet?null:s.override("styleH"),mo=lightSet?null:s.override("styleM"),dov=lightSet?null:s.override("styleD");
   int hInk=ho==null?ink:warmed(ho,warm),mInk=mo==null?ink2:warmed(mo,warm),dInk=dov==null?ink:warmed(dov,warm);
   if(s.layer==2&&!s.anyFront())return;boolean main=s.layer!=2;
   String charge=s.charge(),name="studio_clock_"+prefix.replace('/','_')+(main?"":"f");int chargeInk=s.chargeInk();
@@ -360,23 +372,30 @@ public final class StudioTheme {
   return "0+ifelse(lt("+thisYear+",0),"+nextYear+","+thisYear+")";
  }
  /** Up to three day counters (a number in a circle, optional label) and a daily quote, each a movable piece. */
- private static void extras(StringBuilder x,Spec s,int ink,Map<String,byte[]> files)throws Exception{
-  JSONArray counters=s.j.optJSONArray("counters");int shown=0;
-  if(counters!=null)for(int k=0;k<counters.length()&&shown<3;k++){
+ /** Valid counters as {index, var expression}; their Vars are declared once at the root. */
+ private static List<Object[]> counterList(Spec s){
+  List<Object[]> out=new ArrayList<>();JSONArray counters=s.j.optJSONArray("counters");
+  if(counters!=null)for(int k=0;k<counters.length()&&out.size()<3;k++){
    JSONObject c=counters.optJSONObject(k);if(c==null||!c.optBoolean("on",false))continue;String date=c.optString("date","");if(!date.matches("\\d{4}-\\d{2}-\\d{2}"))continue;
-   int y=Integer.parseInt(date.substring(0,4)),m=Integer.parseInt(date.substring(5,7)),d=Integer.parseInt(date.substring(8,10));if(m<1||m>12||d<1||d>31)continue;shown++;
-   String var="studio_cnt"+k,label=c.optString("label","").replaceAll("[\\x00-\\x1f]"," ").trim();if(label.length()>24)label=label.substring(0,24);
-   x.append("<Var name=\"").append(var).append("\" expression=\"").append(esc(countdown(y,m,d,c.optBoolean("yearly",false)))).append("\"/>");
+   int y=Integer.parseInt(date.substring(0,4)),m=Integer.parseInt(date.substring(5,7)),d=Integer.parseInt(date.substring(8,10));if(m<1||m>12||d<1||d>31)continue;
+   out.add(new Object[]{k,countdown(y,m,d,c.optBoolean("yearly",false))});
+  }return out;
+ }
+ private static void extras(StringBuilder x,Spec s,int ink,String pre,Map<String,byte[]> files)throws Exception{
+  JSONArray counters=s.j.optJSONArray("counters");
+  for(Object[] item:counterList(s)){
+   int k=(Integer)item[0];JSONObject c=counters.optJSONObject(k);
+   String var="studio_cnt"+k,label=c.optString("label","").replaceAll("[\\x00-\\x1f]"," ").trim();if(label.length()>24)label=label.substring(0,24);String f=pre+"cnt"+k;
    int dsz=Spec.n(c,"size",140,60,400),ts=(int)(dsz*.42),cell=(int)Math.ceil(ts*.62),pad=(int)Math.ceil(ts*.22),cw=cell+pad*2,ch=(int)Math.ceil(ts*1.28)+pad*2,lh=label.isEmpty()?0:(int)(dsz*.3);
    Paint dp=paint(s,ink,ink,ts,false);dp.clearShadowLayer();dp.setShader(null);dp.setStyle(Paint.Style.FILL);
-   for(int i=0;i<10;i++)store(files,"cnt"+k+"_"+i+".png",text(""+i,dp,cw,ch,0,false,null));
-   Bitmap disc=Bitmap.createBitmap(dsz,dsz,Bitmap.Config.ARGB_8888);Canvas dc=new Canvas(disc);Paint fill=new Paint(Paint.ANTI_ALIAS_FLAG);fill.setColor((ink&0xffffff)|0x2e000000);dc.drawCircle(dsz/2f,dsz/2f,dsz/2f-2,fill);fill.setStyle(Paint.Style.STROKE);fill.setStrokeWidth(Math.max(2,dsz*.025f));fill.setColor((ink&0xffffff)|0xb0000000);dc.drawCircle(dsz/2f,dsz/2f,dsz/2f-dsz*.03f,fill);store(files,"cnt"+k+"_disc.png",disc);
+   for(int i=0;i<10;i++)store(files,f+"_"+i+".png",text(""+i,dp,cw,ch,0,false,null));
+   Bitmap disc=Bitmap.createBitmap(dsz,dsz,Bitmap.Config.ARGB_8888);Canvas dc=new Canvas(disc);Paint fill=new Paint(Paint.ANTI_ALIAS_FLAG);fill.setColor((ink&0xffffff)|0x2e000000);dc.drawCircle(dsz/2f,dsz/2f,dsz/2f-2,fill);fill.setStyle(Paint.Style.STROKE);fill.setStrokeWidth(Math.max(2,dsz*.025f));fill.setColor((ink&0xffffff)|0xb0000000);dc.drawCircle(dsz/2f,dsz/2f,dsz/2f-dsz*.03f,fill);store(files,f+"_disc.png",disc);
    double width=Math.max(dsz,label.isEmpty()?0:dsz*2.4),height=dsz+lh;
-   x.append("<Group visibility=\"ge(#").append(var).append(",0)\">");open(x,s,"studio_counter_"+k,Spec.n(c,"x",0,-80,80),Spec.n(c,"y",50,-10,80),Spec.n(c,"rot",0,-180,180),width,height);
-   double cx=(width-dsz)/2;image(x,"cnt"+k+"_disc.png",null,fmt(cx),"0",null,null,null);
+   x.append("<Group visibility=\"ge(#").append(var).append(",0)\">");open(x,s,"studio_counter_"+pre+k,Spec.n(c,"x",0,-80,80),Spec.n(c,"y",50,-10,80),Spec.n(c,"rot",0,-180,180),width,height);
+   double cx=(width-dsz)/2;image(x,f+"_disc.png",null,fmt(cx),"0",null,null,null);
    String v="min(999,#"+var+")",ones="int("+v+"%10)",tens="int("+v+"/10)%10",hund="int("+v+"/100)";double top=dsz/2.0-ch/2.0;
-   for(int len=1;len<=3;len++){String vis=len==1?"lt("+v+",10)":len==2?"ge("+v+",10)*lt("+v+",100)":"ge("+v+",100)";x.append("<Group visibility=\"").append(vis).append("\">");double start=width/2-len*cell/2.0;String[] ids=len==1?new String[]{ones}:len==2?new String[]{tens,ones}:new String[]{hund,tens,ones};for(int i=0;i<len;i++)image(x,"cnt"+k+".png",ids[i],fmt(start+i*cell-pad),fmt(top),fmt(cw),fmt(ch),null);x.append("</Group>");}
-   if(!label.isEmpty()){Paint lp=paint(s,ink,ink,dsz*.2,true);store(files,"cnt"+k+"_label.png",text(label,lp,(int)Math.ceil(width),lh,0,false,null));image(x,"cnt"+k+"_label.png",null,"0",fmt(dsz),null,null,null);}
+   for(int len=1;len<=3;len++){String vis=len==1?"lt("+v+",10)":len==2?"ge("+v+",10)*lt("+v+",100)":"ge("+v+",100)";x.append("<Group visibility=\"").append(vis).append("\">");double start=width/2-len*cell/2.0;String[] ids=len==1?new String[]{ones}:len==2?new String[]{tens,ones}:new String[]{hund,tens,ones};for(int i=0;i<len;i++)image(x,f+".png",ids[i],fmt(start+i*cell-pad),fmt(top),fmt(cw),fmt(ch),null);x.append("</Group>");}
+   if(!label.isEmpty()){Paint lp=paint(s,ink,ink,dsz*.2,true);store(files,f+"_label.png",text(label,lp,(int)Math.ceil(width),lh,0,false,null));image(x,f+"_label.png",null,"0",fmt(dsz),null,null,null);}
    x.append("</Group></Group>");
   }
   JSONObject q=s.j.optJSONObject("quote");JSONArray lines=q==null?null:q.optJSONArray("lines");
@@ -384,10 +403,106 @@ public final class StudioTheme {
    List<String> list=new ArrayList<>();for(int i=0;i<lines.length()&&list.size()<30;i++){String l=lines.optString(i,"").replaceAll("[\\x00-\\x1f]"," ").trim();if(!l.isEmpty())list.add(l.length()>80?l.substring(0,80):l);}
    if(!list.isEmpty()){
     int fsz=Spec.n(q,"size",40,20,90),h=(int)(fsz*1.5),w=1040;
-    for(int i=0;i<list.size();i++){Paint qp=paint(s,ink,ink,fsz,true);float m=qp.measureText(list.get(i));if(m>w-40)qp.setTextSize(fsz*(w-40)/m);store(files,"quote_"+i+".png",text(list.get(i),qp,w,h,0,false,null));}
-    open(x,s,"studio_quote",Spec.n(q,"x",0,-80,80),Spec.n(q,"y",62,-10,80),Spec.n(q,"rot",0,-180,180),w,h);image(x,"quote.png","#studio_day%"+list.size(),"0","0",null,null,null);x.append("</Group>");
+    for(int i=0;i<list.size();i++){Paint qp=paint(s,ink,ink,fsz,true);float m=qp.measureText(list.get(i));if(m>w-40)qp.setTextSize(fsz*(w-40)/m);store(files,pre+"quote_"+i+".png",text(list.get(i),qp,w,h,0,false,null));}
+    open(x,s,"studio_quote"+pre,Spec.n(q,"x",0,-80,80),Spec.n(q,"y",62,-10,80),Spec.n(q,"rot",0,-180,180),w,h);image(x,pre+"quote.png","#studio_day%"+list.size(),"0","0",null,null,null);x.append("</Group>");
    }
   }
+  shortcuts(x,s,ink,pre,files);alerts(x,s,ink,pre,files);
+ }
+ /** Icons for app shortcuts and the default camera; set by the app, absent in host checks. */
+ public interface Apps {Bitmap icon(String pkg,String cls,int px);String camera();}
+ public static Apps apps;
+ public static final List<String> SHORTCUTS=Arrays.asList("app","camera","ring","wifi","data");
+ /** Shortcut items that can actually be drawn and launched (an app needs a package and activity). */
+ static List<JSONObject> shortcutItems(Spec s){
+  List<JSONObject> out=new ArrayList<>();JSONObject sc=s.j.optJSONObject("shortcuts");if(sc==null||!sc.optBoolean("on",false))return out;JSONArray items=sc.optJSONArray("items");if(items==null)return out;
+  for(int i=0;i<items.length()&&out.size()<4;i++){JSONObject it=items.optJSONObject(i);if(it==null||!SHORTCUTS.contains(it.optString("type")))continue;if(it.optString("type").equals("app")&&(!it.optString("pkg").matches("[A-Za-z0-9_.]{1,200}")||!it.optString("cls").matches("[A-Za-z0-9_.$]{1,300}")))continue;out.add(it);}
+  return out;
+ }
+ /** Row geometry shared by the icons and their buttons: left x expression, top y expression, icon size, gap. */
+ static String[] shortcutRow(Spec s,int n){JSONObject sc=s.j.optJSONObject("shortcuts");int size=Spec.n(sc,"size",120,60,220);double gap=size*.4,w=n*size+(n-1)*gap;
+  return new String[]{"#screen_width*"+fmt(.5+Spec.n(sc,"x",0,-80,80)*.006)+"-"+fmt(w/2),"#screen_height*"+fmt(.12+Spec.n(sc,"y",70,-10,80)*.011)+"-"+fmt(size/2d),""+size,fmt(gap)};}
+ private static int onInk(int ink){return (Color.red(ink)*299+Color.green(ink)*587+Color.blue(ink)*114)/1000>140?0xff16161a:0xfff4f4f6;}
+ private static Bitmap plate(int size,int ink,boolean on){Bitmap b=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setColor((ink&0xffffff)|(on?0xd9000000:0x2e000000));c.drawCircle(size/2f,size/2f,size/2f-2,p);if(!on){p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(2,size*.025f));p.setColor((ink&0xffffff)|0xb0000000);c.drawCircle(size/2f,size/2f,size/2f-size*.03f,p);}return b;}
+ /** Line glyphs on a 24-unit grid, drawn into the middle half of a size×size bitmap. */
+ static Bitmap glyph(String kind,int size,int color){
+  Bitmap b=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);float u=size*.5f/24;c.translate(size*.25f,size*.25f);c.scale(u,u);
+  Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setColor(color);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);Paint f=new Paint(p);f.setStyle(Paint.Style.FILL);
+  Path bell=new Path();bell.moveTo(5,17);bell.lineTo(19,17);bell.lineTo(17,14.5f);bell.lineTo(17,10.5f);bell.cubicTo(17,7.5f,14.8f,5,12,5);bell.cubicTo(9.2f,5,7,7.5f,7,10.5f);bell.lineTo(7,14.5f);bell.close();
+  switch(kind){
+   case "camera":c.drawRoundRect(new RectF(3,7,21,19),2.5f,2.5f,p);c.drawLine(9,7,10,4.5f,p);c.drawLine(10,4.5f,14,4.5f,p);c.drawLine(14,4.5f,15,7,p);c.drawCircle(12,13,3.5f,p);break;
+   case "ring2":c.drawPath(bell,p);c.drawCircle(12,20,1.4f,f);break;
+   case "ring0":c.drawPath(bell,p);c.drawCircle(12,20,1.4f,f);c.drawLine(4,4,20,20,p);break;
+   case "ring1":c.drawRoundRect(new RectF(8,4,16,20),2,2,p);c.drawLine(4.5f,9,4.5f,15,p);c.drawLine(19.5f,9,19.5f,15,p);c.drawLine(1.5f,10.5f,1.5f,13.5f,p);c.drawLine(22.5f,10.5f,22.5f,13.5f,p);break;
+   case "wifi":for(float r:new float[]{5,9.5f,14}){c.drawArc(new RectF(12-r,19-r,12+r,19+r),-135,90,false,p);}c.drawCircle(12,19,1.6f,f);break;
+   case "data":c.drawLine(8,19,8,5,p);c.drawLine(4.5f,8.5f,8,5,p);c.drawLine(11.5f,8.5f,8,5,p);c.drawLine(16,5,16,19,p);c.drawLine(12.5f,15.5f,16,19,p);c.drawLine(19.5f,15.5f,16,19,p);break;
+   case "call":{Path h=new Path();h.moveTo(7,3.5f);h.lineTo(9.5f,3.5f);h.lineTo(11,8);h.lineTo(9,9.5f);h.quadTo(11,14.5f,14.5f,15);h.lineTo(16,13);h.lineTo(20.5f,14.5f);h.lineTo(20.5f,17);h.quadTo(20.5f,20,17.5f,20);h.quadTo(5.5f,19.5f,4,6.5f);h.quadTo(4,3.5f,7,3.5f);h.close();c.drawPath(h,f);break;}
+   case "sms":{Path m=new Path();m.addRoundRect(new RectF(3,4.5f,21,17),3,3,Path.Direction.CW);c.drawPath(m,p);Path t=new Path();t.moveTo(7,17);t.lineTo(6.5f,21);t.lineTo(11,17);c.drawPath(t,p);for(int i=0;i<3;i++)c.drawCircle(8+i*4,10.8f,1.2f,f);break;}
+  }return b;
+ }
+ /** Shortcut icons: a plate per item with an app icon or a glyph; toggles show their live state. */
+ private static void shortcuts(StringBuilder x,Spec s,int ink,String pre,Map<String,byte[]> files)throws Exception{
+  List<JSONObject> items=shortcutItems(s);if(items.isEmpty())return;JSONObject sc=s.j.optJSONObject("shortcuts");String[] row=shortcutRow(s,items.size());int size=Integer.parseInt(row[2]);double gap=Double.parseDouble(row[3]);boolean tint=sc.optBoolean("tint",false);
+  int on=onInk(ink);store(files,pre+"sc_off.png",plate(size,ink,false));store(files,pre+"sc_on.png",plate(size,ink,true));
+  x.append("<Group name=\"studio_shortcuts").append(pre).append("\" x=\"").append(row[0]).append("\" y=\"").append(row[1]).append("\" alpha=\"").append(esc(alpha(s))).append("\">");
+  for(int i=0;i<items.size();i++){
+   JSONObject it=items.get(i);String type=it.optString("type"),f=pre+"sc"+i,left=fmt(i*(size+gap));
+   if(type.equals("wifi")||type.equals("data")){
+    String active=type.equals("wifi")?"gt(eq(#wifi_state,1)+eq(#wifi_state,2),0)":"eq(#data_state,1)";
+    store(files,f+"_off.png",glyph(type,size,ink));store(files,f+"_on.png",glyph(type,size,on));
+    image(x,pre+"sc_off.png",null,left,"0",null,null," visibility=\"eq("+active+",0)\"");image(x,f+"_off.png",null,left,"0",null,null," visibility=\"eq("+active+",0)\"");
+    image(x,pre+"sc_on.png",null,left,"0",null,null," visibility=\""+active+"\"");image(x,f+"_on.png",null,left,"0",null,null," visibility=\""+active+"\"");
+   }else{
+    image(x,pre+"sc_off.png",null,left,"0",null,null,null);
+    if(type.equals("ring")){for(int m=0;m<3;m++)store(files,f+"_"+m+".png",glyph("ring"+m,size,ink));image(x,f+".png","max(0,min(2,#ring_mode))",left,"0",null,null,null);}
+    else if(type.equals("camera"))store(files,f+".png",glyph("camera",size,ink));
+    else{
+     Bitmap icon=apps==null?null:apps.icon(it.optString("pkg"),it.optString("cls"),(int)(size*.62));Bitmap b=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);
+     if(icon!=null){Canvas c=new Canvas(b);if(tint){Bitmap t=icon.copy(Bitmap.Config.ARGB_8888,true);new Canvas(t).drawColor(ink,PorterDuff.Mode.SRC_IN);c.drawBitmap(t,(size-t.getWidth())/2f,(size-t.getHeight())/2f,null);t.recycle();}else c.drawBitmap(icon,(size-icon.getWidth())/2f,(size-icon.getHeight())/2f,new Paint(Paint.FILTER_BITMAP_FLAG));icon.recycle();}
+     store(files,f+".png",b);
+    }
+    if(!type.equals("ring"))image(x,f+".png",null,left,"0",null,null,null);
+   }
+  }
+  x.append("</Group>");
+ }
+ /** Touch targets for the shortcuts, drawn once over everything; the engine passes a touch to every button under it. */
+ private static void shortcutButtons(StringBuilder x,Spec s){
+  List<JSONObject> items=shortcutItems(s);if(items.isEmpty())return;String[] row=shortcutRow(s,items.size());int size=Integer.parseInt(row[2]);double gap=Double.parseDouble(row[3]);boolean haptic=s.j.optJSONObject("shortcuts").optBoolean("haptic",true);
+  String camera=apps==null?null:apps.camera();
+  for(int i=0;i<items.size();i++){
+   JSONObject it=items.get(i);String type=it.optString("type"),cmd;
+   switch(type){
+    case "ring":cmd="<Command target=\"RingMode\" value=\"toggle\"/>";break;
+    case "wifi":cmd="<Command target=\"Wifi\" value=\"toggle\"/>";break;
+    case "data":cmd="<Command target=\"Data\" value=\"toggle\"/>";break;
+    case "camera":cmd="<IntentCommand action=\"android.media.action.STILL_IMAGE_CAMERA_SECURE\""+(camera!=null&&camera.matches("[A-Za-z0-9_.]{1,200}")?" package=\""+camera+"\"":"")+"/>";break;
+    default:cmd="<IntentCommand action=\"android.intent.action.MAIN\" category=\"android.intent.category.LAUNCHER\" package=\""+it.optString("pkg")+"\" class=\""+esc(it.optString("cls"))+"\"/>";
+   }
+   x.append("<Button x=\"").append(row[0]).append("+").append(fmt(i*(size+gap))).append("\" y=\"").append(row[1]).append("\" w=\"").append(size).append("\" h=\"").append(size).append("\" visibility=\"eq(#studio_hidden,0)\"><Triggers><Trigger action=\"click\">").append(haptic?"<VibratorCommand duration=\"18\"/>":"").append(cmd).append("</Trigger></Triggers></Button>");
+  }
+ }
+ /** Missed-call and unread-message badges; each shows only above zero and the pair stays centred. */
+ private static void alerts(StringBuilder x,Spec s,int ink,String pre,Map<String,byte[]> files)throws Exception{
+  JSONObject a=s.j.optJSONObject("alerts");if(a==null||!a.optBoolean("on",false))return;boolean calls=a.optBoolean("calls",true),sms=a.optBoolean("sms",true);if(!calls&&!sms)return;
+  int h=Spec.n(a,"size",60,40,140),w=(int)(h*2.3),ts=(int)(h*.55),cell=(int)Math.ceil(ts*.62),pad=(int)Math.ceil(ts*.22),cw=cell+pad*2,ch=(int)Math.ceil(ts*1.28)+pad*2;double gap=h*.3;
+  Bitmap pill=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas pc=new Canvas(pill);Paint pp=new Paint(Paint.ANTI_ALIAS_FLAG);pp.setColor((ink&0xffffff)|0x2e000000);pc.drawRoundRect(new RectF(1,1,w-1,h-1),h/2f,h/2f,pp);pp.setStyle(Paint.Style.STROKE);pp.setStrokeWidth(Math.max(2,h*.04f));pp.setColor((ink&0xffffff)|0xb0000000);pc.drawRoundRect(new RectF(h*.03f,h*.03f,w-h*.03f,h-h*.03f),h/2f,h/2f,pp);store(files,pre+"al_pill.png",pill);
+  Paint dp=paint(s,ink,ink,ts,false);dp.clearShadowLayer();dp.setShader(null);dp.setStyle(Paint.Style.FILL);for(int i=0;i<10;i++)store(files,pre+"aln_"+i+".png",text(""+i,dp,cw,ch,0,false,null));
+  String ca=calls?"gt(#call_missed_count,0)":"0",sa=sms?"gt(#sms_unread_count,0)":"0";
+  String cx="#screen_width*"+fmt(.5+Spec.n(a,"x",0,-80,80)*.006),y="#screen_height*"+fmt(.12+Spec.n(a,"y",44,-10,80)*.011)+"-"+fmt(h/2d);
+  String first=cx+"-("+ca+"*"+w+"+"+sa+"*"+w+"+"+ca+"*"+sa+"*"+fmt(gap)+")/2";
+  x.append("<Group name=\"studio_alerts").append(pre).append("\" alpha=\"").append(esc(alpha(s))).append("\">");
+  for(int b=0;b<2;b++){
+   if(b==0&&!calls||b==1&&!sms)continue;String var=b==0?"#call_missed_count":"#sms_unread_count",vis=b==0?ca:sa,bx=b==0?first:first+"+"+ca+"*"+fmt(w+gap),g=b==0?"call":"sms";
+   store(files,pre+"al_"+g+".png",glyph(g,h,ink));
+   x.append("<Group x=\"").append(esc(bx)).append("\" y=\"").append(y).append("\" visibility=\"").append(vis).append("\">");
+   image(x,pre+"al_pill.png",null,"0","0",null,null,null);image(x,pre+"al_"+g+".png",null,fmt(h*.12),"0",null,null,null);
+   String v="min(99,"+var+")",top=fmt(h/2.0-ch/2.0);double right=w-h*.3;
+   x.append("<Group visibility=\"lt(").append(v).append(",10)\">");image(x,pre+"aln.png","int("+v+"%10)",fmt(right-cell-pad),top,fmt(cw),fmt(ch),null);x.append("</Group>");
+   x.append("<Group visibility=\"ge(").append(v).append(",10)\">");image(x,pre+"aln.png","int("+v+"/10)",fmt(right-2*cell-pad),top,fmt(cw),fmt(ch),null);image(x,pre+"aln.png","int("+v+"%10)",fmt(right-cell-pad),top,fmt(cw),fmt(ch),null);x.append("</Group>");
+   x.append("</Group>");
+  }
+  x.append("</Group>");
  }
  private static double date(StringBuilder x,Spec s,String prefix,int ink,double width,double y,Map<String,byte[]> files)throws Exception{
   int size=metaSize(s),h=(int)(size*1.5);Paint p=paint(s,ink,ink,size,true);double tracking=size*s.n("dateTrack",0,0,30)*.01;
@@ -429,19 +544,25 @@ public final class StudioTheme {
    boolean scheduled=schedule!=null&&schedule.optBoolean("on",false)&&styles!=null;
    List<Spec> slots=new ArrayList<>();List<String> names=new ArrayList<>();
    if(scheduled){for(String key:new String[]{"day","eve","night"}){JSONObject j=styles.optJSONObject(key);slots.add(new Spec(j==null?base.j:j));names.add(key);}}else{slots.add(base);names.add("current");}
-   boolean moving=false,seconds=false,tilt=false;for(Spec s:slots){moving|=!s.s("movement","still").equals("still")||s.charge().equals("glow");seconds|=s.b("seconds",false)||s.layout().equals("analog")&&s.b("secHand",false);tilt|=s.s("movement","still").equals("tilt")||s.s("movement","still").equals("parallax");}
+   boolean moving=false,seconds=false,tilt=false;for(Spec s:slots){moving|=!s.s("movement","still").equals("still")||s.charge().equals("glow");seconds|=s.b("seconds",false)||s.layout().equals("analog")&&s.b("secHand",false);tilt|=gyro(s);}
    StringBuilder x=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Lockscreen version=\"1\" screenWidth=\"1080\" frameRate=\"").append(moving?15:1).append("\" useVariableUpdater=\"Battery,DateTime.").append(seconds?"Second":"Minute").append("\"");
    if(base.s("bg","atmos").equals("atmos"))x.append(" showSysWallpaper=\"true\"");x.append("><Var name=\"notification\" expression=\"1\"/><Var name=\"studio_hidden\" expression=\"").append(base.b("startHidden",false)?1:0).append("\"/><Var name=\"studio_day\" expression=\"").append(esc(TODAY)).append("\"/>");
+   for(Object[] c:counterList(base))x.append("<Var name=\"studio_cnt").append(c[0]).append("\" expression=\"").append(esc((String)c[1])).append("\"/>");
+   if(drag(base))x.append("<Var name=\"studio_drag\" expression=\"0\"/>");
    if(tilt)x.append("<VariableBinders><SensorBinder type=\"gravity\" rate=\"2\"><Variable name=\"studio_gravity_x\" index=\"0\"/><Variable name=\"studio_gravity_y\" index=\"1\"/></SensorBinder></VariableBinders>");
    String bgMode=base.choice("bg","atmos","atmos","photo","gradient","black");byte[] jpg=null;Bitmap bg=null;
    // Parallax: the photo plane (background, subject, its shadow and rim) drifts against the clock, slightly enlarged so no edge shows.
-   boolean parallax=base.s("movement","still").equals("parallax");double k=parallax?1.045:1;String px=parallax?"-max(-14,min(14,#studio_gravity_x*2))":"",py=parallax?"-max(-14,min(14,#studio_gravity_y*1.5))":"";
+   boolean parallax=base.s("movement","still").equals("parallax");double k=parallax?1.045:1;String px=parallax?motion(base,true,-.4):"",py=parallax?motion(base,false,-.4):"";
+   JSONObject water=base.j.optJSONObject("water");boolean ripple=water!=null&&water.optBoolean("on",false)&&(bgMode.equals("photo")||bgMode.equals("gradient"));
    if(!bgMode.equals("atmos")){
     bg=ThemeBuilder.wallpaper(bgMode.equals("photo")?photo:null,d.height);
     if(bgMode.equals("black"))bg.eraseColor(Color.BLACK);
     if(bgMode.equals("gradient")){int[] colors=gradient(base.s("gradient","dusk"));Paint p=new Paint();p.setShader(new LinearGradient(0,0,1080,d.height,colors,null,Shader.TileMode.CLAMP));new Canvas(bg).drawRect(0,0,1080,d.height,p);}
     ByteArrayOutputStream bytes=new ByteArrayOutputStream();bg.compress(Bitmap.CompressFormat.JPEG,92,bytes);jpg=bytes.toByteArray();files.put("advance/bg.jpg",jpg);
-    if(parallax)image(x,"bg.jpg",null,"0-#screen_width*"+fmt((k-1)/2)+px,"0-#screen_height*"+fmt((k-1)/2)+py,"#screen_width*"+fmt(k),"#screen_height*"+fmt(k),null);else image(x,"bg.jpg",null,"0","0","#screen_width","#screen_height",null);
+    String bx=parallax?"0-#screen_width*"+fmt((k-1)/2)+px:"0",by=parallax?"0-#screen_height*"+fmt((k-1)/2)+py:"0",bw=parallax?"#screen_width*"+fmt(k):"#screen_width",bh=parallax?"#screen_height*"+fmt(k):"#screen_height";
+    // Water: the engine's ripple mesh redraws only while a touch ripple settles.
+    if(ripple)x.append("<WaterWallpaper src=\"bg.jpg\" x=\"").append(esc(bx)).append("\" y=\"").append(esc(by)).append("\" w=\"").append(bw).append("\" h=\"").append(bh).append("\" torsion=\"").append(Spec.n(water,"strength",2,1,5)).append("\" xmesh=\"27\" ymesh=\"48\"/>");
+    else image(x,"bg.jpg",null,bx,by,bw,bh,null);
    }
    Bitmap pixel=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);pixel.eraseColor(Color.BLACK);files.put("advance/dim.png",png(pixel));pixel.eraseColor(Color.WHITE);files.put("advance/ink.png",png(pixel));pixel.eraseColor(0x66ffffff);files.put("advance/progress-track.png",png(pixel));pixel.recycle();
    if(base.n("dim",0,0,100)>0)image(x,"dim.png",null,"0","0","#screen_width","#screen_height"," alpha=\""+Math.round(base.n("dim",0,0,100)*2.55*.8)+"\"");
@@ -449,7 +570,9 @@ public final class StudioTheme {
    for(Spec s:slots){s.backdrop=bgMode.equals("photo")||bgMode.equals("gradient")?bg:null;s.screenH=d.height;front|=subjectShown&&s.anyFront();}
    for(Spec s:slots)s.layer=front?1:0;
    x.append("<Group name=\"studio_clock\" visibility=\"eq(#studio_hidden,0)\">");clocks(x,slots,names,scheduled,files);
-   extras(x,base,base.color(false),files);
+   int[] lightInk=base.lightInks();
+   if(lightInk==null)extras(x,base,base.color(false),"",files);
+   else{x.append("<Group visibility=\"eq(#dark_mode,1)\">");extras(x,base,base.color(false),"",files);x.append("</Group><Group visibility=\"eq(#dark_mode,0)\">");extras(x,base,lightInk[0],"l",files);x.append("</Group>");}
    if(base.charge().equals("bar")){
     // Energy bar along the bottom edge, filled to the battery level, only while charging.
     int ci=base.chargeInk();Bitmap dot=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);dot.eraseColor(0x30ffffff);files.put("advance/charge_track.png",png(dot));dot.eraseColor(ci);files.put("advance/charge_fill.png",png(dot));dot.recycle();
@@ -469,8 +592,10 @@ public final class StudioTheme {
     if(rimBitmap!=null){store(files,"subject_rim.png",rimBitmap);image(x,"subject_rim.png",null,ix,iy,iw,ih," alpha=\""+Math.round(rim*2.55)+"\"");}
    }
    if(front){for(Spec s:slots)s.layer=2;x.append("<Group name=\"studio_front\" visibility=\"eq(#studio_hidden,0)\">");clocks(x,slots,names,scheduled,files);x.append("</Group>");}
-   x.append("<Button h=\"#screen_height\" w=\"#screen_width\"><Triggers><Trigger action=\"up\"><ExternCommand command=\"unlock\" condition=\"gt(#touch_begin_y-#touch_y,440)\"/></Trigger>");
-   if(base.b("dbl",true))x.append("<Trigger action=\"double\"><VariableCommand name=\"studio_hidden\" expression=\"1-#studio_hidden\"/></Trigger>");x.append("</Triggers></Button></Lockscreen>");
+   boolean dragging=drag(base);
+   x.append("<Button h=\"#screen_height\" w=\"#screen_width\"><Triggers><Trigger action=\"up\"><ExternCommand command=\"unlock\" condition=\"gt(#touch_begin_y-#touch_y,440)\"/>").append(dragging?"<VariableCommand name=\"studio_drag\" expression=\"0\"/>":"").append("</Trigger>");
+   if(dragging)x.append("<Trigger action=\"down\"><VariableCommand name=\"studio_drag\" expression=\"1\"/></Trigger><Trigger action=\"cancel\"><VariableCommand name=\"studio_drag\" expression=\"0\"/></Trigger>");
+   if(base.b("dbl",true))x.append("<Trigger action=\"double\"><VariableCommand name=\"studio_hidden\" expression=\"1-#studio_hidden\"/></Trigger>");x.append("</Triggers></Button>");shortcutButtons(x,base);x.append("</Lockscreen>");
    byte[] manifest=x.toString().getBytes("UTF-8");files.put("advance/manifest.xml",manifest);for(String ratio:new String[]{"11x5","13x6","19x9","20x9","2x1","301x135","403x180","67x30"})files.put("advance/"+ratio+"/manifest.xml",manifest);
    if(bg!=null)bg.recycle();
    return ThemeBuilder.packageTheme(ThemeBuilder.wallpaperComponent(jpg==null?new byte[0]:jpg,!base.b("replaceWallpaper",false)||bgMode.equals("atmos")),zip(files));
@@ -480,8 +605,10 @@ public final class StudioTheme {
  private static void clocks(StringBuilder x,List<Spec> slots,List<String> names,boolean scheduled,Map<String,byte[]> files)throws Exception{
   for(int i=0;i<slots.size();i++){
    Spec s=slots.get(i);String visibility=scheduled?(i==0?"gt(#hour,5)*lt(#hour,18)":i==1?"gt(#hour,17)*lt(#hour,23)":"gt(gt(#hour,22)+lt(#hour,6),0)"):"1";x.append("<Group visibility=\"").append(visibility).append("\">");
+   // Light mode: a second set in the light-mode colours, shown while the phone's dark theme is off.
+   int[] light=s.lightInks();if(light!=null){x.append("<Group visibility=\"eq(#dark_mode,0)\">");time(x,s,names.get(i)+"/light/",light[0],light[1],files);x.append("</Group><Group visibility=\"eq(#dark_mode,1)\">");}
    if(s.b("warm",false)){x.append("<Group visibility=\"eq(").append(s.night()).append(",0)\">");time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group><Group visibility=\"").append(s.night()).append("\">");time(x,s,names.get(i)+"/warm/",mix(s.color(false),0xffffb070,.6f),(s.b("twoTone",false)?mix(s.color(true),0xffff9a55,.6f):mix(s.color(false),0xffffb070,.6f)),files);x.append("</Group>");}
-   else time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);x.append("</Group>");
+   else time(x,s,names.get(i)+"/day/",s.color(false),s.color(true),files);if(light!=null)x.append("</Group>");x.append("</Group>");
   }
  }
  /** Cheap blur by scaling down and back up with filtering. */

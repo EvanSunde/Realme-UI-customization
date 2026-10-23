@@ -41,6 +41,37 @@ evaluator in `V2Check`.
 Still to see on a phone: how the photo-fill texture lines up, and the look of the shadow
 and rim.
 
+**Engine features used for shortcuts, alerts, light mode and water** (also from the
+decompiled engine):
+
+- **Shortcuts** are `Button`s with `<Trigger action="click">`. The engine passes a touch to
+  every button under the finger, so they sit alongside the full-screen unlock button.
+  - Apps open with `IntentCommand` (MAIN/LAUNCHER, package and activity).
+  - The camera uses `android.media.action.STILL_IMAGE_CAMERA_SECURE` on the camera package
+    resolved when the theme is built.
+  - The engine only accepts exported activities, unless one is on its remote whitelist.
+    Launcher and camera activities are exported.
+  - Ringer, Wi‑Fi and data use `<Command target="RingMode|Wifi|Data" value="toggle"/>`.
+    Their state comes from `#ring_mode` (0 silent, 1 vibrate, 2 normal), `#wifi_state`
+    (1 on, 2 turning on) and `#data_state` (1 on).
+  - The optional tap feedback is `VibratorCommand`.
+  - The engine's own torch path only switches the torch on, so there is no torch shortcut.
+- **Light mode**: `#dark_mode` is 1 when the system dark theme is on. The clock, counters,
+  quote, shortcuts and alerts are drawn a second time in the light-mode colours, and only
+  that set shows while `#dark_mode` is 0. Per-part colour overrides apply to the dark set
+  only.
+- **Alerts** read `#call_missed_count` and `#sms_unread_count`. The engine fills these from
+  the Oplus settings `oplus_customize_missed_calls_number` and
+  `oplus_customize_unread_mms_number`, which the realme Phone and Messages apps keep. Each
+  badge is visible only above zero, and the pair stays centred through x expressions.
+- **Water ripple** is the engine's `WaterWallpaper`: a touch-driven `drawBitmapMesh` (27×48
+  mesh, `torsion` = strength) used in place of the background image. It only redraws while a
+  ripple settles.
+- **Parallax source.** Drag parallax uses `#touch_x - #touch_begin_x`, and `#touch_y` less
+  strongly, gated by a `studio_drag` variable that the unlock button's down/up/cancel
+  triggers set. The engine's `MultiLayer` (a GPU layer stack) was not used. Its layers are
+  static images, so it cannot move the live clock, and it adds its own 30 fps surface.
+
 - **Stretch.** `sx`/`sy` (and `mins.sx`/`mins.sy`), 50–200 %, scale digit images and
   positions horizontally or vertically. The preview scales the font size by height and adds
   `scaleX` for the rest. Vertical, Arc, Analog and Rings keep their proportions.
