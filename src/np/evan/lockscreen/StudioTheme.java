@@ -437,6 +437,11 @@ public final class StudioTheme {
    case "wifi":for(float r:new float[]{5,9.5f,14}){c.drawArc(new RectF(12-r,19-r,12+r,19+r),-135,90,false,p);}c.drawCircle(12,19,1.6f,f);break;
    case "data":c.drawLine(8,19,8,5,p);c.drawLine(4.5f,8.5f,8,5,p);c.drawLine(11.5f,8.5f,8,5,p);c.drawLine(16,5,16,19,p);c.drawLine(12.5f,15.5f,16,19,p);c.drawLine(19.5f,15.5f,16,19,p);break;
    case "call":{Path h=new Path();h.moveTo(7,3.5f);h.lineTo(9.5f,3.5f);h.lineTo(11,8);h.lineTo(9,9.5f);h.quadTo(11,14.5f,14.5f,15);h.lineTo(16,13);h.lineTo(20.5f,14.5f);h.lineTo(20.5f,17);h.quadTo(20.5f,20,17.5f,20);h.quadTo(5.5f,19.5f,4,6.5f);h.quadTo(4,3.5f,7,3.5f);h.close();c.drawPath(h,f);break;}
+   case "prev":{Path t=new Path();t.moveTo(18,5);t.lineTo(8,12);t.lineTo(18,19);t.close();c.drawPath(t,f);c.drawLine(6,5,6,19,p);break;}
+   case "next":{Path t=new Path();t.moveTo(6,5);t.lineTo(16,12);t.lineTo(6,19);t.close();c.drawPath(t,f);c.drawLine(18,5,18,19,p);break;}
+   case "play":{Path t=new Path();t.moveTo(7,4);t.lineTo(19,12);t.lineTo(7,20);t.close();c.drawPath(t,f);break;}
+   case "pause":c.drawRoundRect(new RectF(6,5,10,19),1,1,f);c.drawRoundRect(new RectF(14,5,18,19),1,1,f);break;
+   case "note":{c.drawLine(9,17,9,5,p);c.drawLine(9,5,19,3,p);c.drawLine(19,3,19,15,p);c.drawCircle(7,17,2.5f,f);c.drawCircle(17,15,2.5f,f);break;}
    case "sms":{Path m=new Path();m.addRoundRect(new RectF(3,4.5f,21,17),3,3,Path.Direction.CW);c.drawPath(m,p);Path t=new Path();t.moveTo(7,17);t.lineTo(6.5f,21);t.lineTo(11,17);c.drawPath(t,p);for(int i=0;i<3;i++)c.drawCircle(8+i*4,10.8f,1.2f,f);break;}
   }return b;
  }
@@ -484,6 +489,33 @@ public final class StudioTheme {
    }
    x.append("<Button x=\"").append(row[0]).append("+").append(fmt(i*(size+gap))).append("\" y=\"").append(row[1]).append("\" w=\"").append(size).append("\" h=\"").append(size).append("\" visibility=\"eq(#studio_hidden,0)\"><Triggers><Trigger action=\"up\" condition=\"").append(TAP).append("\">").append(haptic?"<VibratorCommand duration=\"18\"/>":"").append(cmd).append("</Trigger></Triggers></Button>");
   }
+ }
+ /** Experimental: Realme's own music widget (MusicControl). It only shows something when exactly one installed service answers
+  *  com.oplus.music.service.command, such as the Studio Music Bridge test app. Names inside it are fixed by the engine. */
+ private static void music(StringBuilder x,Spec s,int ink,Map<String,byte[]> files)throws Exception{
+  JSONObject m=s.j.optJSONObject("music");if(m==null||!m.optBoolean("on",false))return;
+  int h=Spec.n(m,"size",110,70,240),w=(int)(h*3.6),pad=(int)(h*.1),cover=h-2*pad;double gap=h*.14,left=h+gap,ic=h*.3,top=h*.6;
+  Bitmap card=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas cc=new Canvas(card);Paint cp=new Paint(Paint.ANTI_ALIAS_FLAG);cp.setColor((ink&0xffffff)|0x24000000);cc.drawRoundRect(new RectF(1,1,w-1,h-1),h*.22f,h*.22f,cp);cp.setStyle(Paint.Style.STROKE);cp.setStrokeWidth(Math.max(2,h*.02f));cp.setColor((ink&0xffffff)|0x80000000);cc.drawRoundRect(new RectF(h*.02f,h*.02f,w-h*.02f,h-h*.02f),h*.21f,h*.21f,cp);store(files,"music_card.png",card);
+  Bitmap def=Bitmap.createBitmap(cover,cover,Bitmap.Config.ARGB_8888);Canvas dc=new Canvas(def);Paint dp=new Paint(Paint.ANTI_ALIAS_FLAG);dp.setColor((ink&0xffffff)|0x40000000);dc.drawRoundRect(new RectF(0,0,cover,cover),cover*.14f,cover*.14f,dp);Bitmap note=glyph("note",cover,ink);dc.drawBitmap(note,0,0,null);note.recycle();store(files,"music_cover.png",def);
+  for(String g:new String[]{"prev","play","pause","next"})store(files,"music_"+g+".png",glyph(g,(int)ic,ink));
+  String col=String.format(Locale.US,"#%06x",ink&0xffffff),state="#studio_music.music_state";double tw=w-left-gap;
+  x.append("<MusicControl name=\"studio_music\" x=\"#screen_width*").append(fmt(.5+Spec.n(m,"x",0,-80,80)*.006)).append("-").append(fmt(w/2d)).append("\" y=\"#screen_height*").append(fmt(.12+Spec.n(m,"y",58,-10,80)*.011)).append("-").append(fmt(h/2d))
+   .append("\" w=\"").append(w).append("\" h=\"").append(h).append("\" autoShow=\"0\" defAlbumCover=\"music_cover.png\" visibility=\"eq(#studio_hidden,0)\" alpha=\"").append(esc(alpha(s))).append("\">");
+  image(x,"music_card.png",null,"0","0",null,null,null);
+  x.append("<Image name=\"music_album_cover\" src=\"music_cover.png\" x=\"").append(pad).append("\" y=\"").append(pad).append("\" w=\"").append(cover).append("\" h=\"").append(cover).append("\"/>");
+  x.append("<Text name=\"music_track\" x=\"").append(fmt(left)).append("\" y=\"").append(fmt(h*.1)).append("\" w=\"").append(fmt(tw)).append("\" size=\"").append(fmt(h*.2)).append("\" color=\"").append(col).append("\" bold=\"true\" marqueeSpeed=\"40\" text=\"Nothing playing\"/>");
+  x.append("<Text name=\"music_artist\" x=\"").append(fmt(left)).append("\" y=\"").append(fmt(h*.34)).append("\" w=\"").append(fmt(tw)).append("\" size=\"").append(fmt(h*.15)).append("\" color=\"").append(col).append("\" alpha=\"190\" text=\"\"/>");
+  String[] names={"music_prev","music_play","music_next"};
+  for(int i=0;i<3;i++){
+   double bx=left+i*ic*1.6;
+   if(i==1){image(x,"music_play.png",null,fmt(bx),fmt(top),null,null," visibility=\"eq("+state+",0)\"");image(x,"music_pause.png",null,fmt(bx),fmt(top),null,null," visibility=\"eq("+state+",1)\"");}
+   else image(x,"music_"+(i==0?"prev":"next")+".png",null,fmt(bx),fmt(top),null,null,null);
+   // Buttons named like this are wired to play/pause/previous/next by the engine itself; their hit area is the icon, a little larger.
+   String bxs=fmt(bx-ic*.25),bys=fmt(top-ic*.25),bs=fmt(ic*1.5);
+   x.append("<Button name=\"").append(names[i]).append("\" x=\"").append(bxs).append("\" y=\"").append(bys).append("\" w=\"").append(bs).append("\" h=\"").append(bs).append("\"/>");
+   if(i==1)x.append("<Button name=\"music_pause\" x=\"").append(bxs).append("\" y=\"").append(bys).append("\" w=\"").append(bs).append("\" h=\"").append(bs).append("\"/>");
+  }
+  x.append("</MusicControl>");
  }
  /** Missed-call and unread-message badges; each shows only above zero and the pair stays centred. */
  private static void alerts(StringBuilder x,Spec s,int ink,String pre,Map<String,byte[]> files)throws Exception{
@@ -598,7 +630,7 @@ public final class StudioTheme {
    boolean dragging=drag(base);
    x.append("<Button h=\"#screen_height\" w=\"#screen_width\"><Triggers><Trigger action=\"up\"><ExternCommand command=\"unlock\" condition=\"gt(#touch_begin_y-#touch_y,440)\"/>").append(dragging?"<VariableCommand name=\"studio_drag\" expression=\"0\"/>":"").append("</Trigger>");
    if(dragging)x.append("<Trigger action=\"down\"><VariableCommand name=\"studio_drag\" expression=\"1\"/></Trigger><Trigger action=\"cancel\"><VariableCommand name=\"studio_drag\" expression=\"0\"/></Trigger>");
-   if(base.b("dbl",true))x.append("<Trigger action=\"double\"><VariableCommand name=\"studio_hidden\" expression=\"1-#studio_hidden\"/></Trigger>");x.append("</Triggers></Button>");shortcutButtons(x,base);x.append("</Lockscreen>");
+   if(base.b("dbl",true))x.append("<Trigger action=\"double\"><VariableCommand name=\"studio_hidden\" expression=\"1-#studio_hidden\"/></Trigger>");x.append("</Triggers></Button>");shortcutButtons(x,base);music(x,base,base.color(false),files);x.append("</Lockscreen>");
    byte[] manifest=x.toString().getBytes("UTF-8");files.put("advance/manifest.xml",manifest);for(String ratio:new String[]{"11x5","13x6","19x9","20x9","2x1","301x135","403x180","67x30"})files.put("advance/"+ratio+"/manifest.xml",manifest);
    if(bg!=null)bg.recycle();
    return ThemeBuilder.packageTheme(ThemeBuilder.wallpaperComponent(jpg==null?new byte[0]:jpg,!base.b("replaceWallpaper",false)||bgMode.equals("atmos")),zip(files));
