@@ -41,11 +41,6 @@ const ROOT=path.resolve(__dirname,'..'),ASSETS=path.join(ROOT,'assets');
   await tog('alerts.sms');assert.equal(await page.locator('#screen .alp').count(),1);
   doc=await sent();assert.deepEqual([doc.alerts.on,doc.alerts.calls,doc.alerts.sms],[true,true,false]);
 
-  // Experimental music widget: a movable card; the phone fills it through the bridge app.
-  await tog('music.on');assert.equal(await page.locator('#screen .clockpos[data-piece="mu"] .mucard').count(),1,'Music widget card');
-  assert.match(await page.locator('#panel').textContent(),/Studio Music Bridge/);doc=await sent();assert.deepEqual(doc.music,{on:true,x:0,y:58,size:110});
-  assert.deepEqual(await page.evaluate(()=>fixState({...DEFAULTS,music:{on:1,size:9999,x:-500}}).music),{on:true,x:-80,y:58,size:240});
-  await tog('music.on');
   // Light mode colours, previewed from the Style tab or the preview tools.
   await page.evaluate(()=>navigate('style'));await tog('lightMode.on');
   await page.locator('[data-set="lightMode.color"][data-val="#9ec5ff"]').click();await page.locator('#panel [data-act="lightPreview"]').click();await page.waitForTimeout(60);

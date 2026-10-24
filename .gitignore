@@ -6,4 +6,3 @@ node_modules/
 *.keystore
 *.jks
 *.p12
-bridge/build/
