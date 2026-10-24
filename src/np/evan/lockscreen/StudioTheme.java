@@ -466,6 +466,9 @@ public final class StudioTheme {
   }
   x.append("</Group>");
  }
+ /** A tap rather than a swipe: the finger lifted close to where it went down. Realme's engine only fires "click"
+  *  for taps shorter than 100 ms (then waits 300 ms for a double tap), so ordinary taps never reached it; "up" always fires. */
+ static final String TAP="lt(abs(#touch_x-#touch_begin_x)+abs(#touch_y-#touch_begin_y),48)";
  /** Touch targets for the shortcuts, drawn once over everything; the engine passes a touch to every button under it. */
  private static void shortcutButtons(StringBuilder x,Spec s){
   List<JSONObject> items=shortcutItems(s);if(items.isEmpty())return;String[] row=shortcutRow(s,items.size());int size=Integer.parseInt(row[2]);double gap=Double.parseDouble(row[3]);boolean haptic=s.j.optJSONObject("shortcuts").optBoolean("haptic",true);
@@ -479,7 +482,7 @@ public final class StudioTheme {
     case "camera":cmd="<IntentCommand action=\"android.media.action.STILL_IMAGE_CAMERA_SECURE\""+(camera!=null&&camera.matches("[A-Za-z0-9_.]{1,200}")?" package=\""+camera+"\"":"")+"/>";break;
     default:cmd="<IntentCommand action=\"android.intent.action.MAIN\" category=\"android.intent.category.LAUNCHER\" package=\""+it.optString("pkg")+"\" class=\""+esc(it.optString("cls"))+"\"/>";
    }
-   x.append("<Button x=\"").append(row[0]).append("+").append(fmt(i*(size+gap))).append("\" y=\"").append(row[1]).append("\" w=\"").append(size).append("\" h=\"").append(size).append("\" visibility=\"eq(#studio_hidden,0)\"><Triggers><Trigger action=\"click\">").append(haptic?"<VibratorCommand duration=\"18\"/>":"").append(cmd).append("</Trigger></Triggers></Button>");
+   x.append("<Button x=\"").append(row[0]).append("+").append(fmt(i*(size+gap))).append("\" y=\"").append(row[1]).append("\" w=\"").append(size).append("\" h=\"").append(size).append("\" visibility=\"eq(#studio_hidden,0)\"><Triggers><Trigger action=\"up\" condition=\"").append(TAP).append("\">").append(haptic?"<VibratorCommand duration=\"18\"/>":"").append(cmd).append("</Trigger></Triggers></Button>");
   }
  }
  /** Missed-call and unread-message badges; each shows only above zero and the pair stays centred. */

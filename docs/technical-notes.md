@@ -44,7 +44,9 @@ and rim.
 **Engine features used for shortcuts, alerts, light mode and water** (also from the
 decompiled engine):
 
-- **Shortcuts** are `Button`s with `<Trigger action="click">`. The engine passes a touch to
+- **Shortcuts** are `Button`s with `<Trigger action="up">`, gated by a condition that the finger
+  moved less than 48 px. The engine fires `click` only for taps shorter than 100 ms, so in
+  0.9.0 most taps did nothing. The engine passes a touch to
   every button under the finger, so they sit alongside the full-screen unlock button.
   - Apps open with `IntentCommand` (MAIN/LAUNCHER, package and activity).
   - The camera uses `android.media.action.STILL_IMAGE_CAMERA_SECURE` on the camera package
