@@ -510,10 +510,11 @@ public final class StudioTheme {
    double bx=left+i*ic*1.6;
    if(i==1){image(x,"music_play.png",null,fmt(bx),fmt(top),null,null," visibility=\"eq("+state+",0)\"");image(x,"music_pause.png",null,fmt(bx),fmt(top),null,null," visibility=\"eq("+state+",1)\"");}
    else image(x,"music_"+(i==0?"prev":"next")+".png",null,fmt(bx),fmt(top),null,null,null);
-   // Buttons named like this are wired to play/pause/previous/next by the engine itself; their hit area is the icon, a little larger.
+   // Only MusicButton elements with these names are wired to play/pause/previous/next by the engine (a plain Button is not);
+   // the engine itself lets only one of play and pause take touches, depending on the playing state.
    String bxs=fmt(bx-ic*.25),bys=fmt(top-ic*.25),bs=fmt(ic*1.5);
-   x.append("<Button name=\"").append(names[i]).append("\" x=\"").append(bxs).append("\" y=\"").append(bys).append("\" w=\"").append(bs).append("\" h=\"").append(bs).append("\"/>");
-   if(i==1)x.append("<Button name=\"music_pause\" x=\"").append(bxs).append("\" y=\"").append(bys).append("\" w=\"").append(bs).append("\" h=\"").append(bs).append("\"/>");
+   x.append("<MusicButton name=\"").append(names[i]).append("\" x=\"").append(bxs).append("\" y=\"").append(bys).append("\" w=\"").append(bs).append("\" h=\"").append(bs).append("\"/>");
+   if(i==1)x.append("<MusicButton name=\"music_pause\" x=\"").append(bxs).append("\" y=\"").append(bys).append("\" w=\"").append(bs).append("\" h=\"").append(bs).append("\"/>");
   }
   x.append("</MusicControl>");
  }

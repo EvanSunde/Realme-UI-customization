@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="np.evan.musicbridge" android:versionCode="1" android:versionName="0.1">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="np.evan.musicbridge" android:versionCode="2" android:versionName="0.2">
  <!-- Target 28 on purpose: Realme's lock-screen engine starts the service with startForegroundService, and this keeps the
       test free of Android 14's foreground-service type rules and scoped storage while we find out what works. -->
  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="28"/>
@@ -10,11 +10,13 @@
    <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
   </activity>
   <!-- The lock-screen engine looks for exactly one service answering this action. -->
-  <service android:name=".BridgeService" android:exported="true">
+  <!-- Own process: restarting it makes System UI reconnect, and a reconnect is when the engine re-reads the song and cover. -->
+  <service android:name=".BridgeService" android:exported="true" android:process=":engine">
    <intent-filter><action android:name="com.oplus.music.service.command"/></intent-filter>
   </service>
   <service android:name=".MediaListener" android:exported="true" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
    <intent-filter><action android:name="android.service.notification.NotificationListenerService"/></intent-filter>
   </service>
+  <receiver android:name=".ControlReceiver" android:exported="false"/>
  </application>
 </manifest>
