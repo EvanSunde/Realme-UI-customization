@@ -38,9 +38,12 @@ backs up everything before it changes it, and can put it all back with one tap.
   yearly) and a daily quote from your own list. Both can be moved like the clock.
 - Charging styles: glow pulse, colour shift, battery fill, charge ring or energy bar.
 - Rings layout, and an optional seconds hand for Analog.
+- Lock-screen shortcuts (apps, camera, ringer, Wi‑Fi, mobile data), missed-call and
+  unread-message badges, colours that switch with the system light/dark theme, and a water
+  ripple background.
 - Depth extras: choose which digits sit in front of the subject. Also: the subject's shadow
   on the clock, rim light from the clock, digits filled with your photo, a weight that
-  changes through the hour, and parallax between the clock and the photo.
+  changes through the hour, and parallax between the clock and the photo (tilt, drag or both).
 - Applies as a native Theme Store theme, with a confirm-or-revert timer in case
   something looks wrong.
 
